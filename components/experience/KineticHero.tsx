@@ -23,43 +23,32 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
 
     const ctx = gsap.context(() => {
       gsap.from("[data-hero-line]", {
-        yPercent: 110,
-        rotateX: -22,
+        yPercent: 72,
+        rotateX: -16,
         opacity: 0,
-        duration: 1.15,
-        stagger: .1,
+        duration: 1.05,
+        stagger: .11,
         ease: "power4.out",
       });
 
       gsap.from("[data-hero-meta]", {
         opacity: 0,
-        y: 18,
-        duration: .8,
-        delay: .55,
+        y: 14,
+        duration: .75,
+        delay: .5,
         stagger: .07,
         ease: "power2.out",
       });
 
       gsap.to("[data-kinetic-primary]", {
-        letterSpacing: "-0.075em",
-        scaleX: 1.025,
+        letterSpacing: "-0.055em",
+        scaleX: 1.012,
         transformOrigin: "50% 50%",
         scrollTrigger: {
           trigger: rootRef.current,
           start: "top top",
           end: "bottom top",
           scrub: true,
-        },
-      });
-
-      gsap.to("[data-hero-orbit]", {
-        rotate: 180,
-        yPercent: 70,
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
         },
       });
     }, rootRef);
@@ -90,11 +79,11 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
                 : "";
             const accentClass = i === 1 ? " hero-line--accent" : "";
             const lineStyle = line.length >= 17
-              ? { fontSize: "clamp(46px, 9.2vw, 166px)" }
+              ? { fontSize: "clamp(44px, 8.8vw, 158px)" }
               : line.length >= 10
-                ? { fontSize: i === 2 ? "clamp(48px, 10.3vw, 186px)" : "clamp(50px, 12vw, 190px)" }
+                ? { fontSize: i === 2 ? "clamp(46px, 9.8vw, 174px)" : "clamp(48px, 11.2vw, 178px)" }
                 : line.length >= 8
-                  ? { fontSize: "clamp(44px, 12vw, 190px)" }
+                  ? { fontSize: "clamp(44px, 11.2vw, 178px)" }
                   : undefined;
 
             return (
@@ -109,7 +98,6 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
           })}
         </h1>
       </div>
-      <div className="hero-orbit" data-hero-orbit aria-hidden="true"><span /></div>
       <div className="hero-bottom" data-hero-meta style={{ minWidth: 0 }}>
         <p style={{ maxWidth: "min(100%, 34ch)", minWidth: 0 }}>{supporting}</p>
         <div className="hero-actions">
