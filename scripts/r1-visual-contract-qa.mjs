@@ -8,7 +8,7 @@ async function waitForServer(url, attempts = 60) {
     try { const response = await fetch(url); if (response.ok) return; } catch {}
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
-  throw new Error(`R1 visual-contract server did not become ready: ${url}`);
+  throw new Error(`R2 visual-contract server did not become ready: ${url}`);
 }
 
 const server = spawn(process.execPath, ["server.js"], {
@@ -41,26 +41,64 @@ async function railContract(page, label, contentSelector) {
   invariant(!state.overlap, `${label}: fixed rail overlaps ${contentSelector} (${state.contentBottom} > ${state.railTop - 8})`);
 }
 
+async function typographyContract(page, label) {
+  const state = await page.evaluate(() => {
+    const rects = (selector) => [...document.querySelectorAll(selector)].map((node) => {
+      const rect = node.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, width: rect.width, height: rect.height };
+    });
+    const overlaps = (items) => items.slice(0, -1).some((item, index) => item.bottom > items[index + 1].top + 2);
+    const heroLines = rects("[data-hero-line]");
+    const contactLines = rects(".contact-title-line");
+    const heroOverflow = [...document.querySelectorAll(".hero-line")].map((node) => getComputedStyle(node).overflowY);
+    const contact = document.querySelector(".contact");
+    const contactStyle = contact ? getComputedStyle(contact) : null;
+    return {
+      heroLines,
+      contactLines,
+      heroOverlap: overlaps(heroLines),
+      contactOverlap: overlaps(contactLines),
+      heroOverflow,
+      orbitPresent: Boolean(document.querySelector(".hero-orbit")),
+      contactBackgroundColor: contactStyle?.backgroundColor ?? null,
+      contactBackgroundImage: contactStyle?.backgroundImage ?? null,
+    };
+  });
+
+  invariant(state.heroLines.length === 3, `${label}: expected 3 hero lines, got ${state.heroLines.length}`);
+  invariant(!state.heroOverlap, `${label}: hero title lines overlap`);
+  invariant(state.contactLines.length >= 2, `${label}: contact title lines missing`);
+  invariant(!state.contactOverlap, `${label}: contact title lines overlap`);
+  invariant(state.heroOverflow.every((value) => value !== "hidden"), `${label}: hero line still clips glyphs with overflow:hidden`);
+  invariant(!state.orbitPresent, `${label}: ornamental hero orbit must not exist in R2`);
+  invariant(state.contactBackgroundColor !== "rgb(200, 255, 26)", `${label}: contact still uses flat signal-lime background`);
+  invariant(state.contactBackgroundImage && state.contactBackgroundImage !== "none", `${label}: contact requires controlled signal field background`);
+}
+
 try {
   await waitForServer(`${baseUrl}/en`);
   const browser = await chromium.launch({ headless: true });
 
-  const desktop = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
-  const desktopPage = await desktop.newPage();
-  await desktopPage.goto(`${baseUrl}/en`, { waitUntil: "domcontentloaded" });
-  const desktopState = await desktopPage.evaluate(() => ({
-    rail: getComputedStyle(document.querySelector(".mobile-rail")).display,
-    desktop: getComputedStyle(document.querySelector(".desktop-nav")).display,
-  }));
-  invariant(desktopState.rail === "none", `desktop: mobile rail leaked into desktop (${desktopState.rail})`);
-  invariant(desktopState.desktop !== "none", "desktop: primary navigation is hidden");
-  await desktop.close();
+  for (const locale of ["en", "es"]) {
+    const desktop = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+    const desktopPage = await desktop.newPage();
+    await desktopPage.goto(`${baseUrl}/${locale}`, { waitUntil: "domcontentloaded" });
+    const desktopState = await desktopPage.evaluate(() => ({
+      rail: getComputedStyle(document.querySelector(".mobile-rail")).display,
+      desktop: getComputedStyle(document.querySelector(".desktop-nav")).display,
+    }));
+    invariant(desktopState.rail === "none", `${locale}-desktop: mobile rail leaked into desktop (${desktopState.rail})`);
+    invariant(desktopState.desktop !== "none", `${locale}-desktop: primary navigation is hidden`);
+    await typographyContract(desktopPage, `${locale}-desktop`);
+    await desktop.close();
+  }
 
   for (const locale of ["en", "es"]) {
     const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
     const page = await mobile.newPage();
     await page.goto(`${baseUrl}/${locale}`, { waitUntil: "domcontentloaded" });
     await railContract(page, `${locale}-home-mobile`, ".hero-actions");
+    await typographyContract(page, `${locale}-mobile`);
     await mobile.close();
   }
 
@@ -71,7 +109,7 @@ try {
   await caseMobile.close();
 
   await browser.close();
-  console.log("R1 visual contract QA: PASS");
+  console.log("R2 visual contract QA: PASS");
 } finally {
   server.kill("SIGTERM");
 }
