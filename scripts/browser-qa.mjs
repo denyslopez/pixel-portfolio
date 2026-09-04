@@ -53,6 +53,24 @@ async function diagnostics(page) {
       .filter((item) => item.width > 0 && (item.right > innerWidth + 1 || item.left < -1))
       .sort((a, b) => Math.max(b.right - innerWidth, -b.left) - Math.max(a.right - innerWidth, -a.left))
       .slice(0, 12);
+    const scrollContainers = [document.documentElement, document.body, ...document.querySelectorAll("body *")]
+      .map((element) => {
+        const className = typeof element.className === "string" ? element.className : "";
+        const style = getComputedStyle(element);
+        return {
+          tag: element.tagName.toLowerCase(),
+          id: element.id || null,
+          className: className || null,
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          overflowX: style.overflowX,
+          transform: style.transform,
+          text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 90),
+        };
+      })
+      .filter((item) => item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 1)
+      .sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth))
+      .slice(0, 20);
 
     return {
       url: location.href,
@@ -62,6 +80,7 @@ async function diagnostics(page) {
       scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
       overflowX: document.documentElement.scrollWidth > innerWidth,
       overflowElements,
+      scrollContainers,
       canvas: Boolean(immersive?.querySelector("canvas")),
       gpuStage: immersive?.getAttribute("data-stage") ?? null,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -79,7 +98,7 @@ function assertCore(name, result, locale) {
   invariant(result.lang === locale, `${name}: document language drift (${result.lang} !== ${locale})`);
   invariant(
     !result.overflowX,
-    `${name}: horizontal overflow detected (${result.scroll[0]} > ${result.viewport[0]}). Offenders: ${JSON.stringify(result.overflowElements)}`,
+    `${name}: horizontal overflow detected (${result.scroll[0]} > ${result.viewport[0]}). Offenders: ${JSON.stringify(result.overflowElements)}. Scroll containers: ${JSON.stringify(result.scrollContainers)}`,
   );
 }
 
@@ -111,9 +130,6 @@ const persistReport = () => writeFile(`${outputDir}/diagnostics.json`, JSON.stri
 try {
   await waitForServer(`${baseUrl}/en`);
 
-  // Pass A: validate the real GPU/kinetic runtime. No screenshots are taken
-  // from this browser because headless Chromium can deadlock while capturing
-  // an actively composited WebGL surface after scroll.
   const gpuBrowser = await chromium.launch({
     headless: true,
     args: ["--enable-webgl", "--ignore-gpu-blocklist", "--use-angle=swiftshader"],
@@ -179,8 +195,6 @@ try {
   await switchContext.close();
   await gpuBrowser.close();
 
-  // Pass B: static visual evidence under the accessibility/reduced-motion mode.
-  // This keeps screenshots deterministic while also validating the required fallback.
   const visualBrowser = await chromium.launch({ headless: true });
 
   async function visualCase({ name, path, locale, width, height, scrollTo = null, caseMedia = false }) {
