@@ -1,10 +1,32 @@
-# Pixel Portfolio
-A free developer / designer portfolio website template
+# PORTFOLIO-001 — Visual Edition 001
 
-This Bootstrap 4 based portfolio website template will help you save time and clearly communicate your expertise.
+Bilingual personal portfolio for Denys Lopez.
 
-If you want to use this as your GitHub profile site and use a custom domain, follow these instructions: https://help.github.com/articles/using-a-custom-domain-with-github-pages/
+## Positioning
+**AI Product Engineer & Design Engineer**
 
-Demo: https://jacoblett.github.io/pixel-portfolio/
+## Markets
+Canada · United States · El Salvador
 
-![alt text](https://raw.githubusercontent.com/JacobLett/pixel-portfolio/master/screenshot.png "Free web developer portfolio website template")
+## Languages
+English (`/en`) · Spanish (`/es`)
+
+## Experience architecture
+- Next.js + React + TypeScript
+- GSAP kinetic typography
+- Three.js/WebGL immersive field
+- Reduced-motion fallback
+- Stable content core + mutable monthly visual-edition layer
+
+Kinetic typography is a signature behavior inside the broader immersive experience; it does not replace the GPU/spatial layer.
+
+## Development
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run build
+```
+
+## Legacy archive
+The 2017 portfolio code is preserved on branch `legacy/2017`.
