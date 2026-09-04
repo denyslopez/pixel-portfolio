@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Capabilities } from "@/components/Capabilities";
+import { DocumentLocale } from "@/components/DocumentLocale";
 import { Nav } from "@/components/Nav";
 import { SelectedWork } from "@/components/SelectedWork";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
@@ -32,6 +33,7 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
 
   return (
     <main>
+      <DocumentLocale locale={locale} />
       <ImmersiveField />
       <Nav locale={locale} labels={c.nav} />
       <KineticHero {...c.hero} />
