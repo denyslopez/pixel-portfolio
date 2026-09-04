@@ -68,6 +68,20 @@
   letter-spacing: -.05em;
 }
 
+/* Kinetic hero fit rules: preserve scale without sacrificing legibility. */
+.hero-line--medium {
+  font-size: clamp(64px, 9.8vw, 174px);
+}
+
+.hero-line--long {
+  font-size: clamp(58px, 8.35vw, 150px);
+  letter-spacing: -.065em;
+}
+
+.hero-line:nth-child(2) > span {
+  padding-right: .025em;
+}
+
 @media (max-width: 900px) {
   .practice-intro {
     grid-template-columns: 1fr;
@@ -92,6 +106,18 @@
 
   .practice-stage:nth-child(even) strong {
     text-align: left;
+  }
+
+  .hero-line--medium,
+  .hero-line--long {
+    font-size: clamp(50px, 14vw, 102px);
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-line--medium,
+  .hero-line--long {
+    font-size: clamp(44px, 13.2vw, 78px);
   }
 }
 
