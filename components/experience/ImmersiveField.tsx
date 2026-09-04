@@ -48,37 +48,39 @@ const fragmentShader = `
     float wSum = max(.0001, w0 + w1 + w2 + w3);
     w0 /= wSum; w1 /= wSum; w2 /= wSum; w3 /= wSum;
 
-    float flow = noise(uv * 3.6 + vec2(uTime * .055, -uTime * .035));
-    flow += .5 * noise(uv * 7.2 - vec2(uTime * .025, uTime * .04));
+    float flow = noise(uv * 3.2 + vec2(uTime * .045, -uTime * .03));
+    flow += .46 * noise(uv * 6.6 - vec2(uTime * .022, uTime * .032));
 
-    float design = .5 + .5 * sin((uv.y + flow * .11) * 18.0 + uTime * .22);
-    design *= smoothstep(.9, .12, length(centered - pointer * .16));
+    float design = .5 + .5 * sin((uv.y * 13.0 + uv.x * 3.0) + flow * 4.2 + uTime * .18);
+    design *= smoothstep(1.0, .14, length(centered - pointer * .13));
 
-    float gx = .5 + .5 * sin(uv.x * 34.0 + uTime * .34);
-    float gy = .5 + .5 * sin(uv.y * 24.0 - uTime * .21);
-    float build = pow(gx * gy, 3.0) + .22 * flow;
+    float gx = .5 + .5 * sin(uv.x * 27.0 + uTime * .25 + flow * 2.0);
+    float gy = .5 + .5 * sin(uv.y * 19.0 - uTime * .18 - flow * 1.4);
+    float build = pow(max(gx * gy, 0.0), 2.4) + .18 * flow;
 
-    float radial = length(centered - pointer * .24);
-    float ai = .5 + .5 * sin(radial * 42.0 - uTime * .78 + flow * 5.0);
-    ai *= smoothstep(.96, .08, radial);
+    float aiA = sin(uv.x * 15.0 + uv.y * 8.0 + uTime * .42 + flow * 3.1);
+    float aiB = sin(uv.x * 6.0 - uv.y * 14.0 - uTime * .31 + flow * 2.4);
+    float ai = .5 + .5 * (aiA * aiB);
+    ai *= smoothstep(1.0, .12, length(centered - pointer * .15));
 
-    float growth = .5 + .5 * sin(length(centered) * 31.0 - uTime * 1.05 - uScroll * .0022);
-    growth *= smoothstep(1.05, .1, length(centered));
+    float growth = .5 + .5 * sin(uv.x * 8.0 + uv.y * 17.0 - uTime * .54 - uScroll * .0015 + flow * 4.0);
+    growth = pow(max(growth, 0.0), 1.35);
+    growth *= smoothstep(1.05, .12, length(centered));
 
     float energy = design * w0 + build * w1 + ai * w2 + growth * w3;
-    float pointerGlow = smoothstep(.52, .02, length(centered - pointer * .25));
-    energy += pointerGlow * mix(.12, .32, w2 + w3);
+    float pointerGlow = smoothstep(.58, .025, length(centered - pointer * .23));
+    energy += pointerGlow * mix(.08, .22, w2 + w3);
 
-    vec3 base = vec3(.018);
-    vec3 acid = vec3(.72, 1.0, .08);
-    vec3 warm = vec3(.96, .95, .91);
+    vec3 base = vec3(.014);
+    vec3 signal = vec3(.56, .86, .08);
+    vec3 warm = vec3(.94, .93, .89);
     vec3 color = base;
-    color += acid * pow(max(energy, 0.0), 1.65) * (.32 + .26 * (w2 + w3));
-    color += warm * pow(max(flow - .72, 0.0), 2.0) * (.12 + .16 * w1);
+    color += signal * pow(max(energy, 0.0), 1.72) * (.22 + .2 * (w2 + w3));
+    color += warm * pow(max(flow - .74, 0.0), 2.15) * (.08 + .11 * w1);
 
-    float vignette = smoothstep(.98, .24, length(centered));
-    color *= .6 + vignette * .4;
-    gl_FragColor = vec4(color, .94);
+    float vignette = smoothstep(1.02, .25, length(centered));
+    color *= .58 + vignette * .42;
+    gl_FragColor = vec4(color, .9);
   }
 `;
 
