@@ -78,9 +78,16 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
                 ? " hero-line--medium"
                 : "";
             const accentClass = i === 1 ? " hero-line--accent" : "";
+            const longLineStyle = line.length >= 17
+              ? { fontSize: "clamp(56px, 9.4vw, 170px)" }
+              : undefined;
 
             return (
-              <span className={`hero-line${accentClass}${lengthClass}`} key={line}>
+              <span
+                className={`hero-line${accentClass}${lengthClass}`}
+                style={longLineStyle}
+                key={line}
+              >
                 <span data-hero-line>{line}</span>
               </span>
             );
