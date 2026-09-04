@@ -39,17 +39,7 @@ async function captureViaCdp(page, path, timeoutMs = 8_000) {
   }
 }
 
-async function captureViewport(page, path, preferStatic = false) {
-  if (preferStatic) {
-    await page.evaluate(() => {
-      const immersive = document.querySelector(".immersive-field");
-      if (immersive instanceof HTMLElement) immersive.style.visibility = "hidden";
-    });
-    await page.waitForTimeout(80);
-    await captureViaCdp(page, path);
-    return "gpu-hidden-for-scrolled-capture";
-  }
-
+async function captureViewport(page, path) {
   try {
     await captureViaCdp(page, path, 7_000);
     return "gpu-visible";
@@ -62,6 +52,47 @@ async function captureViewport(page, path, preferStatic = false) {
     await captureViaCdp(page, path, 8_000);
     return "gpu-hidden-fallback";
   }
+}
+
+async function stageSectionForCapture(page, selector) {
+  await page.evaluate((targetSelector) => {
+    const target = document.querySelector(targetSelector);
+    if (!(target instanceof HTMLElement)) throw new Error(`Snapshot target missing: ${targetSelector}`);
+
+    const overlay = document.createElement("div");
+    overlay.setAttribute("data-qa-snapshot", targetSelector);
+    Object.assign(overlay.style, {
+      position: "fixed",
+      inset: "0",
+      zIndex: "2147483647",
+      overflow: "hidden",
+      background: getComputedStyle(target).backgroundColor || "#f3f2ed",
+    });
+
+    const clone = target.cloneNode(true);
+    if (!(clone instanceof HTMLElement)) throw new Error("Unable to clone snapshot target");
+    clone.removeAttribute("id");
+    Object.assign(clone.style, {
+      position: "relative",
+      minHeight: "100vh",
+      height: "100vh",
+      padding: "58px 60px 42px",
+      overflow: "hidden",
+    });
+
+    const heading = clone.querySelector(".section-heading");
+    if (heading instanceof HTMLElement) heading.style.marginBottom = "42px";
+    clone.querySelectorAll(".work-row").forEach((row) => {
+      if (row instanceof HTMLElement) row.style.minHeight = "145px";
+    });
+
+    overlay.appendChild(clone);
+    document.body.appendChild(overlay);
+
+    const immersive = document.querySelector(".immersive-field");
+    if (immersive instanceof HTMLElement) immersive.style.visibility = "hidden";
+  }, selector);
+  await page.waitForTimeout(100);
 }
 
 const server = spawn(process.execPath, ["server.js"], {
@@ -85,7 +116,20 @@ try {
     args: ["--enable-webgl", "--ignore-gpu-blocklist", "--use-angle=swiftshader"],
   });
 
-  async function runCase({ name, path, width, height, locale, reducedMotion = false, scrollTo = null, expectWork = false, expectCaseMedia = false, expectHeroFit = false }) {
+  async function runCase({
+    name,
+    path,
+    width,
+    height,
+    locale,
+    reducedMotion = false,
+    scrollTo = null,
+    snapshotSelector = null,
+    skipScreenshot = false,
+    expectWork = false,
+    expectCaseMedia = false,
+    expectHeroFit = false,
+  }) {
     const context = await browser.newContext({
       viewport: { width, height },
       reducedMotion: reducedMotion ? "reduce" : "no-preference",
@@ -138,7 +182,8 @@ try {
         scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
         overflowX: document.documentElement.scrollWidth > innerWidth,
         canvas: Boolean(canvas),
-        fallback: immersive?.dataset?.fallback ?? null,
+        gpuStage: immersive?.getAttribute("data-stage") ?? null,
+        fallback: immersive?.getAttribute("data-fallback") ?? null,
         reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
         switchHref: localeSwitch?.getAttribute("href") ?? null,
         h1: document.querySelector("h1")?.textContent?.trim() ?? null,
@@ -171,17 +216,22 @@ try {
       invariant(diagnostics.imageFailures.length === 0, `${name}: case-study media failed to load`);
     }
 
-    report[name] = { ...diagnostics, browserErrors, screenshotMode: "pending" };
+    report[name] = { ...diagnostics, browserErrors, screenshotMode: skipScreenshot ? "skipped-functional" : "pending" };
     await persistReport();
 
-    const screenshotMode = await captureViewport(page, `${outputDir}/${name}.png`, Boolean(scrollTo));
-    report[name].screenshotMode = screenshotMode;
-    await persistReport();
+    if (!skipScreenshot) {
+      if (snapshotSelector) await stageSectionForCapture(page, snapshotSelector);
+      const screenshotMode = await captureViewport(page, `${outputDir}/${name}.png`);
+      report[name].screenshotMode = snapshotSelector ? `isolated-section/${screenshotMode}` : screenshotMode;
+      await persistReport();
+    }
+
     await context.close();
   }
 
   await runCase({ name: "en-home-desktop", path: "/en", width: 1440, height: 1000, locale: "en", expectWork: true, expectHeroFit: true });
-  await runCase({ name: "en-work-desktop", path: "/en", width: 1440, height: 1000, locale: "en", scrollTo: "#work", expectWork: true });
+  await runCase({ name: "en-work-scroll-functional", path: "/en", width: 1440, height: 1000, locale: "en", scrollTo: "#work", skipScreenshot: true, expectWork: true });
+  await runCase({ name: "en-work-desktop", path: "/en", width: 1440, height: 1000, locale: "en", snapshotSelector: "#work", expectWork: true });
   await runCase({ name: "en-home-mobile", path: "/en", width: 390, height: 844, locale: "en", expectWork: true, expectHeroFit: true });
   await runCase({ name: "es-home-desktop", path: "/es", width: 1440, height: 1000, locale: "es", expectWork: true, expectHeroFit: true });
   await runCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", width: 1440, height: 1000, locale: "en", expectCaseMedia: true });
@@ -189,6 +239,22 @@ try {
   await runCase({ name: "villas-desktop", path: "/en/work/villas-de-san-luis", width: 1440, height: 1000, locale: "en", expectCaseMedia: true });
   await runCase({ name: "reveal-mobile", path: "/en/work/reveal-studio", width: 390, height: 844, locale: "en", expectCaseMedia: true });
   await runCase({ name: "en-reduced-motion", path: "/en", width: 1440, height: 1000, locale: "en", reducedMotion: true, expectWork: true, expectHeroFit: true });
+
+  const kineticContext = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+  const kineticPage = await kineticContext.newPage();
+  await kineticPage.goto(`${baseUrl}/en`, { waitUntil: "domcontentloaded" });
+  await kineticPage.waitForTimeout(1200);
+  const initialStage = await kineticPage.locator(".immersive-field").getAttribute("data-stage");
+  await kineticPage.locator("[data-practice-stage]").nth(0).scrollIntoViewIfNeeded();
+  await kineticPage.waitForTimeout(350);
+  await kineticPage.locator("[data-practice-stage]").nth(2).scrollIntoViewIfNeeded();
+  await kineticPage.waitForTimeout(650);
+  const receivedStage = await kineticPage.locator(".immersive-field").getAttribute("data-stage");
+  invariant(initialStage === "0", `GPU stage should initialize at 0, received ${initialStage}`);
+  invariant(Number(receivedStage) >= 2, `Kinetic practice did not drive GPU stage, received ${receivedStage}`);
+  report.kineticGpuBridge = { initialStage, receivedStage, pass: true };
+  await persistReport();
+  await kineticContext.close();
 
   const switchContext = await browser.newContext({ viewport: { width: 1200, height: 900 } });
   const switchPage = await switchContext.newPage();
