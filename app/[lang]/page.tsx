@@ -7,6 +7,7 @@ import { SelectedWork } from "@/components/SelectedWork";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
 import { KineticHero } from "@/components/experience/KineticHero";
 import { KineticPractice } from "@/components/experience/KineticPractice";
+import { getContactLinks, publicContact } from "@/lib/contact";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
 
 export function generateStaticParams() {
@@ -45,13 +46,14 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
   if (!isLocale(lang)) notFound();
   const locale = lang as Locale;
   const c = getContent(locale);
+  const contact = getContactLinks(locale);
 
   return (
     <main>
       <DocumentLocale locale={locale} />
       <ImmersiveField />
       <Nav locale={locale} labels={c.nav} />
-      <KineticHero {...c.hero} />
+      <KineticHero {...c.hero} contactHref={contact.email} />
       <KineticPractice {...c.identity} />
 
       <SelectedWork {...c.work} locale={locale} />
@@ -88,7 +90,14 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
         </h2>
         <div className="contact-bottom">
           <p>{c.contact.body}</p>
-          <span className="contact-cta">{c.contact.cta} ↗</span>
+          <div className="contact-actions" aria-label={locale === "en" ? "Contact options" : "Opciones de contacto"}>
+            <a className="contact-cta" href={contact.email}>
+              Email · {publicContact.email} ↗
+            </a>
+            <a className="contact-cta" href={contact.whatsapp} target="_blank" rel="noreferrer">
+              WhatsApp · {publicContact.whatsappDisplay} ↗
+            </a>
+          </div>
         </div>
       </section>
 
