@@ -41,7 +41,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
 
       gsap.to("[data-kinetic-primary]", {
         letterSpacing: "-0.075em",
-        scaleX: 1.035,
+        scaleX: 1.025,
         transformOrigin: "50% 50%",
         scrollTrigger: {
           trigger: rootRef.current,
@@ -71,11 +71,20 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
       <div className="hero-meta label" data-hero-meta>{eyebrow}</div>
       <div className="hero-title-wrap">
         <h1 id="hero-title" className="hero-title" data-kinetic-primary>
-          {lines.map((line, i) => (
-            <span className={i === 1 ? "hero-line hero-line--accent" : "hero-line"} key={line}>
-              <span data-hero-line>{line}</span>
-            </span>
-          ))}
+          {lines.map((line, i) => {
+            const lengthClass = line.length >= 17
+              ? " hero-line--long"
+              : line.length >= 12
+                ? " hero-line--medium"
+                : "";
+            const accentClass = i === 1 ? " hero-line--accent" : "";
+
+            return (
+              <span className={`hero-line${accentClass}${lengthClass}`} key={line}>
+                <span data-hero-line>{line}</span>
+              </span>
+            );
+          })}
         </h1>
       </div>
       <div className="hero-orbit" data-hero-orbit aria-hidden="true"><span /></div>
