@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./experience.css";
+import "./accessibility.css";
 
 const title = "Denys Lopez — AI Product Engineer & Design Engineer";
 const description = "AI Product Engineer and Design Engineer building intelligent digital products across Canada, the United States and El Salvador.";
