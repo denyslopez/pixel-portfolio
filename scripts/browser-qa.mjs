@@ -36,6 +36,23 @@ async function diagnostics(page) {
       scrollWidth: line.scrollWidth,
       text: line.textContent?.trim() ?? "",
     }));
+    const overflowElements = [...document.querySelectorAll("body *")]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        const className = typeof element.className === "string" ? element.className : "";
+        return {
+          tag: element.tagName.toLowerCase(),
+          id: element.id || null,
+          className: className || null,
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 90),
+        };
+      })
+      .filter((item) => item.width > 0 && (item.right > innerWidth + 1 || item.left < -1))
+      .sort((a, b) => Math.max(b.right - innerWidth, -b.left) - Math.max(a.right - innerWidth, -a.left))
+      .slice(0, 12);
 
     return {
       url: location.href,
@@ -44,6 +61,7 @@ async function diagnostics(page) {
       viewport: [innerWidth, innerHeight],
       scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
       overflowX: document.documentElement.scrollWidth > innerWidth,
+      overflowElements,
       canvas: Boolean(immersive?.querySelector("canvas")),
       gpuStage: immersive?.getAttribute("data-stage") ?? null,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -59,7 +77,10 @@ async function diagnostics(page) {
 
 function assertCore(name, result, locale) {
   invariant(result.lang === locale, `${name}: document language drift (${result.lang} !== ${locale})`);
-  invariant(!result.overflowX, `${name}: horizontal overflow detected (${result.scroll[0]} > ${result.viewport[0]})`);
+  invariant(
+    !result.overflowX,
+    `${name}: horizontal overflow detected (${result.scroll[0]} > ${result.viewport[0]}). Offenders: ${JSON.stringify(result.overflowElements)}`,
+  );
 }
 
 function assertHeroFit(name, result) {
@@ -113,12 +134,14 @@ try {
     invariant(response?.status() === 200, `${spec.name}: expected HTTP 200`);
     await page.waitForTimeout(1600);
     const result = await diagnostics(page);
+    report[spec.name] = { ...result, browserErrors: errors, pass: false };
+    await persistReport();
     assertCore(spec.name, result, spec.locale);
     assertHeroFit(spec.name, result);
     invariant(result.canvas, `${spec.name}: immersive GPU canvas did not initialize`);
     invariant(result.workRows === 3, `${spec.name}: expected 3 selected-work rows`);
     invariant(errors.length === 0, `${spec.name}: browser errors: ${JSON.stringify(errors)}`);
-    report[spec.name] = { ...result, browserErrors: errors, pass: true };
+    report[spec.name].pass = true;
     await persistReport();
     await context.close();
   }
