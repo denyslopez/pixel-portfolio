@@ -81,7 +81,9 @@ body {
   font-size: clamp(58px, 11.2vw, 198px);
 }
 
-.mobile-rail {
+/* Keep the mobile navigation out of the desktop cascade. The selector must
+   outrank .site-nav nav from globals.css. */
+.site-nav .mobile-rail {
   display: none;
 }
 
@@ -155,6 +157,13 @@ body {
     line-height: 1;
     letter-spacing: .035em;
     white-space: nowrap;
+  }
+
+  /* A fixed rail must never cover the first-view conversion surfaces. */
+  .hero,
+  .case-hero,
+  .contact {
+    padding-bottom: 106px;
   }
 
   .contact-title {
