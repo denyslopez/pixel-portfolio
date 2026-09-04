@@ -4,7 +4,9 @@ on:
   pull_request:
     branches: [master]
   push:
-    branches: [feature/portfolio-001-edition-001]
+    branches:
+      - feature/portfolio-001-edition-001
+      - feature/portfolio-001-edition-001-r1
 
 permissions:
   contents: read
