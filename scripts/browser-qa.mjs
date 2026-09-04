@@ -36,6 +36,11 @@ async function diagnostics(page) {
       scrollWidth: line.scrollWidth,
       text: line.textContent?.trim() ?? "",
     }));
+    const practiceStages = [...document.querySelectorAll("[data-practice-stage]")].map((stage) => ({
+      clientWidth: stage.clientWidth,
+      scrollWidth: stage.scrollWidth,
+      text: stage.textContent?.trim().replace(/\s+/g, " ") ?? "",
+    }));
     const overflowElements = [...document.querySelectorAll("body *")]
       .map((element) => {
         const rect = element.getBoundingClientRect();
@@ -90,6 +95,7 @@ async function diagnostics(page) {
       caseMedia: document.querySelectorAll(".case-media img").length,
       imageFailures: images.filter((image) => image.complete && image.naturalWidth === 0),
       heroLines,
+      practiceStages,
     };
   });
 }
@@ -105,6 +111,11 @@ function assertCore(name, result, locale) {
 function assertHeroFit(name, result) {
   const clipped = result.heroLines.filter((line) => line.scrollWidth > line.clientWidth + 2);
   invariant(clipped.length === 0, `${name}: clipped kinetic hero lines: ${JSON.stringify(clipped)}`);
+}
+
+function assertPracticeFit(name, result) {
+  const clipped = result.practiceStages.filter((stage) => stage.scrollWidth > stage.clientWidth + 2);
+  invariant(clipped.length === 0, `${name}: clipped kinetic practice stages: ${JSON.stringify(clipped)}`);
 }
 
 async function waitForCaseMedia(page) {
@@ -155,6 +166,7 @@ try {
     await persistReport();
     assertCore(spec.name, result, spec.locale);
     assertHeroFit(spec.name, result);
+    assertPracticeFit(spec.name, result);
     invariant(result.canvas, `${spec.name}: immersive GPU canvas did not initialize`);
     invariant(result.workRows === 3, `${spec.name}: expected 3 selected-work rows`);
     invariant(errors.length === 0, `${spec.name}: browser errors: ${JSON.stringify(errors)}`);
@@ -173,9 +185,11 @@ try {
   await kineticPage.locator("[data-practice-stage]").nth(2).scrollIntoViewIfNeeded();
   await kineticPage.waitForTimeout(650);
   const receivedStage = await kineticPage.locator(".immersive-field").getAttribute("data-stage");
+  const visualStage = await kineticPage.locator(".practice-section").getAttribute("data-stage");
   invariant(initialStage === "0", `GPU stage should initialize at 0, received ${initialStage}`);
   invariant(Number(receivedStage) >= 2, `Kinetic practice did not drive GPU stage, received ${receivedStage}`);
-  report.kineticGpuBridge = { initialStage, receivedStage, pass: true };
+  invariant(visualStage === receivedStage, `Kinetic visual stage drifted from GPU state (${visualStage} !== ${receivedStage})`);
+  report.kineticGpuBridge = { initialStage, receivedStage, visualStage, pass: true };
   await persistReport();
   await kineticContext.close();
 
@@ -224,7 +238,10 @@ try {
     assertCore(name, result, locale);
     invariant(result.reduced, `${name}: reduced-motion mode not active`);
     invariant(!result.canvas, `${name}: GPU canvas must not initialize under reduced motion`);
-    if (path === "/en" || path === "/es") assertHeroFit(name, result);
+    if (path === "/en" || path === "/es") {
+      assertHeroFit(name, result);
+      assertPracticeFit(name, result);
+    }
     if (caseMedia) {
       invariant(result.caseMedia === 1, `${name}: expected one case-study media image`);
       invariant(result.imageFailures.length === 0, `${name}: case-study media failed to load`);
@@ -242,6 +259,7 @@ try {
   await visualCase({ name: "en-home-mobile", path: "/en", locale: "en", width: 390, height: 844 });
   await visualCase({ name: "es-home-desktop", path: "/es", locale: "es", width: 1440, height: 1000 });
   await visualCase({ name: "es-home-mobile", path: "/es", locale: "es", width: 390, height: 844 });
+  await visualCase({ name: "es-practice-mobile", path: "/es", locale: "es", width: 390, height: 844, scrollTo: ".practice-stage--long" });
   await visualCase({ name: "es-contact-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#contact" });
   await visualCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, caseMedia: true });
   await visualCase({ name: "taller-desktop", path: "/en/work/taller-express", locale: "en", width: 1440, height: 1000, caseMedia: true });
@@ -250,7 +268,7 @@ try {
   await visualCase({ name: "reveal-media-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, scrollTo: ".case-media", caseMedia: true });
 
   await visualBrowser.close();
-  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 11 };
+  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 12, kineticPracticeFit: true };
   await persistReport();
   console.log(JSON.stringify(report, null, 2));
 } finally {
