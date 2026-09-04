@@ -36,29 +36,28 @@ const fragmentShader = `
     vec2 centered = uv - .5;
     centered.x *= 1.5;
 
-    float stage = clamp(uStage, 0.0, 3.0);
     vec2 pointer = (uPointer - .5) * vec2(1.5, 1.0);
-    float d = length(centered - pointer * (.18 + stage * .025));
+    float d = length(centered - pointer * .25);
 
-    float flowScale = 3.2 + stage * .38;
-    float flow = noise(uv * flowScale + vec2(uTime * (.055 + stage * .004), -uTime * .035));
-    flow += .55 * noise(uv * (6.6 + stage * .55) - vec2(uTime * .025, uTime * .04));
+    float stage = clamp(uStage, 0.0, 3.0);
+    float stageNorm = stage / 3.0;
+    float density = mix(2.9, 5.4, stageNorm);
+    float speed = mix(.045, .095, stageNorm);
 
-    float frequency = 14.5 + stage * 2.35;
-    float wave = sin((uv.x + flow * (.12 + stage * .012) + uScroll * .00028) * frequency + uTime * (.42 + stage * .035));
-    float energy = smoothstep(.72, .04, d) * (.52 + .48 * wave);
-    energy += smoothstep(.78, .18, abs(uv.y - .52 - (.07 + stage * .012) * sin(uv.x * (7.5 + stage) + uTime * .28))) * (.1 + stage * .018);
+    float flow = noise(uv * density + vec2(uTime * speed, -uTime * speed * .58));
+    flow += .55 * noise(uv * (density * 2.05) - vec2(uTime * .025, uTime * .04));
+
+    float wave = sin((uv.x + flow * .14 + uScroll * .00028) * mix(14.0, 22.0, stageNorm) + uTime * mix(.34, .7, stageNorm));
+    float energy = smoothstep(.72, .04, d) * (.55 + .45 * wave);
+    energy += smoothstep(.78, .18, abs(uv.y - .52 - .09 * sin(uv.x * 8.0 + uTime * .28))) * mix(.10, .2, stageNorm);
 
     vec3 base = vec3(.018);
     vec3 acid = vec3(.72, 1.0, .08);
     vec3 warm = vec3(.96, .95, .91);
 
     vec3 color = base;
-    color += acid * max(0.0, energy) * (.38 + stage * .055);
-    color += warm * pow(max(flow - (.73 - stage * .018), 0.0), 2.1) * (.14 + stage * .02);
-
-    float stagePulse = .5 + .5 * sin(uTime * .35 + stage * 1.7);
-    color += acid * stagePulse * .018 * stage;
+    color += acid * max(0.0, energy) * mix(.36, .62, stageNorm);
+    color += warm * pow(max(flow - mix(.75, .66, stageNorm), 0.0), 2.1) * mix(.12, .25, stageNorm);
 
     float vignette = smoothstep(.95, .25, length(centered));
     color *= .62 + vignette * .38;
@@ -97,6 +96,7 @@ export function ImmersiveField() {
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
     host.appendChild(renderer.domElement);
+    host.dataset.stage = "0";
 
     let stageTarget = 0;
     const resize = () => renderer.setSize(host.clientWidth, host.clientHeight, false);
@@ -107,6 +107,7 @@ export function ImmersiveField() {
     const onStage = (event: Event) => {
       const detail = (event as CustomEvent<{ stage?: number }>).detail;
       stageTarget = Math.max(0, Math.min(3, detail?.stage ?? 0));
+      host.dataset.stage = String(stageTarget);
     };
 
     resize();
