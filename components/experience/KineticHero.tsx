@@ -67,10 +67,20 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
   }, []);
 
   return (
-    <section ref={rootRef} className="hero" aria-labelledby="hero-title">
-      <div className="hero-meta label" data-hero-meta>{eyebrow}</div>
-      <div className="hero-title-wrap">
-        <h1 id="hero-title" className="hero-title" data-kinetic-primary>
+    <section
+      ref={rootRef}
+      className="hero"
+      aria-labelledby="hero-title"
+      style={{ gridTemplateColumns: "minmax(0, 1fr)" }}
+    >
+      <div className="hero-meta label" data-hero-meta style={{ minWidth: 0 }}>{eyebrow}</div>
+      <div className="hero-title-wrap" style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
+        <h1
+          id="hero-title"
+          className="hero-title"
+          data-kinetic-primary
+          style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}
+        >
           {lines.map((line, i) => {
             const lengthClass = line.length >= 17
               ? " hero-line--long"
@@ -97,7 +107,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
         </h1>
       </div>
       <div className="hero-orbit" data-hero-orbit aria-hidden="true"><span /></div>
-      <div className="hero-bottom" data-hero-meta>
+      <div className="hero-bottom" data-hero-meta style={{ minWidth: 0 }}>
         <p style={{ maxWidth: "min(100%, 34ch)", minWidth: 0 }}>{supporting}</p>
         <div className="hero-actions">
           <a className="text-link" href="#work">{cta} ↘</a>
