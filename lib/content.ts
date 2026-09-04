@@ -7,7 +7,7 @@ export function isLocale(value: string): value is Locale {
 
 const content = {
   en: {
-    nav: { work: "Work", lab: "Lab", about: "About", contact: "Contact" },
+    nav: { work: "Work", lab: "Practice", about: "About", contact: "Contact" },
     hero: {
       eyebrow: "AI Product Engineer / Design Engineer",
       lines: ["I build", "intelligent", "digital products."],
@@ -57,7 +57,7 @@ const content = {
     footer: "Canada / United States / El Salvador",
   },
   es: {
-    nav: { work: "Trabajo", lab: "Lab", about: "Perfil", contact: "Contacto" },
+    nav: { work: "Trabajo", lab: "Práctica", about: "Perfil", contact: "Contacto" },
     hero: {
       eyebrow: "AI Product Engineer / Design Engineer",
       lines: ["Construyo", "productos digitales", "inteligentes."],
