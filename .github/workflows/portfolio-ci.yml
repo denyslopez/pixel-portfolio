@@ -12,7 +12,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,4 +44,19 @@ jobs:
           path: .next/standalone
           include-hidden-files: true
           if-no-files-found: error
+          retention-days: 3
+
+      - name: Install Chromium for browser QA
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser visual QA
+        run: npm run qa:browser
+
+      - name: Upload browser QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-001-browser-qa
+          path: qa/browser
+          if-no-files-found: warn
           retention-days: 3
