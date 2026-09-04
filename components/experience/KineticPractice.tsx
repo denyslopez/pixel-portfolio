@@ -18,11 +18,12 @@ export function KineticPractice({ eyebrow, statement, words, body }: {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dispatchStage = (stage: number) => {
+      rootRef.current?.setAttribute("data-stage", String(stage));
       window.dispatchEvent(new CustomEvent("portfolio:stage", { detail: { stage } }));
     };
 
     if (reduce) {
-      dispatchStage(1);
+      dispatchStage(0);
       return;
     }
 
@@ -68,19 +69,32 @@ export function KineticPractice({ eyebrow, statement, words, body }: {
   }, []);
 
   return (
-    <section ref={rootRef} className="practice-section">
+    <section ref={rootRef} className="practice-section" data-stage="0">
       <div className="practice-intro">
         <span className="label">{eyebrow}</span>
         <h2>{statement}</h2>
       </div>
 
       <div className="practice-sequence">
-        {words.map((word, index) => (
-          <article className="practice-stage" data-practice-stage key={word}>
-            <span className="label">0{index + 1}</span>
-            <strong data-practice-word>{word}</strong>
-          </article>
-        ))}
+        {words.map((word, index) => {
+          const lengthClass = word.length >= 10
+            ? " practice-stage--long"
+            : word.length >= 8
+              ? " practice-stage--medium"
+              : "";
+
+          return (
+            <article
+              className={`practice-stage${lengthClass}`}
+              data-practice-stage
+              data-stage-index={index}
+              key={word}
+            >
+              <span className="label">0{index + 1}</span>
+              <strong data-practice-word>{word}</strong>
+            </article>
+          );
+        })}
       </div>
 
       <p className="practice-copy">{body}</p>
