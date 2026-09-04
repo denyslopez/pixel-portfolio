@@ -41,13 +41,20 @@
   border-bottom: 1px solid var(--line);
 }
 
+.practice-stage .label {
+  transition: color .3s ease, opacity .3s ease;
+}
+
 .practice-stage strong {
   display: block;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   font: 500 clamp(82px, 16vw, 280px)/.7 Georgia, serif;
   letter-spacing: -.08em;
   text-transform: uppercase;
   transform-origin: 0 50%;
+  transition: color .3s ease, text-shadow .3s ease;
   will-change: transform, opacity;
 }
 
@@ -56,8 +63,20 @@
   font-style: italic;
 }
 
-.practice-stage:nth-child(3) strong {
+.practice-section[data-stage="0"] .practice-stage:nth-child(1) strong,
+.practice-section[data-stage="1"] .practice-stage:nth-child(2) strong,
+.practice-section[data-stage="2"] .practice-stage:nth-child(3) strong,
+.practice-section[data-stage="3"] .practice-stage:nth-child(4) strong {
   color: var(--signal);
+  text-shadow: 0 0 42px rgba(200, 255, 26, .08);
+}
+
+.practice-section[data-stage="0"] .practice-stage:nth-child(1) .label,
+.practice-section[data-stage="1"] .practice-stage:nth-child(2) .label,
+.practice-section[data-stage="2"] .practice-stage:nth-child(3) .label,
+.practice-section[data-stage="3"] .practice-stage:nth-child(4) .label {
+  color: var(--signal);
+  opacity: 1;
 }
 
 .practice-copy {
@@ -104,6 +123,14 @@
     font-size: clamp(70px, 20vw, 170px);
   }
 
+  .practice-stage--medium strong {
+    font-size: clamp(56px, 16vw, 145px);
+  }
+
+  .practice-stage--long strong {
+    font-size: clamp(48px, 13.2vw, 128px);
+  }
+
   .practice-stage:nth-child(even) strong {
     text-align: left;
   }
@@ -115,6 +142,25 @@
 }
 
 @media (max-width: 560px) {
+  .practice-stage {
+    min-height: 52vh;
+  }
+
+  .practice-stage strong,
+  .practice-stage--medium strong,
+  .practice-stage--long strong {
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .practice-stage--medium strong {
+    font-size: clamp(54px, 15.5vw, 92px);
+  }
+
+  .practice-stage--long strong {
+    font-size: clamp(46px, 12.8vw, 78px);
+  }
+
   .hero-line--medium,
   .hero-line--long {
     font-size: clamp(44px, 13.2vw, 78px);
