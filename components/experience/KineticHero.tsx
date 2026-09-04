@@ -4,12 +4,13 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
+export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contactHref }: {
   eyebrow: string;
   lines: readonly string[];
   supporting: string;
   cta: string;
   secondary: string;
+  contactHref: string;
 }) {
   const rootRef = useRef<HTMLElement>(null);
 
@@ -113,7 +114,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
         <p style={{ maxWidth: "min(100%, 34ch)", minWidth: 0 }}>{supporting}</p>
         <div className="hero-actions">
           <a className="text-link" href="#work">{cta} ↘</a>
-          <a className="text-link text-link--muted" href="#contact">{secondary} ↗</a>
+          <a className="text-link text-link--muted" href={contactHref}>{secondary} ↗</a>
         </div>
       </div>
     </section>
