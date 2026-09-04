@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://denyslopez.com"),
   title: {
     default: "Denys Lopez — AI Product Engineer & Design Engineer",
     template: "%s — Denys Lopez",
