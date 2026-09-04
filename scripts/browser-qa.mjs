@@ -22,6 +22,23 @@ async function waitForServer(url, attempts = 60) {
   throw new Error(`QA server did not become ready: ${url}`);
 }
 
+async function captureViewport(page, path) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    const result = await Promise.race([
+      session.send("Page.captureScreenshot", {
+        format: "png",
+        fromSurface: true,
+        captureBeyondViewport: false,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`Screenshot timeout: ${path}`)), 12_000)),
+    ]);
+    await writeFile(path, Buffer.from(result.data, "base64"));
+  } finally {
+    await session.detach();
+  }
+}
+
 const server = spawn(process.execPath, ["server.js"], {
   cwd: ".next/standalone",
   env: { ...process.env, PORT: "3100", HOSTNAME: "127.0.0.1" },
@@ -42,7 +59,7 @@ try {
     args: ["--enable-webgl", "--ignore-gpu-blocklist", "--use-angle=swiftshader"],
   });
 
-  async function runCase({ name, path, width, height, locale, reducedMotion = false, scrollTo = null, expectWork = false, expectCaseMedia = false }) {
+  async function runCase({ name, path, width, height, locale, reducedMotion = false, scrollTo = null, expectWork = false, expectCaseMedia = false, expectHeroFit = false }) {
     const context = await browser.newContext({
       viewport: { width, height },
       reducedMotion: reducedMotion ? "reduce" : "no-preference",
@@ -58,7 +75,7 @@ try {
     const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     invariant(response?.status() === 200, `${name}: expected HTTP 200, received ${response?.status()}`);
 
-    await page.waitForTimeout(1600);
+    await page.waitForTimeout(1800);
     if (scrollTo) {
       await page.locator(scrollTo).scrollIntoViewIfNeeded();
       await page.waitForTimeout(700);
@@ -81,6 +98,11 @@ try {
         naturalWidth: image.naturalWidth,
         naturalHeight: image.naturalHeight,
       }));
+      const heroLines = [...document.querySelectorAll(".hero-line")].map((line) => ({
+        clientWidth: line.clientWidth,
+        scrollWidth: line.scrollWidth,
+        text: line.textContent?.trim() ?? "",
+      }));
 
       return {
         url: location.href,
@@ -97,6 +119,7 @@ try {
         workRows: document.querySelectorAll(".work-row").length,
         caseMedia: document.querySelectorAll(".case-media img").length,
         imageFailures: images.filter((image) => image.complete && image.naturalWidth === 0),
+        heroLines,
       };
     });
 
@@ -111,26 +134,31 @@ try {
       invariant(diagnostics.canvas, `${name}: immersive GPU canvas did not initialize`);
     }
 
+    if (expectHeroFit) {
+      const clipped = diagnostics.heroLines.filter((line) => line.scrollWidth > line.clientWidth + 2);
+      invariant(clipped.length === 0, `${name}: clipped kinetic hero lines: ${JSON.stringify(clipped)}`);
+    }
+
     if (expectWork) invariant(diagnostics.workRows === 3, `${name}: expected 3 selected-work rows`);
     if (expectCaseMedia) {
       invariant(diagnostics.caseMedia === 1, `${name}: expected one case-study media image`);
       invariant(diagnostics.imageFailures.length === 0, `${name}: case-study media failed to load`);
     }
 
-    await page.screenshot({ path: `${outputDir}/${name}.png`, fullPage: false });
+    await captureViewport(page, `${outputDir}/${name}.png`);
     report[name] = { ...diagnostics, browserErrors };
     await context.close();
   }
 
-  await runCase({ name: "en-home-desktop", path: "/en", width: 1440, height: 1000, locale: "en", expectWork: true });
+  await runCase({ name: "en-home-desktop", path: "/en", width: 1440, height: 1000, locale: "en", expectWork: true, expectHeroFit: true });
   await runCase({ name: "en-work-desktop", path: "/en", width: 1440, height: 1000, locale: "en", scrollTo: "#work", expectWork: true });
-  await runCase({ name: "en-home-mobile", path: "/en", width: 390, height: 844, locale: "en", expectWork: true });
-  await runCase({ name: "es-home-desktop", path: "/es", width: 1440, height: 1000, locale: "es", expectWork: true });
+  await runCase({ name: "en-home-mobile", path: "/en", width: 390, height: 844, locale: "en", expectWork: true, expectHeroFit: true });
+  await runCase({ name: "es-home-desktop", path: "/es", width: 1440, height: 1000, locale: "es", expectWork: true, expectHeroFit: true });
   await runCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", width: 1440, height: 1000, locale: "en", expectCaseMedia: true });
   await runCase({ name: "taller-desktop", path: "/en/work/taller-express", width: 1440, height: 1000, locale: "en", expectCaseMedia: true });
   await runCase({ name: "villas-desktop", path: "/en/work/villas-de-san-luis", width: 1440, height: 1000, locale: "en", expectCaseMedia: true });
   await runCase({ name: "reveal-mobile", path: "/en/work/reveal-studio", width: 390, height: 844, locale: "en", expectCaseMedia: true });
-  await runCase({ name: "en-reduced-motion", path: "/en", width: 1440, height: 1000, locale: "en", reducedMotion: true, expectWork: true });
+  await runCase({ name: "en-reduced-motion", path: "/en", width: 1440, height: 1000, locale: "en", reducedMotion: true, expectWork: true, expectHeroFit: true });
 
   const switchContext = await browser.newContext({ viewport: { width: 1200, height: 900 } });
   const switchPage = await switchContext.newPage();
