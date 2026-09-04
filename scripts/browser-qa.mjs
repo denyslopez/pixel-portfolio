@@ -22,7 +22,7 @@ async function waitForServer(url, attempts = 60) {
   throw new Error(`QA server did not become ready: ${url}`);
 }
 
-async function captureViewport(page, path) {
+async function captureViaCdp(page, path, timeoutMs = 8_000) {
   const session = await page.context().newCDPSession(page);
   try {
     const result = await Promise.race([
@@ -31,11 +31,36 @@ async function captureViewport(page, path) {
         fromSurface: true,
         captureBeyondViewport: false,
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error(`Screenshot timeout: ${path}`)), 12_000)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`Screenshot timeout: ${path}`)), timeoutMs)),
     ]);
     await writeFile(path, Buffer.from(result.data, "base64"));
   } finally {
-    await session.detach();
+    await session.detach().catch(() => {});
+  }
+}
+
+async function captureViewport(page, path, preferStatic = false) {
+  if (preferStatic) {
+    await page.evaluate(() => {
+      const immersive = document.querySelector(".immersive-field");
+      if (immersive instanceof HTMLElement) immersive.style.visibility = "hidden";
+    });
+    await page.waitForTimeout(80);
+    await captureViaCdp(page, path);
+    return "gpu-hidden-for-scrolled-capture";
+  }
+
+  try {
+    await captureViaCdp(page, path, 7_000);
+    return "gpu-visible";
+  } catch {
+    await page.evaluate(() => {
+      const immersive = document.querySelector(".immersive-field");
+      if (immersive instanceof HTMLElement) immersive.style.visibility = "hidden";
+    });
+    await page.waitForTimeout(80);
+    await captureViaCdp(page, path, 8_000);
+    return "gpu-hidden-fallback";
   }
 }
 
@@ -50,6 +75,7 @@ server.stdout.on("data", (chunk) => { serverLog += chunk.toString(); });
 server.stderr.on("data", (chunk) => { serverLog += chunk.toString(); });
 
 const report = {};
+const persistReport = () => writeFile(`${outputDir}/diagnostics.json`, JSON.stringify(report, null, 2));
 
 try {
   await waitForServer(`${baseUrl}/en`);
@@ -145,8 +171,12 @@ try {
       invariant(diagnostics.imageFailures.length === 0, `${name}: case-study media failed to load`);
     }
 
-    await captureViewport(page, `${outputDir}/${name}.png`);
-    report[name] = { ...diagnostics, browserErrors };
+    report[name] = { ...diagnostics, browserErrors, screenshotMode: "pending" };
+    await persistReport();
+
+    const screenshotMode = await captureViewport(page, `${outputDir}/${name}.png`, Boolean(scrollTo));
+    report[name].screenshotMode = screenshotMode;
+    await persistReport();
     await context.close();
   }
 
@@ -173,12 +203,13 @@ try {
   invariant(after.endsWith("/es/work/reveal-studio"), `Locale switch navigated to unexpected route: ${after}`);
   invariant(lang === "es", `Locale switch did not update document lang: ${lang}`);
   report.localeSwitch = { before, href, after, lang };
+  await persistReport();
   await switchContext.close();
 
   await browser.close();
-  await writeFile(`${outputDir}/diagnostics.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
 } finally {
   server.kill("SIGTERM");
   await writeFile(`${outputDir}/server.log`, serverLog);
+  await persistReport();
 }
