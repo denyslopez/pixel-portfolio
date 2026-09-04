@@ -54,7 +54,7 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
         <p className="wide-copy">{c.identity.body}</p>
       </section>
 
-      <SelectedWork {...c.work} />
+      <SelectedWork {...c.work} locale={locale} />
       <Capabilities {...c.capabilities} />
 
       <section className="section about" id="about">
