@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Capabilities } from "@/components/Capabilities";
-import { DocumentLocale } from "@/components/DocumentLocale";
 import { Nav } from "@/components/Nav";
 import { SelectedWork } from "@/components/SelectedWork";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
@@ -50,7 +49,6 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
 
   return (
     <main>
-      <DocumentLocale locale={locale} />
       <ImmersiveField />
       <Nav locale={locale} labels={c.nav} />
       <KineticHero {...c.hero} contactHref={contact.email} />
@@ -77,12 +75,14 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
         <span className="label">{c.contact.eyebrow}</span>
         <h2 className="contact-title">
           {c.contact.title.map((line) => {
-            const isLongUnbrokenLine = line.length >= 10 && !/\s/.test(line);
+            const lengthClass = line.length >= 10 && !/\s/.test(line)
+              ? " contact-title-line--long"
+              : line.length >= 8
+                ? " contact-title-line--medium"
+                : "";
+
             return (
-              <span
-                key={line}
-                style={isLongUnbrokenLine ? { fontSize: "clamp(46px, 12vw, 205px)" } : undefined}
-              >
+              <span className={`contact-title-line${lengthClass}`} key={line}>
                 {line}
               </span>
             );

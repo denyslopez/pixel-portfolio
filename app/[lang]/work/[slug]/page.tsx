@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DocumentLocale } from "@/components/DocumentLocale";
 import { Nav } from "@/components/Nav";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
@@ -68,7 +67,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
 
   return (
     <main className="case-study">
-      <DocumentLocale locale={locale} />
       <ImmersiveField />
       <Nav locale={locale} labels={c.nav} />
 

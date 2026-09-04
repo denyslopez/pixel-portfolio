@@ -61,6 +61,26 @@ body {
   font-style: italic;
 }
 
+.contact-title {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.contact-title-line {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.contact-title-line--medium {
+  font-size: clamp(68px, 12.8vw, 218px);
+}
+
+.contact-title-line--long {
+  font-size: clamp(58px, 11.2vw, 198px);
+}
+
 .mobile-rail {
   display: none;
 }
@@ -136,10 +156,37 @@ body {
     letter-spacing: .035em;
     white-space: nowrap;
   }
+
+  .contact-title {
+    letter-spacing: -.055em;
+  }
+
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(52px, 17.5vw, 116px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(45px, 14.2vw, 92px);
+  }
+
+  .hero-orbit {
+    right: -4vw;
+    width: 36vw;
+  }
 }
 
 @media (max-width: 430px) {
   .mobile-rail span {
     font-size: 7.5px;
+  }
+
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(50px, 16vw, 74px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(43px, 13.2vw, 66px);
   }
 }
