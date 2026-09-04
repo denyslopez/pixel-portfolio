@@ -74,18 +74,20 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
           {lines.map((line, i) => {
             const lengthClass = line.length >= 17
               ? " hero-line--long"
-              : line.length >= 12
+              : line.length >= 10
                 ? " hero-line--medium"
                 : "";
             const accentClass = i === 1 ? " hero-line--accent" : "";
-            const longLineStyle = line.length >= 17
-              ? { fontSize: "clamp(56px, 9.4vw, 170px)" }
-              : undefined;
+            const lineStyle = line.length >= 17
+              ? { fontSize: "clamp(46px, 9.4vw, 170px)" }
+              : line.length >= 10
+                ? { fontSize: i === 2 ? "clamp(50px, 10.5vw, 190px)" : "clamp(50px, 12vw, 190px)" }
+                : undefined;
 
             return (
               <span
                 className={`hero-line${accentClass}${lengthClass}`}
-                style={longLineStyle}
+                style={lineStyle}
                 key={line}
               >
                 <span data-hero-line>{line}</span>
@@ -96,7 +98,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
       </div>
       <div className="hero-orbit" data-hero-orbit aria-hidden="true"><span /></div>
       <div className="hero-bottom" data-hero-meta>
-        <p>{supporting}</p>
+        <p style={{ maxWidth: "min(100%, 34ch)", minWidth: 0 }}>{supporting}</p>
         <div className="hero-actions">
           <a className="text-link" href="#work">{cta} ↘</a>
           <a className="text-link text-link--muted" href="#contact">{secondary} ↗</a>
