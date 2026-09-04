@@ -90,7 +90,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
                 : "";
             const accentClass = i === 1 ? " hero-line--accent" : "";
             const lineStyle = line.length >= 17
-              ? { fontSize: "clamp(46px, 9.4vw, 170px)" }
+              ? { fontSize: "clamp(46px, 9.2vw, 166px)" }
               : line.length >= 10
                 ? { fontSize: i === 2 ? "clamp(50px, 10.5vw, 190px)" : "clamp(50px, 12vw, 190px)" }
                 : line.length >= 8
