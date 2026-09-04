@@ -90,7 +90,11 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
         </h2>
         <div className="contact-bottom">
           <p>{c.contact.body}</p>
-          <div className="contact-actions" aria-label={locale === "en" ? "Contact options" : "Opciones de contacto"}>
+          <div
+            className="contact-actions"
+            aria-label={locale === "en" ? "Contact options" : "Opciones de contacto"}
+            style={{ display: "flex", flexDirection: "column", gap: "14px", alignItems: "flex-start" }}
+          >
             <a className="contact-cta" href={contact.email}>
               Email · {publicContact.email} ↗
             </a>
