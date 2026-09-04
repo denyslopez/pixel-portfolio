@@ -6,6 +6,7 @@ import { Nav } from "@/components/Nav";
 import { SelectedWork } from "@/components/SelectedWork";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
 import { KineticHero } from "@/components/experience/KineticHero";
+import { KineticPractice } from "@/components/experience/KineticPractice";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
 
 export function generateStaticParams() {
@@ -37,22 +38,7 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
       <ImmersiveField />
       <Nav locale={locale} labels={c.nav} />
       <KineticHero {...c.hero} />
-
-      <section className="section identity-section">
-        <div className="section-heading">
-          <span className="label">{c.identity.eyebrow}</span>
-          <h2>{c.identity.statement}</h2>
-        </div>
-        <div className="identity-words" aria-label={c.identity.words.join(", ")}>
-          {c.identity.words.map((word, index) => (
-            <div className="identity-word" key={word}>
-              <span className="label">0{index + 1}</span>
-              <strong>{word}</strong>
-            </div>
-          ))}
-        </div>
-        <p className="wide-copy">{c.identity.body}</p>
-      </section>
+      <KineticPractice {...c.identity} />
 
       <SelectedWork {...c.work} locale={locale} />
       <Capabilities {...c.capabilities} />
