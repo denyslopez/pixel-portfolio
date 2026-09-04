@@ -17,12 +17,26 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang } = await params;
   if (!isLocale(lang)) return {};
 
+  const title = "AI Product Engineer & Design Engineer";
+  const description = lang === "en"
+    ? "Denys Lopez builds intelligent digital products across Canada, the United States and El Salvador."
+    : "Denys Lopez construye productos digitales inteligentes para Canadá, Estados Unidos y El Salvador.";
+
   return {
-    title: "AI Product Engineer & Design Engineer",
-    description: lang === "en"
-      ? "Denys Lopez builds intelligent digital products across Canada, the United States and El Salvador."
-      : "Denys Lopez construye productos digitales inteligentes para Canadá, Estados Unidos y El Salvador.",
+    title,
+    description,
     alternates: { languages: { en: "/en", es: "/es" } },
+    openGraph: {
+      title: `${title} — Denys Lopez`,
+      description,
+      locale: lang === "en" ? "en_CA" : "es_SV",
+      alternateLocale: [lang === "en" ? "es_SV" : "en_CA"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} — Denys Lopez`,
+      description,
+    },
   };
 }
 
