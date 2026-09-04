@@ -60,7 +60,17 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
       <section className="section contact" id="contact">
         <span className="label">{c.contact.eyebrow}</span>
         <h2 className="contact-title">
-          {c.contact.title.map((line) => <span key={line}>{line}</span>)}
+          {c.contact.title.map((line) => {
+            const isLongUnbrokenLine = line.length >= 10 && !/\s/.test(line);
+            return (
+              <span
+                key={line}
+                style={isLongUnbrokenLine ? { fontSize: "clamp(46px, 12vw, 205px)" } : undefined}
+              >
+                {line}
+              </span>
+            );
+          })}
         </h2>
         <div className="contact-bottom">
           <p>{c.contact.body}</p>
