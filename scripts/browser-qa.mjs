@@ -139,6 +139,7 @@ try {
     { name: "gpu-en-desktop", path: "/en", locale: "en", width: 1440, height: 1000 },
     { name: "gpu-en-mobile", path: "/en", locale: "en", width: 390, height: 844 },
     { name: "gpu-es-desktop", path: "/es", locale: "es", width: 1440, height: 1000 },
+    { name: "gpu-es-mobile", path: "/es", locale: "es", width: 390, height: 844 },
   ]) {
     const context = await gpuBrowser.newContext({ viewport: { width: spec.width, height: spec.height } });
     const page = await context.newPage();
@@ -181,11 +182,14 @@ try {
   const switchContext = await gpuBrowser.newContext({ viewport: { width: 1200, height: 900 } });
   const switchPage = await switchContext.newPage();
   await switchPage.goto(`${baseUrl}/en/work/reveal-studio`, { waitUntil: "domcontentloaded" });
+  await switchPage.waitForTimeout(500);
   const before = switchPage.url();
   const href = await switchPage.locator(".locale-switch a").getAttribute("href");
   invariant(href === "/es/work/reveal-studio", `Locale switch does not preserve case-study route: ${href}`);
-  await switchPage.locator(".locale-switch a").click();
-  await switchPage.waitForLoadState("domcontentloaded");
+  await Promise.all([
+    switchPage.waitForURL(`${baseUrl}/es/work/reveal-studio`, { timeout: 10_000 }),
+    switchPage.locator(".locale-switch a").click(),
+  ]);
   const after = switchPage.url();
   const lang = await switchPage.evaluate(() => document.documentElement.lang);
   invariant(after.endsWith("/es/work/reveal-studio"), `Locale switch navigated to unexpected route: ${after}`);
@@ -237,6 +241,8 @@ try {
   await visualCase({ name: "en-work-desktop", path: "/en", locale: "en", width: 1440, height: 1000, scrollTo: "#work" });
   await visualCase({ name: "en-home-mobile", path: "/en", locale: "en", width: 390, height: 844 });
   await visualCase({ name: "es-home-desktop", path: "/es", locale: "es", width: 1440, height: 1000 });
+  await visualCase({ name: "es-home-mobile", path: "/es", locale: "es", width: 390, height: 844 });
+  await visualCase({ name: "es-contact-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#contact" });
   await visualCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, caseMedia: true });
   await visualCase({ name: "taller-desktop", path: "/en/work/taller-express", locale: "en", width: 1440, height: 1000, caseMedia: true });
   await visualCase({ name: "villas-desktop", path: "/en/work/villas-de-san-luis", locale: "en", width: 1440, height: 1000, caseMedia: true });
@@ -244,7 +250,7 @@ try {
   await visualCase({ name: "reveal-media-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, scrollTo: ".case-media", caseMedia: true });
 
   await visualBrowser.close();
-  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 9 };
+  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 11 };
   await persistReport();
   console.log(JSON.stringify(report, null, 2));
 } finally {
