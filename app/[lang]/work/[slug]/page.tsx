@@ -17,10 +17,23 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const project = getProject(lang, slug);
   if (!project) return {};
 
+  const title = `${project.title} — Denys Lopez`;
+
   return {
     title: project.title,
     description: project.summary,
     alternates: { languages: { en: `/en/work/${slug}`, es: `/es/work/${slug}` } },
+    openGraph: {
+      title,
+      description: project.summary,
+      locale: lang === "en" ? "en_CA" : "es_SV",
+      alternateLocale: [lang === "en" ? "es_SV" : "en_CA"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: project.summary,
+    },
   };
 }
 
