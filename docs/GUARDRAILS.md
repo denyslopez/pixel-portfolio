@@ -1,0 +1,5 @@
+- No fabricated metrics.
+- No fabricated contact data.
+- Public-safe project evidence only.
+- Kinetic typography complements immersive/GPU layer.
+- ENG/ESP remains first-class.
