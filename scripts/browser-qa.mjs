@@ -260,6 +260,7 @@ try {
   await visualCase({ name: "es-home-desktop", path: "/es", locale: "es", width: 1440, height: 1000 });
   await visualCase({ name: "es-home-mobile", path: "/es", locale: "es", width: 390, height: 844 });
   await visualCase({ name: "es-practice-mobile", path: "/es", locale: "es", width: 390, height: 844, scrollTo: ".practice-stage--long" });
+  await visualCase({ name: "es-about-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#about" });
   await visualCase({ name: "es-contact-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#contact" });
   await visualCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, caseMedia: true });
   await visualCase({ name: "taller-desktop", path: "/en/work/taller-express", locale: "en", width: 1440, height: 1000, caseMedia: true });
@@ -268,7 +269,7 @@ try {
   await visualCase({ name: "reveal-media-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, scrollTo: ".case-media", caseMedia: true });
 
   await visualBrowser.close();
-  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 12, kineticPracticeFit: true };
+  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 13, kineticPracticeFit: true };
   await persistReport();
   console.log(JSON.stringify(report, null, 2));
 } finally {
