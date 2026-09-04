@@ -69,7 +69,7 @@ export function KineticPractice({ eyebrow, statement, words, body }: {
   }, []);
 
   return (
-    <section ref={rootRef} className="practice-section" data-stage="0">
+    <section ref={rootRef} id="practice" className="practice-section" data-stage="0">
       <div className="practice-intro">
         <span className="label">{eyebrow}</span>
         <h2>{statement}</h2>
