@@ -5,6 +5,7 @@ import "../globals.css";
 import "../experience.css";
 import "../accessibility.css";
 import "../r1.css";
+import "../r1-expansion.css";
 import { isLocale, locales } from "@/lib/content";
 
 const title = "Denys Lopez — AI Product Engineer & Design Engineer";

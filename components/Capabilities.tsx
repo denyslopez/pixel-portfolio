@@ -4,7 +4,7 @@ export function Capabilities({ eyebrow, title, groups }: {
   groups: readonly (readonly string[])[];
 }) {
   return (
-    <section className="section capabilities" id="lab">
+    <section className="section capabilities" id="capabilities">
       <div className="section-heading">
         <span className="label">{eyebrow}</span>
         <h2>{title}</h2>

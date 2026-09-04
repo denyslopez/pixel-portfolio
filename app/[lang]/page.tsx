@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Capabilities } from "@/components/Capabilities";
+import { ClientArchive } from "@/components/ClientArchive";
 import { Nav } from "@/components/Nav";
+import { ProductLab } from "@/components/ProductLab";
 import { SelectedWork } from "@/components/SelectedWork";
 import { ImmersiveField } from "@/components/experience/ImmersiveField";
 import { KineticHero } from "@/components/experience/KineticHero";
@@ -31,11 +33,13 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       description,
       locale: lang === "en" ? "en_CA" : "es_SV",
       alternateLocale: [lang === "en" ? "es_SV" : "en_CA"],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Denys Lopez — AI Product Engineer & Design Engineer" }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} — Denys Lopez`,
       description,
+      images: ["/twitter-image"],
     },
   };
 }
@@ -55,6 +59,8 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
       <KineticPractice {...c.identity} />
 
       <SelectedWork {...c.work} locale={locale} />
+      <ClientArchive {...c.archive} />
+      <ProductLab {...c.lab} locale={locale} />
       <Capabilities {...c.capabilities} />
 
       <section className="section about" id="about">

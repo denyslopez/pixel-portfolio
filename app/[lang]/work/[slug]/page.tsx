@@ -27,11 +27,13 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       description: project.summary,
       locale: lang === "en" ? "en_CA" : "es_SV",
       alternateLocale: [lang === "en" ? "es_SV" : "en_CA"],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Denys Lopez portfolio" }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: project.summary,
+      images: ["/twitter-image"],
     },
   };
 }
@@ -49,6 +51,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     back: "Back to selected work",
     challenge: "The challenge",
     approach: "The approach",
+    flow: "Product flow",
+    decisions: "Key decisions",
+    gallery: "Evidence views",
     highlights: "What the experience demonstrates",
     stack: "Focus / Technology",
     live: "View live project",
@@ -58,6 +63,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     back: "Volver al trabajo seleccionado",
     challenge: "El reto",
     approach: "El enfoque",
+    flow: "Flujo del producto",
+    decisions: "Decisiones clave",
+    gallery: "Vistas de evidencia",
     highlights: "Lo que demuestra la experiencia",
     stack: "Enfoque / Tecnología",
     live: "Ver proyecto en vivo",
@@ -98,15 +106,51 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
         </article>
       </section>
 
+      <section className="case-flow-section">
+        <span className="label">03 / {labels.flow}</span>
+        <ol className="case-flow">
+          {project.flow.map((item, index) => (
+            <li key={item}>
+              <span className="label">{String(index + 1).padStart(2, "0")}</span>
+              <strong>{item}</strong>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="case-decisions">
+        <span className="label">04 / {labels.decisions}</span>
+        <div className="case-decision-grid">
+          {project.decisions.map((decision, index) => (
+            <article key={decision.title}>
+              <span className="label">D{String(index + 1).padStart(2, "0")}</span>
+              <h2>{decision.title}</h2>
+              <p>{decision.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {project.gallery.length > 0 ? (
+        <section className="case-gallery" aria-label={labels.gallery}>
+          <div className="case-gallery-heading"><span className="label">{labels.gallery}</span></div>
+          {project.gallery.map((item) => (
+            <figure key={item.src}>
+              <img src={item.src} alt={item.alt} loading="lazy" />
+            </figure>
+          ))}
+        </section>
+      ) : null}
+
       <section className="case-evidence">
         <div>
-          <span className="label">03 / {labels.highlights}</span>
+          <span className="label">05 / {labels.highlights}</span>
           <ul>
             {project.highlights.map((item) => <li key={item}>{item}</li>)}
           </ul>
         </div>
         <div>
-          <span className="label">04 / {labels.stack}</span>
+          <span className="label">06 / {labels.stack}</span>
           <ul className="case-stack">
             {project.stack.map((item) => <li key={item}>{item}</li>)}
           </ul>
