@@ -31,6 +31,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
   const project = getProject(locale, slug);
   if (!project) notFound();
   const c = getContent(locale);
+  const liveReady = slug !== "villas-de-san-luis";
 
   const labels = locale === "en" ? {
     back: "Back to selected work",
@@ -39,6 +40,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     highlights: "What the experience demonstrates",
     stack: "Focus / Technology",
     live: "View live project",
+    evolving: "Live project evolving",
     next: "Explore more work",
   } : {
     back: "Volver al trabajo seleccionado",
@@ -47,6 +49,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     highlights: "Lo que demuestra la experiencia",
     stack: "Enfoque / Tecnología",
     live: "Ver proyecto en vivo",
+    evolving: "Proyecto en evolución",
     next: "Explorar más trabajo",
   };
 
@@ -101,7 +104,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
 
       <section className="case-live">
         <p>{project.statement}</p>
-        <a href={project.liveUrl} target="_blank" rel="noreferrer" className="case-live-link">{labels.live} ↗</a>
+        {liveReady ? (
+          <a href={project.liveUrl} target="_blank" rel="noreferrer" className="case-live-link">{labels.live} ↗</a>
+        ) : (
+          <span className="case-live-link" aria-label={labels.evolving}>{labels.evolving}</span>
+        )}
       </section>
 
       <footer className="case-footer">
