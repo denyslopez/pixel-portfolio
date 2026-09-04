@@ -58,6 +58,14 @@
   will-change: transform, opacity;
 }
 
+.practice-stage--medium strong {
+  font-size: clamp(76px, 14vw, 250px);
+}
+
+.practice-stage--long strong {
+  font-size: clamp(68px, 12.5vw, 220px);
+}
+
 .practice-stage:nth-child(even) strong {
   text-align: right;
   font-style: italic;
