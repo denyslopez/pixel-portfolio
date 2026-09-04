@@ -84,7 +84,7 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
           {lines.map((line, i) => {
             const lengthClass = line.length >= 17
               ? " hero-line--long"
-              : line.length >= 10
+              : line.length >= 8
                 ? " hero-line--medium"
                 : "";
             const accentClass = i === 1 ? " hero-line--accent" : "";
@@ -92,7 +92,9 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary }: {
               ? { fontSize: "clamp(46px, 9.4vw, 170px)" }
               : line.length >= 10
                 ? { fontSize: i === 2 ? "clamp(50px, 10.5vw, 190px)" : "clamp(50px, 12vw, 190px)" }
-                : undefined;
+                : line.length >= 8
+                  ? { fontSize: "clamp(44px, 12vw, 190px)" }
+                  : undefined;
 
             return (
               <span
