@@ -167,7 +167,7 @@ body {
   }
 
   .contact-title-line--long {
-    font-size: clamp(45px, 14.2vw, 92px);
+    font-size: clamp(41px, 12vw, 82px);
   }
 
   .hero-orbit {
@@ -187,6 +187,6 @@ body {
   }
 
   .contact-title-line--long {
-    font-size: clamp(43px, 13.2vw, 66px);
+    font-size: clamp(39px, 11.5vw, 58px);
   }
 }
