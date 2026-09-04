@@ -10,17 +10,19 @@ type NavLabels = {
 };
 
 export function Nav({ locale, labels }: { locale: Locale; labels: NavLabels }) {
+  const home = `/${locale}`;
+
   return (
     <header className="site-nav">
-      <Link href={`/${locale}`} className="brand" aria-label="Denys Lopez home">
+      <Link href={home} className="brand" aria-label="Denys Lopez home">
         <span>DENYS LOPEZ</span>
         <small>EDITION 001 / 09.2026</small>
       </Link>
       <nav aria-label="Primary navigation">
-        <a href="#work">{labels.work}</a>
-        <a href="#lab">{labels.lab}</a>
-        <a href="#about">{labels.about}</a>
-        <a href="#contact">{labels.contact}</a>
+        <Link href={`${home}#work`}>{labels.work}</Link>
+        <Link href={`${home}#practice`}>{labels.lab}</Link>
+        <Link href={`${home}#about`}>{labels.about}</Link>
+        <Link href={`${home}#contact`}>{labels.contact}</Link>
       </nav>
       <LocaleSwitch locale={locale} />
     </header>
