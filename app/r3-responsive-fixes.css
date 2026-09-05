@@ -54,11 +54,24 @@
   text-wrap: balance;
 }
 
+html[lang="es"] .r3-section-heading h2 {
+  font-size: clamp(50px, 7.4vw, 112px);
+  letter-spacing: -.045em;
+}
+
 html[lang="es"] .r3-axom-copy h2,
 html[lang="es"] .r3-about h2 {
   max-width: 12ch;
-  font-size: clamp(44px, 4.75vw, 76px);
-  letter-spacing: -.035em;
+  font-size: clamp(44px, 4.45vw, 72px);
+  letter-spacing: -.03em;
+}
+
+html[lang="es"] .r3-close h2 {
+  max-width: 10ch;
+  font-size: clamp(52px, 6.9vw, 108px);
+  line-height: .9;
+  letter-spacing: -.04em;
+  text-wrap: balance;
 }
 
 @media (max-width: 760px) {
