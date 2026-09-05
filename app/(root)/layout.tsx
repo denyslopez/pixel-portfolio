@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/lib/site-url";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 import "../experience.css";
 import "../accessibility.css";
 import "../r1.css";
 
-function getMetadataBase() {
-  const vercelUrl = process.env.VERCEL_URL;
-  return new URL(vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
-}
-
 export const metadata: Metadata = {
-  metadataBase: getMetadataBase(),
+  metadataBase: getSiteUrl(),
 };
 
 export default function RedirectRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

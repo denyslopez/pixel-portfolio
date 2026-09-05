@@ -18,14 +18,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const description = lang === "en"
     ? "Denys Lopez builds intelligent digital products across Canada, the United States, El Salvador and Latin America."
     : "Denys Lopez construye productos digitales inteligentes para Canadá, Estados Unidos, El Salvador y Latinoamérica.";
+  const canonicalPath = `/${lang}`;
 
   return {
     title,
     description,
-    alternates: { languages: { en: "/en", es: "/es" } },
+    alternates: {
+      canonical: canonicalPath,
+      languages: { en: "/en", es: "/es" },
+    },
     openGraph: {
       title: `${title} — Denys Lopez`,
       description,
+      url: canonicalPath,
       locale: lang === "en" ? "en_CA" : "es_SV",
       alternateLocale: [lang === "en" ? "es_SV" : "en_CA"],
       images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Denys Lopez — AI Product Engineer & Design Engineer" }],
