@@ -33,6 +33,34 @@
   min-width: 0;
 }
 
+.r3-visual-meta > span {
+  max-width: 48%;
+  overflow-wrap: anywhere;
+}
+
+.r3-visual-meta > span:last-child {
+  text-align: right;
+}
+
+/* R3 section display scale is intentionally lower than the hero scale.
+   This keeps long English/Spanish words inside their editorial columns
+   instead of relying on clipped glyphs or root overflow masking. */
+.r3-axom-copy h2,
+.r3-about h2 {
+  max-width: 11ch;
+  font-size: clamp(48px, 5.3vw, 92px);
+  line-height: .9;
+  letter-spacing: -.05em;
+  text-wrap: balance;
+}
+
+html[lang="es"] .r3-axom-copy h2,
+html[lang="es"] .r3-about h2 {
+  max-width: 12ch;
+  font-size: clamp(44px, 4.75vw, 76px);
+  letter-spacing: -.035em;
+}
+
 @media (max-width: 760px) {
   .r3-site .site-nav .r3-mobile-nav {
     display: flex;
@@ -73,15 +101,6 @@
     align-items: end;
   }
 
-  .r3-visual-meta > span {
-    max-width: 48%;
-    overflow-wrap: anywhere;
-  }
-
-  .r3-visual-meta > span:last-child {
-    text-align: right;
-  }
-
   .r3-section-heading h2,
   .r3-axom-copy h2,
   .r3-products-heading h2,
@@ -93,6 +112,12 @@
     text-wrap: balance;
   }
 
+  .r3-axom-copy h2,
+  .r3-about h2 {
+    font-size: clamp(44px, 13vw, 58px);
+    line-height: .9;
+  }
+
   .r3-close h2 {
     max-width: 10ch;
   }
@@ -102,9 +127,9 @@
   html[lang="es"] .r3-products-heading h2,
   html[lang="es"] .r3-about h2,
   html[lang="es"] .r3-close h2 {
-    font-size: clamp(42px, 12.2vw, 58px);
-    line-height: .9;
-    letter-spacing: -.035em;
+    font-size: clamp(40px, 11.4vw, 52px);
+    line-height: .92;
+    letter-spacing: -.03em;
   }
 
   html[lang="es"] .r3-close h2 {
