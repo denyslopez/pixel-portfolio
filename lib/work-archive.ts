@@ -32,6 +32,10 @@ export function getArchiveEntry(locale: Locale, slug: string) {
   return getArchiveEntries(locale).find(entry => entry.slug === slug);
 }
 
+export function getPortfolioGridEntries(locale: Locale) {
+  return getArchiveEntries(locale);
+}
+
 export function getWorkItems(locale: Locale) {
   const selected = getProjectSlugs().map(slug => {
     const project = getProject(locale, slug)!;

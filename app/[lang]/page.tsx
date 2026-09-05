@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { SelectedWork } from "@/components/SelectedWork";
+import { PortfolioGrid } from "@/components/PortfolioGrid";
+import { RangeSection } from "@/components/RangeSection";
+import { Capabilities } from "@/components/Capabilities";
 import { KineticHero } from "@/components/experience/KineticHero";
 import { getContactLinks, publicContact } from "@/lib/contact";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
@@ -64,6 +67,12 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
 
       <SelectedWork {...c.work} locale={locale} />
 
+      <PortfolioGrid {...c.portfolio} locale={locale} />
+
+      <RangeSection {...c.range} />
+
+      <Capabilities {...c.capabilities} />
+
       <section className="r3-axom" id="axom">
         <div className="r3-axom-grid">
           <div className="r3-axom-copy">
@@ -81,7 +90,14 @@ export default async function PortfolioPage({ params }: { params: Promise<{ lang
             </ul>
           </div>
 
-          <div className="r3-system-panel" aria-hidden="true" />
+          <div className="r3-system-panel" aria-hidden="true">
+            <span className="r3-orbit">
+              <span className="r3-orbit-node" />
+            </span>
+            <span className="r3-orbit r3-orbit--inner">
+              <span className="r3-orbit-node" />
+            </span>
+          </div>
         </div>
       </section>
 
