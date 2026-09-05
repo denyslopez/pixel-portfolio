@@ -8,18 +8,14 @@ import "../r1.css";
 import "../r1-expansion.css";
 import "../r3.css";
 import "../r3-responsive-fixes.css";
+import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
 
 const title = "Denys Lopez — AI Product Engineer & Design Engineer";
 const description = "AI Product Engineer and Design Engineer building intelligent digital products across Canada, the United States and El Salvador.";
 
-function getMetadataBase() {
-  const vercelUrl = process.env.VERCEL_URL;
-  return new URL(vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
-}
-
 export const metadata: Metadata = {
-  metadataBase: getMetadataBase(),
+  metadataBase: getSiteUrl(),
   title: {
     default: title,
     template: "%s — Denys Lopez",
