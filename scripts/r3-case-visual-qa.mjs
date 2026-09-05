@@ -67,12 +67,43 @@ try {
           complete: image.complete,
           naturalWidth: image.naturalWidth,
         }));
+        const offenders = [...document.querySelectorAll("body *")]
+          .map((element) => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              tag: element.tagName.toLowerCase(),
+              className: typeof element.className === "string" ? element.className : "",
+              text: (element.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 140),
+              left: Math.round(rect.left),
+              right: Math.round(rect.right),
+              width: Math.round(rect.width),
+              clientWidth: element.clientWidth,
+              scrollWidth: element.scrollWidth,
+              overflowX: style.overflowX,
+              whiteSpace: style.whiteSpace,
+              fontSize: style.fontSize,
+              fontFamily: style.fontFamily,
+            };
+          })
+          .filter((item) => item.width > 0 && (
+            item.right > innerWidth + 2 ||
+            item.left < -2 ||
+            item.scrollWidth > item.clientWidth + 2
+          ))
+          .sort((a, b) => {
+            const bOverflow = Math.max(b.right - innerWidth, b.scrollWidth - b.clientWidth);
+            const aOverflow = Math.max(a.right - innerWidth, a.scrollWidth - a.clientWidth);
+            return bOverflow - aOverflow;
+          })
+          .slice(0, 24);
         return {
           lang: document.documentElement.lang,
           viewport: [innerWidth, innerHeight],
           scrollWidth: document.documentElement.scrollWidth,
           bodyScrollWidth: document.body.scrollWidth,
           overflowX: document.documentElement.scrollWidth > innerWidth + 1,
+          offenders,
           decisions: document.querySelectorAll(".case-decision-grid article").length,
           flowItems: document.querySelectorAll(".case-flow li").length,
           switchHref: document.querySelector(".locale-switch a")?.getAttribute("href") ?? null,
@@ -85,7 +116,10 @@ try {
       await persist();
 
       invariant(result.lang === spec.locale, `${name}: document language drift`);
-      invariant(!result.overflowX, `${name}: horizontal overflow html=${result.scrollWidth} body=${result.bodyScrollWidth}`);
+      invariant(
+        !result.overflowX,
+        `${name}: horizontal overflow html=${result.scrollWidth} body=${result.bodyScrollWidth} offenders=${JSON.stringify(result.offenders)}`,
+      );
       invariant(result.decisions === 3, `${name}: expected 3 key decisions`);
       invariant(result.flowItems >= 4, `${name}: expected bounded case flow`);
       invariant(result.imageFailures.length === 0, `${name}: broken images ${JSON.stringify(result.imageFailures)}`);
