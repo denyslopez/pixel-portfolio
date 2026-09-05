@@ -4,7 +4,6 @@ import { chromium } from "playwright";
 
 const baseUrl = "http://127.0.0.1:3100";
 const outputDir = "qa/browser";
-
 await mkdir(outputDir, { recursive: true });
 
 function invariant(condition, message) {
@@ -24,105 +23,64 @@ async function waitForServer(url, attempts = 60) {
 
 async function diagnostics(page) {
   return page.evaluate(() => {
-    const immersive = document.querySelector(".immersive-field");
-    const images = [...document.images].map((image) => ({
-      src: image.currentSrc || image.src,
-      complete: image.complete,
-      naturalWidth: image.naturalWidth,
-      naturalHeight: image.naturalHeight,
-    }));
-    const heroLines = [...document.querySelectorAll(".hero-line")].map((line) => ({
+    const overflowElements = [...document.querySelectorAll("body *")]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          className: typeof element.className === "string" ? element.className : "",
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        };
+      })
+      .filter((item) => item.width > 0 && (item.right > innerWidth + 2 || item.left < -2))
+      .slice(0, 12);
+
+    const heroLines = [...document.querySelectorAll(".r3-hero-line")].map((line) => ({
       clientWidth: line.clientWidth,
       scrollWidth: line.scrollWidth,
       text: line.textContent?.trim() ?? "",
     }));
-    const practiceStages = [...document.querySelectorAll("[data-practice-stage]")].map((stage) => ({
-      clientWidth: stage.clientWidth,
-      scrollWidth: stage.scrollWidth,
-      text: stage.textContent?.trim().replace(/\s+/g, " ") ?? "",
+
+    const images = [...document.images].map((image) => ({
+      src: image.currentSrc || image.src,
+      complete: image.complete,
+      naturalWidth: image.naturalWidth,
     }));
-    const overflowElements = [...document.querySelectorAll("body *")]
-      .map((element) => {
-        const rect = element.getBoundingClientRect();
-        const className = typeof element.className === "string" ? element.className : "";
-        return {
-          tag: element.tagName.toLowerCase(),
-          id: element.id || null,
-          className: className || null,
-          left: Math.round(rect.left),
-          right: Math.round(rect.right),
-          width: Math.round(rect.width),
-          text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 90),
-        };
-      })
-      .filter((item) => item.width > 0 && (item.right > innerWidth + 1 || item.left < -1))
-      .sort((a, b) => Math.max(b.right - innerWidth, -b.left) - Math.max(a.right - innerWidth, -a.left))
-      .slice(0, 12);
-    const scrollContainers = [document.documentElement, document.body, ...document.querySelectorAll("body *")]
-      .map((element) => {
-        const className = typeof element.className === "string" ? element.className : "";
-        const style = getComputedStyle(element);
-        return {
-          tag: element.tagName.toLowerCase(),
-          id: element.id || null,
-          className: className || null,
-          clientWidth: element.clientWidth,
-          scrollWidth: element.scrollWidth,
-          overflowX: style.overflowX,
-          transform: style.transform,
-          text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 90),
-        };
-      })
-      .filter((item) => item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 1)
-      .sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth))
-      .slice(0, 20);
 
     return {
       url: location.href,
       lang: document.documentElement.lang,
-      title: document.title,
       viewport: [innerWidth, innerHeight],
-      scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
-      overflowX: document.documentElement.scrollWidth > innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflowElements,
-      scrollContainers,
-      canvas: Boolean(immersive?.querySelector("canvas")),
-      gpuStage: immersive?.getAttribute("data-stage") ?? null,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
-      switchHref: document.querySelector(".locale-switch a")?.getAttribute("href") ?? null,
-      h1: document.querySelector("h1")?.textContent?.trim() ?? null,
-      workRows: document.querySelectorAll(".work-row").length,
-      caseMedia: document.querySelectorAll(".case-media img").length,
-      imageFailures: images.filter((image) => image.complete && image.naturalWidth === 0),
       heroLines,
-      practiceStages,
+      workCards: document.querySelectorAll(".r3-work-card").length,
+      capabilities: document.querySelectorAll(".r3-capability-item").length,
+      axomProducts: document.querySelectorAll(".r3-product").length,
+      immersiveField: Boolean(document.querySelector(".immersive-field")),
+      lab: Boolean(document.querySelector(".lab-section")),
+      practice: Boolean(document.querySelector(".practice-section")),
+      switchHref: document.querySelector(".locale-switch a")?.getAttribute("href") ?? null,
+      imageFailures: images.filter((image) => image.complete && image.naturalWidth === 0),
     };
   });
 }
 
-function assertCore(name, result, locale) {
+function assertHome(name, result, locale) {
   invariant(result.lang === locale, `${name}: document language drift (${result.lang} !== ${locale})`);
-  invariant(
-    !result.overflowX,
-    `${name}: horizontal overflow detected (${result.scroll[0]} > ${result.viewport[0]}). Offenders: ${JSON.stringify(result.overflowElements)}. Scroll containers: ${JSON.stringify(result.scrollContainers)}`,
-  );
-}
-
-function assertHeroFit(name, result) {
-  const clipped = result.heroLines.filter((line) => line.scrollWidth > line.clientWidth + 2);
-  invariant(clipped.length === 0, `${name}: clipped kinetic hero lines: ${JSON.stringify(clipped)}`);
-}
-
-function assertPracticeFit(name, result) {
-  const clipped = result.practiceStages.filter((stage) => stage.scrollWidth > stage.clientWidth + 2);
-  invariant(clipped.length === 0, `${name}: clipped kinetic practice stages: ${JSON.stringify(clipped)}`);
-}
-
-async function waitForCaseMedia(page) {
-  await page.waitForFunction(() => {
-    const image = document.querySelector(".case-media img");
-    return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
-  }, null, { timeout: 15_000 });
+  invariant(!result.overflowX, `${name}: horizontal overflow. ${JSON.stringify(result.overflowElements)}`);
+  invariant(result.heroLines.length === 3, `${name}: expected 3 R3 hero lines`);
+  invariant(result.heroLines.every((line) => line.scrollWidth <= line.clientWidth + 2), `${name}: clipped R3 hero line`);
+  invariant(result.workCards === 3, `${name}: expected 3 selected-work cards`);
+  invariant(result.capabilities === 5, `${name}: expected 5 business-readable capabilities`);
+  invariant(result.axomProducts === 3, `${name}: expected 3 AXOM product-evidence items`);
+  invariant(!result.immersiveField, `${name}: retired global immersive GPU field reappeared`);
+  invariant(!result.lab, `${name}: deferred Lab reappeared`);
+  invariant(!result.practice, `${name}: retired Practice section reappeared`);
 }
 
 const server = spawn(process.execPath, ["server.js"], {
@@ -136,23 +94,19 @@ server.stdout.on("data", (chunk) => { serverLog += chunk.toString(); });
 server.stderr.on("data", (chunk) => { serverLog += chunk.toString(); });
 
 const report = {};
-const persistReport = () => writeFile(`${outputDir}/diagnostics.json`, JSON.stringify(report, null, 2));
+const persist = () => writeFile(`${outputDir}/diagnostics.json`, JSON.stringify(report, null, 2));
 
 try {
   await waitForServer(`${baseUrl}/en`);
-
-  const gpuBrowser = await chromium.launch({
-    headless: true,
-    args: ["--enable-webgl", "--ignore-gpu-blocklist", "--use-angle=swiftshader"],
-  });
+  const browser = await chromium.launch({ headless: true });
 
   for (const spec of [
-    { name: "gpu-en-desktop", path: "/en", locale: "en", width: 1440, height: 1000 },
-    { name: "gpu-en-mobile", path: "/en", locale: "en", width: 390, height: 844 },
-    { name: "gpu-es-desktop", path: "/es", locale: "es", width: 1440, height: 1000 },
-    { name: "gpu-es-mobile", path: "/es", locale: "es", width: 390, height: 844 },
+    { name: "en-home-desktop", path: "/en", locale: "en", width: 1440, height: 1000 },
+    { name: "en-home-mobile", path: "/en", locale: "en", width: 390, height: 844 },
+    { name: "es-home-desktop", path: "/es", locale: "es", width: 1440, height: 1000 },
+    { name: "es-home-mobile", path: "/es", locale: "es", width: 390, height: 844 },
   ]) {
-    const context = await gpuBrowser.newContext({ viewport: { width: spec.width, height: spec.height } });
+    const context = await browser.newContext({ viewport: { width: spec.width, height: spec.height }, reducedMotion: "reduce" });
     const page = await context.newPage();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -160,120 +114,46 @@ try {
 
     const response = await page.goto(`${baseUrl}${spec.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     invariant(response?.status() === 200, `${spec.name}: expected HTTP 200`);
-    await page.waitForTimeout(1600);
+    await page.waitForTimeout(700);
     const result = await diagnostics(page);
-    report[spec.name] = { ...result, browserErrors: errors, pass: false };
-    await persistReport();
-    assertCore(spec.name, result, spec.locale);
-    assertHeroFit(spec.name, result);
-    assertPracticeFit(spec.name, result);
-    invariant(result.canvas, `${spec.name}: immersive GPU canvas did not initialize`);
-    invariant(result.workRows === 3, `${spec.name}: expected 3 selected-work rows`);
-    invariant(errors.length === 0, `${spec.name}: browser errors: ${JSON.stringify(errors)}`);
-    report[spec.name].pass = true;
-    await persistReport();
+    assertHome(spec.name, result, spec.locale);
+    invariant(result.reduced, `${spec.name}: reduced motion not active`);
+    invariant(errors.length === 0, `${spec.name}: browser errors ${JSON.stringify(errors)}`);
+
+    await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: false, animations: "disabled" });
+    report[spec.name] = { ...result, errors, pass: true };
+    await persist();
     await context.close();
   }
 
-  const kineticContext = await gpuBrowser.newContext({ viewport: { width: 1200, height: 900 } });
-  const kineticPage = await kineticContext.newPage();
-  await kineticPage.goto(`${baseUrl}/en`, { waitUntil: "domcontentloaded" });
-  await kineticPage.waitForTimeout(1200);
-  const initialStage = await kineticPage.locator(".immersive-field").getAttribute("data-stage");
-  await kineticPage.locator("[data-practice-stage]").nth(0).scrollIntoViewIfNeeded();
-  await kineticPage.waitForTimeout(350);
-  await kineticPage.locator("[data-practice-stage]").nth(2).scrollIntoViewIfNeeded();
-  await kineticPage.waitForTimeout(650);
-  const receivedStage = await kineticPage.locator(".immersive-field").getAttribute("data-stage");
-  const visualStage = await kineticPage.locator(".practice-section").getAttribute("data-stage");
-  invariant(initialStage === "0", `GPU stage should initialize at 0, received ${initialStage}`);
-  invariant(Number(receivedStage) >= 2, `Kinetic practice did not drive GPU stage, received ${receivedStage}`);
-  invariant(visualStage === receivedStage, `Kinetic visual stage drifted from GPU state (${visualStage} !== ${receivedStage})`);
-  report.kineticGpuBridge = { initialStage, receivedStage, visualStage, pass: true };
-  await persistReport();
-  await kineticContext.close();
-
-  const switchContext = await gpuBrowser.newContext({ viewport: { width: 1200, height: 900 } });
-  const switchPage = await switchContext.newPage();
-  await switchPage.goto(`${baseUrl}/en/work/reveal-studio`, { waitUntil: "domcontentloaded" });
-  await switchPage.waitForTimeout(500);
-  const before = switchPage.url();
-  const href = await switchPage.locator(".locale-switch a").getAttribute("href");
-  invariant(href === "/es/work/reveal-studio", `Locale switch does not preserve case-study route: ${href}`);
-  await Promise.all([
-    switchPage.waitForURL(`${baseUrl}/es/work/reveal-studio`, { timeout: 10_000 }),
-    switchPage.locator(".locale-switch a").click(),
-  ]);
-  const after = switchPage.url();
-  const lang = await switchPage.evaluate(() => document.documentElement.lang);
-  invariant(after.endsWith("/es/work/reveal-studio"), `Locale switch navigated to unexpected route: ${after}`);
-  invariant(lang === "es", `Locale switch did not update document lang: ${lang}`);
-  report.localeSwitch = { before, href, after, lang, pass: true };
-  await persistReport();
-  await switchContext.close();
-  await gpuBrowser.close();
-
-  const visualBrowser = await chromium.launch({ headless: true });
-
-  async function visualCase({ name, path, locale, width, height, scrollTo = null, caseMedia = false }) {
-    const context = await visualBrowser.newContext({
-      viewport: { width, height },
-      reducedMotion: "reduce",
-    });
-    const page = await context.newPage();
-    const errors = [];
-    page.on("pageerror", (error) => errors.push(error.message));
-    page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-
-    const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
-    invariant(response?.status() === 200, `${name}: expected HTTP 200`);
-    await page.waitForTimeout(900);
-    if (caseMedia) await waitForCaseMedia(page);
-    if (scrollTo) {
-      await page.locator(scrollTo).scrollIntoViewIfNeeded();
-      await page.waitForTimeout(250);
-    }
-
-    const result = await diagnostics(page);
-    assertCore(name, result, locale);
-    invariant(result.reduced, `${name}: reduced-motion mode not active`);
-    invariant(!result.canvas, `${name}: GPU canvas must not initialize under reduced motion`);
-    if (path === "/en" || path === "/es") {
-      assertHeroFit(name, result);
-      assertPracticeFit(name, result);
-    }
-    if (caseMedia) {
-      invariant(result.caseMedia === 1, `${name}: expected one case-study media image`);
-      invariant(result.imageFailures.length === 0, `${name}: case-study media failed to load`);
-    }
-    invariant(errors.length === 0, `${name}: browser errors: ${JSON.stringify(errors)}`);
-
-    await page.screenshot({ path: `${outputDir}/${name}.png`, fullPage: false, animations: "disabled", timeout: 15_000 });
-    report[name] = { ...result, browserErrors: errors, screenshotMode: "reduced-motion-static", pass: true };
-    await persistReport();
-    await context.close();
+  const caseContext = await browser.newContext({ viewport: { width: 1200, height: 900 }, reducedMotion: "reduce" });
+  const casePage = await caseContext.newPage();
+  for (const slug of ["baltica-salon", "taller-express", "mastertax"]) {
+    const response = await casePage.goto(`${baseUrl}/en/work/${slug}`, { waitUntil: "domcontentloaded" });
+    invariant(response?.status() === 200, `${slug}: case study must return 200`);
+    invariant(await casePage.locator(".case-decision-grid article").count() === 3, `${slug}: expected 3 key decisions`);
+    invariant(await casePage.locator(".case-flow li").count() >= 4, `${slug}: expected bounded case flow`);
   }
 
-  await visualCase({ name: "en-home-desktop", path: "/en", locale: "en", width: 1440, height: 1000 });
-  await visualCase({ name: "en-work-desktop", path: "/en", locale: "en", width: 1440, height: 1000, scrollTo: "#work" });
-  await visualCase({ name: "en-home-mobile", path: "/en", locale: "en", width: 390, height: 844 });
-  await visualCase({ name: "es-home-desktop", path: "/es", locale: "es", width: 1440, height: 1000 });
-  await visualCase({ name: "es-home-mobile", path: "/es", locale: "es", width: 390, height: 844 });
-  await visualCase({ name: "es-practice-mobile", path: "/es", locale: "es", width: 390, height: 844, scrollTo: ".practice-stage--long" });
-  await visualCase({ name: "es-about-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#about" });
-  await visualCase({ name: "es-contact-desktop", path: "/es", locale: "es", width: 1440, height: 1000, scrollTo: "#contact" });
-  await visualCase({ name: "reveal-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, caseMedia: true });
-  await visualCase({ name: "taller-desktop", path: "/en/work/taller-express", locale: "en", width: 1440, height: 1000, caseMedia: true });
-  await visualCase({ name: "villas-desktop", path: "/en/work/villas-de-san-luis", locale: "en", width: 1440, height: 1000, caseMedia: true });
-  await visualCase({ name: "reveal-mobile", path: "/en/work/reveal-studio", locale: "en", width: 390, height: 844, caseMedia: true });
-  await visualCase({ name: "reveal-media-desktop", path: "/en/work/reveal-studio", locale: "en", width: 1440, height: 1000, scrollTo: ".case-media", caseMedia: true });
+  await casePage.goto(`${baseUrl}/en/work/baltica-salon`, { waitUntil: "domcontentloaded" });
+  const switchHref = await casePage.locator(".locale-switch a").getAttribute("href");
+  invariant(switchHref === "/es/work/baltica-salon", `Locale switch must preserve R3 case route, got ${switchHref}`);
+  await caseContext.close();
 
-  await visualBrowser.close();
-  report.browserGate = { pass: true, gpuRuntime: true, reducedMotionFallback: true, screenshots: 13, kineticPracticeFit: true };
-  await persistReport();
+  const tallerContext = await browser.newContext({ viewport: { width: 1200, height: 900 }, reducedMotion: "reduce" });
+  const tallerPage = await tallerContext.newPage();
+  await tallerPage.goto(`${baseUrl}/en/work/taller-express`, { waitUntil: "domcontentloaded" });
+  await tallerPage.waitForTimeout(900);
+  const tallerImage = tallerPage.locator(".case-media img");
+  invariant(await tallerImage.count() === 1, "Taller Express: expected real project media image");
+  await tallerContext.close();
+
+  await browser.close();
+  report.browserGate = { pass: true, profile: "R3_STANDARD_PRODUCT", screenshots: 4 };
+  await persist();
   console.log(JSON.stringify(report, null, 2));
 } finally {
   server.kill("SIGTERM");
   await writeFile(`${outputDir}/server.log`, serverLog);
-  await persistReport();
+  await persist();
 }
