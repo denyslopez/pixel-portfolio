@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contactHref }: {
   eyebrow: string;
@@ -16,40 +15,32 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
 
   useEffect(() => {
     if (!rootRef.current) return;
-    gsap.registerPlugin(ScrollTrigger);
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      gsap.from("[data-hero-line]", {
-        yPercent: 72,
-        rotateX: -16,
+      gsap.from("[data-r3-hero-line]", {
+        yPercent: 78,
         opacity: 0,
-        duration: 1.05,
-        stagger: .11,
+        duration: .95,
+        stagger: .09,
         ease: "power4.out",
       });
 
-      gsap.from("[data-hero-meta]", {
+      gsap.from("[data-r3-hero-meta]", {
         opacity: 0,
-        y: 14,
-        duration: .75,
-        delay: .5,
-        stagger: .07,
+        y: 16,
+        duration: .7,
+        delay: .36,
+        stagger: .06,
         ease: "power2.out",
       });
 
-      gsap.to("[data-kinetic-primary]", {
-        letterSpacing: "-0.055em",
-        scaleX: 1.012,
-        transformOrigin: "50% 50%",
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
+      gsap.from("[data-r3-hero-visual]", {
+        opacity: 0,
+        scale: .975,
+        duration: 1.15,
+        delay: .18,
+        ease: "power3.out",
       });
     }, rootRef);
 
@@ -57,52 +48,29 @@ export function KineticHero({ eyebrow, lines, supporting, cta, secondary, contac
   }, []);
 
   return (
-    <section
-      ref={rootRef}
-      className="hero"
-      aria-labelledby="hero-title"
-      style={{ gridTemplateColumns: "minmax(0, 1fr)" }}
-    >
-      <div className="hero-meta label" data-hero-meta style={{ minWidth: 0 }}>{eyebrow}</div>
-      <div className="hero-title-wrap" style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
-        <h1
-          id="hero-title"
-          className="hero-title"
-          data-kinetic-primary
-          style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}
-        >
-          {lines.map((line, i) => {
-            const lengthClass = line.length >= 17
-              ? " hero-line--long"
-              : line.length >= 8
-                ? " hero-line--medium"
-                : "";
-            const accentClass = i === 1 ? " hero-line--accent" : "";
-            const lineStyle = line.length >= 17
-              ? { fontSize: "clamp(44px, 8.8vw, 158px)" }
-              : line.length >= 10
-                ? { fontSize: i === 2 ? "clamp(46px, 9.8vw, 174px)" : "clamp(48px, 11.2vw, 178px)" }
-                : line.length >= 8
-                  ? { fontSize: "clamp(44px, 11.2vw, 178px)" }
-                  : undefined;
+    <section ref={rootRef} className="r3-hero" aria-labelledby="hero-title">
+      <div className="r3-hero-eyebrow label" data-r3-hero-meta>{eyebrow}</div>
 
-            return (
-              <span
-                className={`hero-line${accentClass}${lengthClass}`}
-                style={lineStyle}
-                key={line}
-              >
-                <span data-hero-line>{line}</span>
-              </span>
-            );
-          })}
-        </h1>
+      <h1 id="hero-title" className="r3-hero-title">
+        {lines.map((line, index) => (
+          <span className={`r3-hero-line${index === 1 ? " r3-hero-line--accent" : ""}`} key={line}>
+            <span data-r3-hero-line>{line}</span>
+          </span>
+        ))}
+      </h1>
+
+      <div className="r3-hero-visual" data-r3-hero-visual aria-hidden="true">
+        <div className="r3-visual-meta">
+          <span>CONTROLLED ENERGY</span>
+          <span>PRODUCT / DESIGN / ENGINEERING / AI</span>
+        </div>
       </div>
-      <div className="hero-bottom" data-hero-meta style={{ minWidth: 0 }}>
-        <p style={{ maxWidth: "min(100%, 34ch)", minWidth: 0 }}>{supporting}</p>
-        <div className="hero-actions">
-          <a className="text-link" href="#work">{cta} ↘</a>
-          <a className="text-link text-link--muted" href={contactHref}>{secondary} ↗</a>
+
+      <div className="r3-hero-bottom" data-r3-hero-meta>
+        <p>{supporting}</p>
+        <div className="r3-hero-actions">
+          <a className="r3-link r3-link--signal" href="#work">{cta} ↘</a>
+          <a className="r3-link" href={contactHref}>{secondary} ↗</a>
         </div>
       </div>
     </section>
