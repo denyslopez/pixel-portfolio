@@ -43,6 +43,9 @@ export function SelectedWork({ eyebrow, title, items, locale }: {
           </Link>
         ))}
       </div>
+      <Link href={`/${locale}/work`} className="r3-work-all">
+        {locale === "en" ? "View all work" : "Ver todos los trabajos"} <span aria-hidden="true">↗</span>
+      </Link>
     </section>
   );
 }

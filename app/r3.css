@@ -9,6 +9,9 @@
   --r3-pad: clamp(20px, 3.5vw, 64px);
 }
 
+.r3-work-all { display: inline-flex; gap: 24px; align-items: center; margin-top: 32px; padding: 16px 0; min-height: 44px; border-bottom: 1px solid currentColor; font-size: 16px; }
+.r3-work-all:hover { color: var(--signal); }
+
 body {
   background: var(--r3-carbon);
   color: var(--r3-paper);
