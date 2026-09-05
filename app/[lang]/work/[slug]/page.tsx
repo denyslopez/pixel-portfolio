@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
-import { ImmersiveField } from "@/components/experience/ImmersiveField";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
 import { getProject, getProjectSlugs } from "@/lib/projects";
 
@@ -45,7 +44,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
   const project = getProject(locale, slug);
   if (!project) notFound();
   const c = getContent(locale);
-  const liveReady = slug !== "villas-de-san-luis";
 
   const labels = locale === "en" ? {
     back: "Back to selected work",
@@ -57,8 +55,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     highlights: "What the experience demonstrates",
     stack: "Focus / Technology",
     live: "View live project",
-    evolving: "Live project evolving",
     next: "Explore more work",
+    editorial: "Editorial presentation visual — not product evidence",
   } : {
     back: "Volver al trabajo seleccionado",
     challenge: "El reto",
@@ -69,13 +67,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
     highlights: "Lo que demuestra la experiencia",
     stack: "Enfoque / Tecnología",
     live: "Ver proyecto en vivo",
-    evolving: "Proyecto en evolución",
     next: "Explorar más trabajo",
+    editorial: "Visual editorial de presentación — no es evidencia del producto",
   };
 
   return (
-    <main className="case-study">
-      <ImmersiveField />
+    <main className="case-study r3-site">
       <Nav locale={locale} labels={c.nav} />
 
       <header className="case-hero">
@@ -90,9 +87,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
       </header>
 
       <section className="case-media" aria-label={`${project.title} project media`}>
-        <div className="case-media-frame">
-          <img src={project.media} alt={`${project.title} interface preview`} />
-        </div>
+        {project.media ? (
+          <div className="case-media-frame">
+            <img src={project.media} alt={`${project.title} project presentation`} />
+          </div>
+        ) : (
+          <div className="case-media-frame case-media-frame--editorial">
+            <span>{labels.editorial}</span>
+          </div>
+        )}
       </section>
 
       <section className="case-body">
@@ -159,11 +162,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
 
       <section className="case-live">
         <p>{project.statement}</p>
-        {liveReady ? (
-          <a href={project.liveUrl} target="_blank" rel="noreferrer" className="case-live-link">{labels.live} ↗</a>
-        ) : (
-          <span className="case-live-link" aria-label={labels.evolving}>{labels.evolving}</span>
-        )}
+        <a href={project.liveUrl} target="_blank" rel="noreferrer" className="case-live-link">{labels.live} ↗</a>
       </section>
 
       <footer className="case-footer">
