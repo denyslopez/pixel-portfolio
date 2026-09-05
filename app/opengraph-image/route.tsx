@@ -1,10 +1,8 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Denys Lopez — AI Product Engineer & Design Engineer";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+const size = { width: 1200, height: 630 };
 
-export default function TwitterImage() {
+export async function GET() {
   return new ImageResponse(
     (
       <div
