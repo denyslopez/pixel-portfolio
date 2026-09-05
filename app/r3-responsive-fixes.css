@@ -199,3 +199,12 @@ html[lang="es"] .r3-close h2 {
     max-width: 100%;
   }
 }
+
+@media (max-width: 560px) {
+  .case-study .case-hero h1 {
+    max-width: 100%;
+    font-size: clamp(52px, 15vw, 72px);
+    line-height: .76;
+    letter-spacing: -.065em;
+  }
+}
