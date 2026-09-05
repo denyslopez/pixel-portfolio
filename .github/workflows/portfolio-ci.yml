@@ -8,6 +8,8 @@ on:
       - feature/portfolio-001-edition-001
       - feature/portfolio-001-edition-001-r1
       - feature/portfolio-001-edition-001-r2
+      - feature/portfolio-001-edition-001-r3-design
+      - feature/portfolio-001-edition-001-r3-implementation
 
 permissions:
   contents: read
