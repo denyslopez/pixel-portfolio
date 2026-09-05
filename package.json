@@ -7,20 +7,18 @@
     "build": "next build --turbopack",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "qa:browser": "node scripts/browser-qa.mjs && node scripts/r3-case-visual-qa.mjs && node scripts/r1-structure-qa.mjs && node scripts/r1-visual-contract-qa.mjs && node scripts/social-metadata-qa.mjs"
+    "qa:browser": "node scripts/browser-qa.mjs && node scripts/r3-case-visual-qa.mjs && node scripts/r1-structure-qa.mjs && node scripts/r1-visual-contract-qa.mjs && node scripts/social-metadata-qa.mjs && node scripts/focus-qa.mjs"
   },
   "dependencies": {
     "gsap": "3.15.0",
     "next": "16.3.3",
     "react": "19.2.7",
-    "react-dom": "19.2.7",
-    "three": "0.185.1"
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/three": "0.185.4",
     "playwright": "1.62.1",
     "typescript": "^5.9.0"
   }
