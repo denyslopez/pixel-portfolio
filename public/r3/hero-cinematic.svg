@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1400" role="img" aria-label="Abstract cinematic mountain landscape with lone explorer silhouette">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#23140f"/>
+      <stop offset=".28" stop-color="#8d2d16"/>
+      <stop offset=".5" stop-color="#e04a22"/>
+      <stop offset=".66" stop-color="#5f2419"/>
+      <stop offset="1" stop-color="#0c0c0c"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="66%" cy="29%" r="38%">
+      <stop offset="0" stop-color="#ffd2a0" stop-opacity=".82"/>
+      <stop offset=".14" stop-color="#ff7a45" stop-opacity=".54"/>
+      <stop offset=".45" stop-color="#ff4a1c" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#ff4a1c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mist" x1="0" x2="1">
+      <stop offset="0" stop-color="#f2f0ea" stop-opacity="0"/>
+      <stop offset=".46" stop-color="#f2f0ea" stop-opacity=".18"/>
+      <stop offset=".82" stop-color="#f2f0ea" stop-opacity=".06"/>
+      <stop offset="1" stop-color="#f2f0ea" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="mountainFar" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#4a2921"/>
+      <stop offset="1" stop-color="#171515"/>
+    </linearGradient>
+    <linearGradient id="mountainNear" x1="0" y1="0" x2="0.2" y2="1">
+      <stop stop-color="#251817"/>
+      <stop offset="1" stop-color="#090909"/>
+    </linearGradient>
+    <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.78" numOctaves="4" seed="18" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+      <feComponentTransfer in="g" result="grainAlpha">
+        <feFuncA type="table" tableValues="0 .11"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="grainAlpha" mode="soft-light"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="soft2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="vignette" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".3"/>
+      <stop offset=".47" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".72"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#grain)">
+    <rect width="900" height="1400" fill="url(#sky)"/>
+    <rect width="900" height="1400" fill="url(#sunGlow)"/>
+    <ellipse cx="605" cy="405" rx="255" ry="210" fill="#ff5524" opacity=".16" filter="url(#soft)"/>
+    <circle cx="617" cy="405" r="54" fill="#ffd5a7" opacity=".82" filter="url(#soft2)"/>
+    <circle cx="617" cy="405" r="35" fill="#f6c497" opacity=".92"/>
+    <path d="M0 706 L96 638 L176 662 L265 548 L342 602 L416 536 L501 602 L574 530 L659 592 L738 486 L900 648 L900 1400 L0 1400 Z" fill="url(#mountainFar)" opacity=".67"/>
+    <path d="M0 830 L104 760 L192 782 L286 678 L374 744 L470 652 L572 725 L680 642 L784 714 L900 625 L900 1400 L0 1400 Z" fill="#181516" opacity=".78"/>
+    <path d="M-80 732 C130 650 280 752 465 690 C650 628 774 642 985 574 L985 760 C760 815 595 790 432 830 C246 874 104 836 -80 900 Z" fill="url(#mist)" opacity=".72" filter="url(#soft2)"/>
+    <path d="M-70 925 C140 840 330 894 500 838 C690 774 820 820 970 790" fill="none" stroke="#f2f0ea" stroke-opacity=".09" stroke-width="28" filter="url(#soft)"/>
+    <path d="M0 1034 L76 995 L145 1018 L213 944 L287 968 L346 912 L418 948 L490 876 L557 910 L627 823 L708 846 L771 786 L900 854 L900 1400 L0 1400 Z" fill="url(#mountainNear)"/>
+    <path d="M0 1170 C168 1102 324 1108 466 1060 C626 1006 745 985 900 1012 L900 1400 L0 1400 Z" fill="#070707"/>
+    <g transform="translate(574 720)" fill="#080808">
+      <circle cx="37" cy="39" r="25"/>
+      <path d="M18 67 C23 54 51 53 58 69 L75 163 L15 164 Z"/>
+      <path d="M19 82 C-4 98 -20 131 -26 170 L-9 175 C2 140 10 123 26 111 Z"/>
+      <path d="M58 87 C80 105 91 139 95 173 L78 176 C70 143 66 125 51 111 Z"/>
+      <path d="M27 156 L20 252 L43 252 L51 160 Z"/>
+      <path d="M49 157 L62 252 L84 249 L69 153 Z"/>
+      <path d="M7 69 C-6 88 -7 132 8 165 L28 154 L30 82 Z" opacity=".98"/>
+      <rect x="-5" y="91" width="29" height="65" rx="10"/>
+    </g>
+    <path d="M610 760 C626 771 633 806 639 858" fill="none" stroke="#ff7a45" stroke-opacity=".54" stroke-width="3"/>
+    <rect width="900" height="1400" fill="url(#vignette)"/>
+    <path d="M690 80 V1320" stroke="#f2f0ea" stroke-opacity=".05"/>
+    <path d="M90 1130 H842" stroke="#f2f0ea" stroke-opacity=".045"/>
+    <circle cx="617" cy="405" r="91" fill="none" stroke="#f2f0ea" stroke-opacity=".11" stroke-width="1" stroke-dasharray="5 11"/>
+  </g>
+</svg>

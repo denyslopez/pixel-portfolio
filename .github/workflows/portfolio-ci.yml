@@ -1,0 +1,67 @@
+name: Portfolio CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches:
+      - feature/portfolio-001-edition-001
+      - feature/portfolio-001-edition-001-r1
+      - feature/portfolio-001-edition-001-r2
+      - feature/portfolio-001-edition-001-r3-design
+      - feature/portfolio-001-edition-001-r3-implementation
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
+
+      - name: Assemble standalone QA build
+        run: |
+          mkdir -p .next/standalone/.next
+          cp -R .next/static .next/standalone/.next/static
+          cp -R public .next/standalone/public
+
+      - name: Upload standalone QA build
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-001-standalone
+          path: .next/standalone
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Install Chromium for browser QA
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser visual QA
+        run: npm run qa:browser
+
+      - name: Upload browser QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-001-browser-qa
+          path: qa/browser
+          if-no-files-found: warn
+          retention-days: 3

@@ -1,0 +1,136 @@
+import type { Locale } from "./content";
+
+const projects = {
+  en: {
+    "baltica-salon": {
+      title: "Baltica Salon",
+      category: "Brand / Website / Service Experience",
+      year: "2026",
+      statement: "A calmer digital front door for a premium service business.",
+      summary: "A Toronto salon web presence shaped around service clarity, brand confidence and a more intentional path from discovery to contact.",
+      challenge: "Service businesses often have to communicate atmosphere, trust and practical information at the same time. The experience needed to feel premium without becoming vague, while making it easy for a prospective client to understand the business and take the next step.",
+      approach: "The work treats the website as a customer-facing service surface rather than a digital brochure: clear hierarchy, strong visual identity, concise service communication and direct conversion paths support the business without overwhelming the visitor.",
+      flow: ["Discover", "Understand the offer", "Build confidence", "Contact"],
+      decisions: [
+        { title: "Use atmosphere to support trust", body: "Visual tone is treated as part of the service promise, but content remains readable and action-oriented." },
+        { title: "Keep commercial paths obvious", body: "Primary actions stay close to the moments where a prospective client is most likely to decide whether the salon fits their needs." },
+        { title: "Avoid portfolio theater", body: "The presentation emphasizes the actual business context and customer experience instead of inventing metrics or outcomes that are not evidenced." },
+      ],
+      highlights: ["Service-business positioning", "Customer-facing information hierarchy", "Premium visual direction", "Responsive experience", "Direct conversion paths"],
+      stack: ["Brand direction", "UX/UI", "Web design", "Frontend delivery"],
+      liveUrl: "https://balticasalon.ca/",
+      media: "",
+      gallery: [],
+    },
+    "taller-express": {
+      title: "Taller Express",
+      category: "Product / Service Platform",
+      year: "2026",
+      statement: "Making automotive service easier to understand and operate.",
+      summary: "A multi-client automotive service product being shaped around clearer service requests, practical guidance and governed operational workflows.",
+      challenge: "Automotive service can be difficult to navigate for customers and operators alike. Requests arrive with incomplete information, expectations are unclear and the customer often has limited context for what happens next.",
+      approach: "The product is being structured as a governed service system: customer-facing guidance and request capture are separated from operational authority, while the underlying workflow preserves clear states, evidence and human control.",
+      flow: ["Request", "Review", "Clarify", "Convert", "Service"],
+      decisions: [
+        { title: "Separate guidance from operational authority", body: "Conversational or educational surfaces can help the customer, but they do not silently gain authority over service operations." },
+        { title: "Make state explicit", body: "The service-request lifecycle is modeled with clear transitions so ambiguity does not become hidden operational behavior." },
+        { title: "Design for multi-client reuse", body: "The product direction accounts for different clients and branches without prematurely expanding scope beyond proven requirements." },
+      ],
+      highlights: ["Service request lifecycle", "Governed operational model", "Customer guidance", "Multi-client product direction", "Human-controlled authority"],
+      stack: ["Product strategy", "Service design", "UX/UI", "Governed AI-native development"],
+      liveUrl: "https://tallerexpress.one/",
+      media: "https://tallerexpress.one/images/taller-express-hero-bg-mobilie-001.jpg",
+      gallery: [],
+    },
+    mastertax: {
+      title: "MasterTax",
+      category: "Professional Services / Trust & Conversion",
+      year: "2026",
+      statement: "Clarity for a business built around complex decisions.",
+      summary: "A professional-services web experience for a Toronto financial-services business, organized around service clarity, trust and direct paths to consultation.",
+      challenge: "Tax, accounting and related financial services are information-dense and high-trust. The website needs to help visitors understand the available services without forcing them through unnecessary complexity before they can ask for help.",
+      approach: "The experience uses clear service grouping, trust-oriented content and visible consultation paths. Technical detail is available where it supports confidence, but the primary hierarchy stays focused on what the client needs to understand and do next.",
+      flow: ["Orient", "Explore services", "Build trust", "Request consultation"],
+      decisions: [
+        { title: "Organize around client intent", body: "Service categories are presented in a way that helps visitors identify the type of help they need before navigating deeper detail." },
+        { title: "Treat trust as an information problem", body: "Professional credibility is supported through clarity, consistency and visible next steps rather than decorative claims." },
+        { title: "Keep consultation close", body: "Conversion paths remain visible throughout the experience so visitors can move from research to contact without friction." },
+      ],
+      highlights: ["Professional-services information architecture", "Trust-oriented UX", "Service clarity", "Consultation conversion", "Responsive web experience"],
+      stack: ["Digital strategy", "UX/UI", "Web experience", "Conversion design"],
+      liveUrl: "https://mastertax.ca/",
+      media: "",
+      gallery: [],
+    },
+  },
+  es: {
+    "baltica-salon": {
+      title: "Baltica Salon",
+      category: "Marca / Website / Experiencia de Servicio",
+      year: "2026",
+      statement: "Una entrada digital más clara para un negocio de servicio premium.",
+      summary: "Una presencia web para un salón de Toronto trabajada alrededor de claridad de servicio, confianza de marca y un recorrido más intencional desde descubrimiento hasta contacto.",
+      challenge: "Los negocios de servicio deben comunicar atmósfera, confianza e información práctica al mismo tiempo. La experiencia necesitaba sentirse premium sin volverse ambigua y facilitar que un posible cliente entienda el negocio y dé el siguiente paso.",
+      approach: "El website se trata como una superficie de servicio al cliente y no como un folleto digital: jerarquía clara, identidad visual fuerte, comunicación concisa de servicios y rutas directas de conversión apoyan al negocio sin saturar al visitante.",
+      flow: ["Descubrir", "Entender la oferta", "Generar confianza", "Contactar"],
+      decisions: [
+        { title: "Usar atmósfera para apoyar confianza", body: "El tono visual forma parte de la promesa de servicio, pero el contenido permanece legible y orientado a acción." },
+        { title: "Mantener claras las rutas comerciales", body: "Las acciones principales permanecen cerca de los momentos donde el posible cliente decide si el salón encaja con sus necesidades." },
+        { title: "Evitar teatro de portafolio", body: "La presentación enfatiza el contexto real del negocio y la experiencia del cliente sin inventar métricas o resultados no evidenciados." },
+      ],
+      highlights: ["Posicionamiento de negocio de servicio", "Jerarquía de información orientada al cliente", "Dirección visual premium", "Experiencia responsive", "Rutas directas de conversión"],
+      stack: ["Dirección de marca", "UX/UI", "Diseño web", "Entrega frontend"],
+      liveUrl: "https://balticasalon.ca/",
+      media: "",
+      gallery: [],
+    },
+    "taller-express": {
+      title: "Taller Express",
+      category: "Producto / Plataforma de Servicio",
+      year: "2026",
+      statement: "Hacer más fácil entender y operar el servicio automotriz.",
+      summary: "Un producto automotriz multi-cliente desarrollado alrededor de solicitudes más claras, orientación práctica y flujos operativos gobernados.",
+      challenge: "El servicio automotriz puede ser difícil de navegar para clientes y operadores. Las solicitudes llegan con información incompleta, las expectativas son poco claras y el cliente suele tener poco contexto sobre lo que ocurrirá después.",
+      approach: "El producto se estructura como un sistema de servicio gobernado: la orientación y captura de solicitudes para el cliente se separan de la autoridad operativa, mientras el flujo subyacente preserva estados claros, evidencia y control humano.",
+      flow: ["Solicitar", "Revisar", "Aclarar", "Convertir", "Servicio"],
+      decisions: [
+        { title: "Separar orientación de autoridad operativa", body: "Las superficies conversacionales o educativas pueden ayudar al cliente, pero no obtienen silenciosamente autoridad sobre las operaciones de servicio." },
+        { title: "Hacer explícito el estado", body: "El ciclo de vida de la solicitud se modela con transiciones claras para que la ambigüedad no se convierta en comportamiento operativo oculto." },
+        { title: "Diseñar para reutilización multi-cliente", body: "La dirección del producto considera diferentes clientes y sucursales sin expandir prematuramente el alcance más allá de necesidades comprobadas." },
+      ],
+      highlights: ["Ciclo de solicitud de servicio", "Modelo operativo gobernado", "Orientación al cliente", "Dirección multi-cliente", "Autoridad controlada por humanos"],
+      stack: ["Estrategia de producto", "Diseño de servicio", "UX/UI", "Desarrollo gobernado nativo de IA"],
+      liveUrl: "https://tallerexpress.one/",
+      media: "https://tallerexpress.one/images/taller-express-hero-bg-mobilie-001.jpg",
+      gallery: [],
+    },
+    mastertax: {
+      title: "MasterTax",
+      category: "Servicios Profesionales / Confianza & Conversión",
+      year: "2026",
+      statement: "Claridad para un negocio construido alrededor de decisiones complejas.",
+      summary: "Una experiencia web de servicios profesionales para un negocio financiero de Toronto, organizada alrededor de claridad de servicios, confianza y rutas directas hacia una consulta.",
+      challenge: "Impuestos, contabilidad y servicios financieros relacionados concentran mucha información y requieren alta confianza. El website debe ayudar a comprender los servicios disponibles sin obligar al visitante a atravesar complejidad innecesaria antes de pedir ayuda.",
+      approach: "La experiencia usa agrupación clara de servicios, contenido orientado a confianza y rutas visibles hacia consulta. El detalle técnico está disponible cuando aporta seguridad, pero la jerarquía principal se mantiene enfocada en lo que el cliente necesita entender y hacer después.",
+      flow: ["Orientarse", "Explorar servicios", "Generar confianza", "Solicitar consulta"],
+      decisions: [
+        { title: "Organizar alrededor de la intención del cliente", body: "Las categorías de servicio ayudan a identificar el tipo de apoyo requerido antes de navegar detalle adicional." },
+        { title: "Tratar confianza como un problema de información", body: "La credibilidad profesional se apoya mediante claridad, consistencia y próximos pasos visibles en lugar de claims decorativos." },
+        { title: "Mantener la consulta cerca", body: "Las rutas de conversión permanecen visibles para que el visitante pase de investigación a contacto sin fricción innecesaria." },
+      ],
+      highlights: ["Arquitectura para servicios profesionales", "UX orientada a confianza", "Claridad de servicios", "Conversión a consulta", "Experiencia web responsive"],
+      stack: ["Estrategia digital", "UX/UI", "Experiencia web", "Diseño de conversión"],
+      liveUrl: "https://mastertax.ca/",
+      media: "",
+      gallery: [],
+    },
+  },
+} as const;
+
+export function getProject(locale: Locale, slug: string) {
+  return projects[locale][slug as keyof (typeof projects)[typeof locale]] ?? null;
+}
+
+export function getProjectSlugs() {
+  return ["baltica-salon", "taller-express", "mastertax"] as const;
+}

@@ -1,0 +1,350 @@
+:root {
+  --type-display: var(--font-newsreader), Georgia, serif;
+  --type-sans: var(--font-manrope), Arial, sans-serif;
+  --type-mono: var(--font-plex-mono), "Courier New", monospace;
+}
+
+body {
+  font-family: var(--type-sans);
+  font-variation-settings: "wght" 420;
+}
+
+.label,
+.brand small,
+.site-nav nav,
+.locale-switch,
+.hero-actions,
+.contact-cta,
+.site-footer,
+.case-stack li,
+.case-live-link,
+.case-footer {
+  font-family: var(--type-mono);
+}
+
+.hero-title,
+.section-heading h2,
+.identity-word strong,
+.work-title,
+.cap-group h3,
+.contact-title,
+.case-hero h1,
+.case-statement,
+.case-block p,
+.case-live p,
+.practice-intro h2,
+.practice-stage strong {
+  font-family: var(--type-display);
+  font-optical-sizing: auto;
+}
+
+.hero-title,
+.practice-stage strong,
+.case-hero h1,
+.contact-title {
+  text-wrap: balance;
+}
+
+.hero-bottom p,
+.practice-copy,
+.wide-copy,
+.case-summary,
+.about-notes,
+.cap-group p {
+  font-family: var(--type-sans);
+}
+
+.hero-line:nth-child(2),
+.practice-stage:nth-child(even) strong,
+.case-statement,
+.contact-title span:nth-child(2) {
+  font-style: italic;
+}
+
+.contact-title {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.contact-title-line {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.contact-title-line--medium {
+  font-size: clamp(68px, 12.8vw, 218px);
+}
+
+.contact-title-line--long {
+  font-size: clamp(58px, 11.2vw, 198px);
+}
+
+/* Keep the mobile navigation out of the desktop cascade. The selector must
+   outrank .site-nav nav from globals.css. */
+.site-nav .mobile-rail {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  main {
+    padding-bottom: 68px;
+  }
+
+  .site-nav {
+    mix-blend-mode: normal;
+    pointer-events: none;
+  }
+
+  .brand,
+  .locale-switch {
+    pointer-events: auto;
+    mix-blend-mode: difference;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .site-nav .mobile-rail {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 70;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    padding: 0;
+    border: 1px solid rgba(243, 242, 237, .24);
+    background: rgba(7, 7, 7, .94);
+    color: var(--paper);
+    box-shadow: 0 12px 46px rgba(0, 0, 0, .28);
+    pointer-events: auto;
+    overflow: hidden;
+    backdrop-filter: blur(14px);
+  }
+
+  .mobile-rail a {
+    min-width: 0;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 6px;
+    text-align: left;
+    border-left: 1px solid rgba(243, 242, 237, .14);
+  }
+
+  .mobile-rail a:first-child {
+    border-left: 0;
+  }
+
+  .mobile-rail small {
+    font-size: 7px;
+    line-height: 1;
+    color: var(--signal);
+    letter-spacing: .08em;
+  }
+
+  .mobile-rail span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: .035em;
+    white-space: nowrap;
+  }
+
+  /* A fixed rail must never cover the first-view conversion surfaces. */
+  .hero,
+  .case-hero,
+  .contact {
+    padding-bottom: 106px;
+  }
+
+  .contact-title {
+    letter-spacing: -.055em;
+  }
+
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(52px, 17.5vw, 116px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(41px, 12vw, 82px);
+  }
+}
+
+@media (max-width: 430px) {
+  .mobile-rail span {
+    font-size: 7.5px;
+  }
+
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(50px, 16vw, 74px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(39px, 11.5vw, 58px);
+  }
+}
+
+/* R2 — Visual correction pass */
+.immersive-field {
+  opacity: .72;
+}
+
+.hero-title {
+  line-height: .88;
+  letter-spacing: -.045em;
+}
+
+.hero-line {
+  overflow: visible;
+  line-height: .88;
+  padding-block: .035em .09em;
+}
+
+.hero-line > span {
+  backface-visibility: hidden;
+}
+
+.section-heading h2 {
+  line-height: .92;
+  letter-spacing: -.045em;
+}
+
+.wide-copy {
+  font-size: clamp(26px, 4.1vw, 66px);
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  max-width: 17ch;
+}
+
+.contact {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(200, 255, 26, .025), transparent 34%),
+    var(--ink);
+  color: var(--paper);
+  border-top: 1px solid rgba(200, 255, 26, .18);
+}
+
+.contact::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(78vw, 1100px);
+  aspect-ratio: 1;
+  right: -24vw;
+  top: 2%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 255, 26, .22) 0%, rgba(200, 255, 26, .08) 24%, transparent 66%);
+  filter: blur(34px);
+  opacity: .9;
+  pointer-events: none;
+}
+
+.contact::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0 58%, rgba(200, 255, 26, .045) 72%, transparent 88%);
+  pointer-events: none;
+}
+
+.contact .label,
+.contact-cta {
+  color: var(--signal);
+}
+
+.contact-title {
+  margin: 7vh 0;
+  line-height: .86;
+  letter-spacing: -.052em;
+}
+
+.contact-title span:nth-child(2) {
+  color: var(--signal);
+  text-shadow: 0 0 42px rgba(200, 255, 26, .09);
+}
+
+.contact-title-line,
+.contact-title-line--medium {
+  font-size: clamp(64px, 11.4vw, 194px);
+}
+
+.contact-title-line--long {
+  font-size: clamp(56px, 10vw, 176px);
+}
+
+.case-live {
+  background:
+    radial-gradient(circle at 78% 28%, rgba(200, 255, 26, .18), transparent 38%),
+    var(--ink);
+  color: var(--paper);
+  border-top: 1px solid rgba(200, 255, 26, .16);
+}
+
+.case-live-link {
+  color: var(--signal);
+}
+
+@media (max-width: 900px) {
+  .hero-title {
+    line-height: .93;
+  }
+
+  .hero-line {
+    line-height: .93;
+    padding-block: .045em .11em;
+  }
+
+  .wide-copy {
+    font-size: clamp(30px, 9.6vw, 52px);
+    line-height: 1.04;
+    max-width: 13ch;
+  }
+
+  .contact-title {
+    margin: 5vh 0 7vh;
+    line-height: .92;
+    letter-spacing: -.045em;
+  }
+
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(48px, 15vw, 98px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(39px, 11vw, 72px);
+  }
+
+  .contact::before {
+    width: 135vw;
+    right: -72vw;
+    top: 16%;
+    opacity: .72;
+  }
+}
+
+@media (max-width: 430px) {
+  .contact-title-line,
+  .contact-title-line--medium {
+    font-size: clamp(46px, 14vw, 66px);
+  }
+
+  .contact-title-line--long {
+    font-size: clamp(37px, 10.5vw, 52px);
+  }
+}

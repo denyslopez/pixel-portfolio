@@ -1,0 +1,18 @@
+a:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+
+.work-section a:focus-visible,
+.contact a:focus-visible,
+.case-live a:focus-visible {
+  outline-color: var(--ink);
+}
+
+#practice,
+#work,
+#about,
+#contact {
+  scroll-margin-top: 76px;
+}
