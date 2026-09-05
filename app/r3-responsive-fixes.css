@@ -28,6 +28,11 @@
   text-align: right;
 }
 
+.r3-visual-meta,
+.r3-visual-meta > span {
+  min-width: 0;
+}
+
 @media (max-width: 760px) {
   .r3-site .site-nav .r3-mobile-nav {
     display: flex;
@@ -61,5 +66,48 @@
 
   .r3-axom-principles li > span:last-child {
     max-width: none;
+  }
+
+  .r3-visual-meta {
+    gap: 10px;
+    align-items: end;
+  }
+
+  .r3-visual-meta > span {
+    max-width: 48%;
+    overflow-wrap: anywhere;
+  }
+
+  .r3-visual-meta > span:last-child {
+    text-align: right;
+  }
+
+  .r3-section-heading h2,
+  .r3-axom-copy h2,
+  .r3-products-heading h2,
+  .r3-about h2,
+  .r3-close h2 {
+    min-width: 0;
+    max-width: 100%;
+    letter-spacing: -.045em;
+    text-wrap: balance;
+  }
+
+  .r3-close h2 {
+    max-width: 10ch;
+  }
+
+  html[lang="es"] .r3-section-heading h2,
+  html[lang="es"] .r3-axom-copy h2,
+  html[lang="es"] .r3-products-heading h2,
+  html[lang="es"] .r3-about h2,
+  html[lang="es"] .r3-close h2 {
+    font-size: clamp(42px, 12.2vw, 58px);
+    line-height: .9;
+    letter-spacing: -.035em;
+  }
+
+  html[lang="es"] .r3-close h2 {
+    max-width: 100%;
   }
 }
