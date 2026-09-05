@@ -3,5 +3,7 @@
 /out
 .DS_Store
 *.log
+*.tsbuildinfo
+/qa
 .env*
 !.env.example
