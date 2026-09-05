@@ -1,3 +1,11 @@
+.r3-site .site-nav {
+  pointer-events: auto;
+}
+
+.r3-site .site-nav .r3-mobile-nav {
+  display: none;
+}
+
 .r3-axom-grid,
 .r3-axom-copy,
 .r3-axom-principles,
@@ -21,6 +29,11 @@
 }
 
 @media (max-width: 760px) {
+  .r3-site .site-nav .r3-mobile-nav {
+    display: flex;
+    pointer-events: auto;
+  }
+
   .r3-axom,
   .r3-products,
   .r3-about {
