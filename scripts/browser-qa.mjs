@@ -23,7 +23,8 @@ async function waitForServer(url, attempts = 60) {
 
 async function diagnostics(page) {
   return page.evaluate(() => {
-    const overflowElements = [...document.querySelectorAll("body *")]
+    const elements = [...document.querySelectorAll("body *")];
+    const overflowElements = elements
       .map((element) => {
         const rect = element.getBoundingClientRect();
         return {
@@ -35,7 +36,21 @@ async function diagnostics(page) {
         };
       })
       .filter((item) => item.width > 0 && (item.right > innerWidth + 2 || item.left < -2))
-      .slice(0, 12);
+      .slice(0, 16);
+
+    const internalOverflowElements = elements
+      .map((element) => ({
+        tag: element.tagName.toLowerCase(),
+        className: typeof element.className === "string" ? element.className : "",
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        overflowX: getComputedStyle(element).overflowX,
+        whiteSpace: getComputedStyle(element).whiteSpace,
+        text: (element.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 120),
+      }))
+      .filter((item) => item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 2)
+      .sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth))
+      .slice(0, 20);
 
     const heroLines = [...document.querySelectorAll(".r3-hero-line")].map((line) => ({
       clientWidth: line.clientWidth,
@@ -54,8 +69,10 @@ async function diagnostics(page) {
       lang: document.documentElement.lang,
       viewport: [innerWidth, innerHeight],
       scrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth,
       overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflowElements,
+      internalOverflowElements,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
       heroLines,
       workCards: document.querySelectorAll(".r3-work-card").length,
@@ -72,7 +89,10 @@ async function diagnostics(page) {
 
 function assertHome(name, result, locale) {
   invariant(result.lang === locale, `${name}: document language drift (${result.lang} !== ${locale})`);
-  invariant(!result.overflowX, `${name}: horizontal overflow. ${JSON.stringify(result.overflowElements)}`);
+  invariant(
+    !result.overflowX,
+    `${name}: horizontal overflow. viewport=${result.viewport[0]} html=${result.scrollWidth} body=${result.bodyScrollWidth} rect=${JSON.stringify(result.overflowElements)} internal=${JSON.stringify(result.internalOverflowElements)}`,
+  );
   invariant(result.heroLines.length === 3, `${name}: expected 3 R3 hero lines`);
   invariant(result.heroLines.every((line) => line.scrollWidth <= line.clientWidth + 2), `${name}: clipped R3 hero line`);
   invariant(result.workCards === 3, `${name}: expected 3 selected-work cards`);
@@ -116,12 +136,15 @@ try {
     invariant(response?.status() === 200, `${spec.name}: expected HTTP 200`);
     await page.waitForTimeout(700);
     const result = await diagnostics(page);
+    report[spec.name] = { ...result, errors, pass: false };
+    await persist();
+
     assertHome(spec.name, result, spec.locale);
     invariant(result.reduced, `${spec.name}: reduced motion not active`);
     invariant(errors.length === 0, `${spec.name}: browser errors ${JSON.stringify(errors)}`);
 
     await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: false, animations: "disabled" });
-    report[spec.name] = { ...result, errors, pass: true };
+    report[spec.name].pass = true;
     await persist();
     await context.close();
   }
