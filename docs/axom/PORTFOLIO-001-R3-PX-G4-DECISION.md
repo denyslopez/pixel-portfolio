@@ -3,9 +3,10 @@
 **Project / slice:** `PORTFOLIO-001 / R3`  
 **Gate:** `PX-G4 — Visual Implementation Acceptance`  
 **Decision date:** `2026-09-05`  
-**Decision state:** `READY_FOR_HUMAN_DECISION`  
-**Decision authority:** `PENDING HUMAN APPROVAL`  
-**AXOM recommendation:** `PASS_WITH_NOTES`
+**Decision state:** `CLOSED`  
+**Decision authority:** `HUMAN APPROVED`  
+**Recorded outcome:** `PASS_WITH_NOTES`  
+**Human approval statement:** `APROBADO — R3 PX-G4 PASS_WITH_NOTES`
 
 ## 1. Gate purpose
 
@@ -18,8 +19,9 @@ PX-G4 acceptance is an implementation/QA gate. It is not deployment, merge, rele
 - Repository: `denyslopez/pixel-portfolio`
 - Design baseline / merge base: `e15ed18b867a97a137828d76fc4dec3231ea3185`
 - Implementation branch: `feature/portfolio-001-edition-001-r3-implementation`
-- Validated implementation HEAD: `694499b81eeb8af63c0ef39316ef832754dacd72`
-- Branch relation to design baseline: `35 commits ahead / 0 behind`
+- Accepted implementation HEAD: `694499b81eeb8af63c0ef39316ef832754dacd72`
+- Pre-decision governance HEAD: `5e80e15d9ae4c5201b843730a5e02cae797b931b`
+- Branch relation to design baseline at implementation acceptance review: `35 commits ahead / 0 behind`
 - Reuse classification: `PX-G3 = PARTIAL_REUSE_ONLY`
 - Visual thesis: `CONTROLLED ENERGY`
 - Flagship Selected Work: `Baltica Salon / Taller Express / MasterTax`
@@ -43,7 +45,7 @@ PX-G4 acceptance is an implementation/QA gate. It is not deployment, merge, rele
 ### Repository / scope
 
 - Exact implementation branch and starting baseline established: **PASS**.
-- Implementation branch remains linearly ahead of the design baseline with no branch drift: **PASS**.
+- Implementation branch remained linearly ahead of the design baseline with no branch drift: **PASS**.
 - No new third-party runtime dependency introduced: **PASS**.
 - Unjustified legacy Three.js/WebGL runtime and `ImmersiveField` removed: **PASS**.
 - Deferred Lab / Practice / global ImmersiveField do not render in the R3 Home: **PASS**.
@@ -93,7 +95,7 @@ AXOM senior visual reconciliation finds the implementation materially consistent
 - no decorative orbit, global GPU field, Lab-first narrative or raw card-soup regression reappears;
 - case studies maintain factual-evidence boundaries and editorial continuity.
 
-**Visual fidelity recommendation:** `PASS`.
+**Visual fidelity decision:** `PASS`.
 
 ## 6. Adaptation / defect classification
 
@@ -116,29 +118,36 @@ AXOM senior visual reconciliation finds the implementation materially consistent
 
 - unused/unapproved Three.js/WebGL dependency and `ImmersiveField` removed after R3 proved no approved requirement for them.
 
-## 7. Material UNKNOWNs
+## 7. Material UNKNOWNs / notes
 
 | Item | Impact | Blocking PX-G4? | Required evidence / next action |
 |---|---|---:|---|
-| Vercel Preview deployment has not been executed for this R3 candidate | Hosted-environment behavior not yet validated | NO | Separate Preview deployment authority/gate after PX-G4 |
-| R3 implementation branch has no open PR | Review packaging is not yet established | NO | Decide PR/Preview packaging after PX-G4 |
-| Original Product Implementation Gate artifact still shows its pre-decision `PENDING HUMAN APPROVAL` state | Durable governance record is stale even though bounded implementation authority was provided in project conversation | NO, but note required | Human PX-G4 decision should explicitly ratify the bounded implementation authority and this PX-G4 outcome |
+| Vercel Preview deployment has not been executed for this R3 candidate | Hosted-environment behavior not yet validated | NO | Separate G5 Preview deployment authority after PX-G4 |
+| R3 implementation branch has no open PR | Review packaging is not yet established | NO | Reconcile PR/Preview packaging before hosted review |
+| Original Product Implementation Gate artifact retained its pre-decision `PENDING HUMAN APPROVAL` state | Durable record was stale relative to the bounded implementation authority actually exercised | NO | Human PX-G4 approval explicitly ratifies only that completed bounded implementation authority; original historical state is preserved and annotated separately |
 
 No UNKNOWN above is converted into deployment or merge authority.
 
-## 8. Recommended decision
+## 8. Decision
 
 `PASS_WITH_NOTES`
 
 Reason: the R3 implementation meets the required visual/browser/responsive/accessibility/fidelity evidence and scope boundary. The note preserves the durable-record discrepancy in the earlier Product Implementation Gate rather than rewriting history.
 
-## 9. Exact binding consequence if Human approves
+## 9. Ratification consequence
+
+The Human approval `APROBADO — R3 PX-G4 PASS_WITH_NOTES` also ratifies the bounded R3 implementation authority that governed the completed implementation cycle because the earlier gate artifact failed to persist that approval state.
+
+This ratification is **retrospective and bounded**. It does not create new Product mutation authority.
+
+## 10. Exact binding consequence
 
 Permits:
 
-- mark `R3 PX-G4 — Visual Implementation Acceptance` as closed;
-- treat `694499b81eeb8af63c0ef39316ef832754dacd72` plus the subsequent gate-documentation-only commit as the accepted R3 implementation candidate;
-- prepare the next separately governed Preview deployment/review action.
+- mark `R3 PX-G4 — Visual Implementation Acceptance` as `CLOSED / PASS_WITH_NOTES`;
+- treat `694499b81eeb8af63c0ef39316ef832754dacd72` as the accepted R3 implementation candidate;
+- treat the subsequent governance-only commits as durable decision records, not Product changes;
+- prepare the next separately governed G5 Preview deployment/review action.
 
 Does **NOT** permit:
 
@@ -149,20 +158,17 @@ Does **NOT** permit:
 - new dependencies or Product architecture expansion;
 - fabricated metrics, testimonials, claims or project states.
 
-## 10. Next gate / action
+## 11. Next gate / action
 
-If Human approves this PX-G4 decision:
+Next governed step: `G5 — R3 Preview Deployment / Hosted Preview Review`.
 
-1. record the Human outcome durably;
-2. keep merge / Production / DNS blocked;
-3. reconcile the correct R3 Preview packaging and Preview-only deployment authority;
-4. perform hosted Preview QA before any later merge or Production decision.
+Separate authority is required before any Preview deployment effect. Prior to authorization, AXOM must reconcile the actual Vercel project/linkage, target branch/commit, Preview-only environment and review packaging.
 
-## 11. Human decision
+## 12. Durable decision reference
 
-Allowed outcome:
-
-- `APPROVED — R3 PX-G4 PASS_WITH_NOTES`
-- `BLOCKED`
-
-**Recorded outcome:** `PENDING`
+- Human approval: `APROBADO — R3 PX-G4 PASS_WITH_NOTES`
+- Accepted implementation HEAD: `694499b81eeb8af63c0ef39316ef832754dacd72`
+- Pre-decision governance HEAD: `5e80e15d9ae4c5201b843730a5e02cae797b931b`
+- CI run: `33964058942`
+- Browser QA artifact: `9968865772`
+- Durable closure: the repository commit containing this approved record.

@@ -109,3 +109,21 @@ Allowed outcome for this project gate:
 - `BLOCKED`
 
 Until a Human outcome is recorded, no Product code mutation or implementation branch creation may occur.
+
+## Post-execution ratification note — 2026-09-05
+
+This artifact intentionally preserves its original pre-decision state above; it is not rewritten to imply that the approval was durably captured before implementation.
+
+The completed R3 implementation cycle was later reconciled at `PX-G4`. Human authority explicitly approved:
+
+`APROBADO — R3 PX-G4 PASS_WITH_NOTES`
+
+That PX-G4 approval **ratifies only the bounded implementation authority already exercised** for the R3 cycle whose accepted implementation HEAD is:
+
+`694499b81eeb8af63c0ef39316ef832754dacd72`
+
+Ratification basis and evidence are recorded in:
+
+`docs/axom/PORTFOLIO-001-R3-PX-G4-DECISION.md`
+
+This post-execution ratification does **not** authorize any new Product mutation, dependency, merge, Preview deployment, Production deployment, DNS change, AI Concierge work or scope expansion.
