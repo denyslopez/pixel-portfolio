@@ -22,7 +22,7 @@ export function Nav({ locale, labels }: { locale: Locale; labels: NavLabels }) {
     <header className="site-nav">
       <Link href={home} className="brand" aria-label="Denys Lopez home">
         <span>DENYS LOPEZ</span>
-        <small>EDITION 001 / R3</small>
+        <small>EDITION 001 / R4</small>
       </Link>
 
       <nav className="desktop-nav" aria-label="Primary navigation">

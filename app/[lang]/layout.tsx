@@ -8,6 +8,7 @@ import "../r1.css";
 import "../r1-expansion.css";
 import "../r3.css";
 import "../r3-responsive-fixes.css";
+import "../r4.css";
 import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
 

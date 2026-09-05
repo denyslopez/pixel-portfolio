@@ -22,6 +22,28 @@ const content = {
       "Frontend Engineering",
       "Growth & Conversion",
     ],
+    portfolio: {
+      eyebrow: "02 / Portfolio",
+      title: "Broader body of work",
+      lead: "A longer record of client and product work across service businesses, community platforms and early-stage products.",
+      cta: "View all work",
+    },
+    range: {
+      eyebrow: "03 / Range",
+      title: "Different businesses. One common purpose.",
+      body: "Salons, tax practices, nonprofits, restoration services, automotive platforms. The industries change. The discipline does not: understand the business, then build the product it actually needs.",
+      note: "Intelligent does not mean complicated.",
+    },
+    capabilities: {
+      eyebrow: "04 / What I do",
+      title: "Capabilities",
+      groups: [
+        ["Product Strategy", "Discovery", "Positioning", "Roadmapping", "Commercial framing"],
+        ["Experience Design", "Interaction design", "Design systems", "Content strategy", "Accessibility"],
+        ["Frontend Engineering", "Next.js / React", "Performance", "Responsive systems", "Component architecture"],
+        ["AI-Native Products", "Applied AI features", "Governed automation", "Evaluation & evidence", "Model-agnostic architecture"],
+      ],
+    },
     work: {
       eyebrow: "01 / Selected Work",
       title: "Selected work",
@@ -54,7 +76,7 @@ const content = {
       ],
     },
     axom: {
-      eyebrow: "02 / Building AXOM",
+      eyebrow: "05 / Building AXOM",
       title: "Building AXOM",
       body: "AXOM is a governed AI-native system for designing and delivering digital products. It separates capability from authority, keeps human approval explicit and treats evidence as part of the product-development process.",
       principles: ["Governed execution", "Human approval", "Model / provider flexibility", "Evidence-driven delivery"],
@@ -79,13 +101,13 @@ const content = {
       ],
     },
     about: {
-      eyebrow: "03 / About",
+      eyebrow: "06 / About",
       title: "Across disciplines, toward products.",
       body: "My work connects product thinking, experience design, frontend engineering, AI and commercial strategy. The value is not the number of tools I know; it is being able to move from an ambiguous business problem toward a coherent digital product.",
       disciplines: ["Product Thinking", "Experience Design", "Engineering", "AI", "Commercial Thinking"],
     },
     contact: {
-      eyebrow: "04 / Contact",
+      eyebrow: "07 / Contact",
       title: "Have a product worth building?",
       body: "Available for selected product, web and AI engagements across Canada, the United States, El Salvador and Latin America.",
       email: "Email",
@@ -109,6 +131,28 @@ const content = {
       "Ingeniería Frontend",
       "Crecimiento & Conversión",
     ],
+    portfolio: {
+      eyebrow: "02 / Portafolio",
+      title: "Trayectoria de trabajo",
+      lead: "Una trayectoria más amplia de trabajo para clientes y producto, entre negocios de servicio, plataformas comunitarias y productos en etapa temprana.",
+      cta: "Ver todos los trabajos",
+    },
+    range: {
+      eyebrow: "03 / Rango",
+      title: "Negocios distintos. Un mismo propósito.",
+      body: "Salones, despachos de impuestos, organizaciones sociales, servicios de restauración, plataformas automotrices. Las industrias cambian. La disciplina no: entender el negocio y luego construir el producto que realmente necesita.",
+      note: "Inteligente no significa complicado.",
+    },
+    capabilities: {
+      eyebrow: "04 / Lo que hago",
+      title: "Capacidades",
+      groups: [
+        ["Estrategia de Producto", "Descubrimiento", "Posicionamiento", "Roadmap", "Enfoque comercial"],
+        ["Diseño de Experiencia", "Diseño de interacción", "Sistemas de diseño", "Estrategia de contenido", "Accesibilidad"],
+        ["Ingeniería Frontend", "Next.js / React", "Rendimiento", "Sistemas responsivos", "Arquitectura de componentes"],
+        ["Productos con IA", "Funciones de IA aplicada", "Automatización gobernada", "Evaluación y evidencia", "Arquitectura agnóstica de modelo"],
+      ],
+    },
     work: {
       eyebrow: "01 / Trabajo Seleccionado",
       title: "Trabajo seleccionado",
@@ -141,7 +185,7 @@ const content = {
       ],
     },
     axom: {
-      eyebrow: "02 / Construyendo AXOM",
+      eyebrow: "05 / Construyendo AXOM",
       title: "Construyendo AXOM",
       body: "AXOM es un sistema nativo de IA y gobernado para diseñar y entregar productos digitales. Separa capacidad de autoridad, mantiene explícita la aprobación humana y trata la evidencia como parte del proceso de desarrollo de producto.",
       principles: ["Ejecución gobernada", "Aprobación humana", "Flexibilidad de modelo / proveedor", "Entrega basada en evidencia"],
@@ -166,13 +210,13 @@ const content = {
       ],
     },
     about: {
-      eyebrow: "03 / Perfil",
+      eyebrow: "06 / Perfil",
       title: "Entre disciplinas, hacia productos.",
       body: "Mi trabajo conecta pensamiento de producto, diseño de experiencia, ingeniería frontend, IA y estrategia comercial. El valor no está en cuántas herramientas conozco; está en poder mover un problema de negocio ambiguo hacia un producto digital coherente.",
       disciplines: ["Pensamiento de Producto", "Diseño de Experiencia", "Ingeniería", "IA", "Pensamiento Comercial"],
     },
     contact: {
-      eyebrow: "04 / Contacto",
+      eyebrow: "07 / Contacto",
       title: "¿Tienes un producto que vale la pena construir?",
       body: "Disponible para proyectos seleccionados de producto, web e IA en Canadá, Estados Unidos, El Salvador y Latinoamérica.",
       email: "Email",
