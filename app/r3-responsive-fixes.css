@@ -1,0 +1,52 @@
+.r3-axom-grid,
+.r3-axom-copy,
+.r3-axom-principles,
+.r3-axom-principles li,
+.r3-products-heading,
+.r3-products-grid,
+.r3-about,
+.r3-about-copy,
+.r3-about-disciplines {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.r3-axom-principles li > span {
+  min-width: 0;
+}
+
+.r3-axom-principles li > span:last-child {
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .r3-axom,
+  .r3-products,
+  .r3-about {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .r3-axom-grid {
+    width: 100%;
+    gap: 34px;
+  }
+
+  .r3-axom-copy,
+  .r3-system-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .r3-axom-principles li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .r3-axom-principles li > span:last-child {
+    max-width: none;
+  }
+}
