@@ -52,6 +52,16 @@ async function diagnostics(page) {
       .sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth))
       .slice(0, 20);
 
+    const criticalTextOverflows = [...document.querySelectorAll(
+      ".r3-section-heading h2, .r3-axom-copy h2, .r3-products-heading h2, .r3-about h2, .r3-close h2, .r3-visual-meta > span",
+    )]
+      .map((element) => ({
+        text: (element.textContent ?? "").trim().replace(/\s+/g, " "),
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      }))
+      .filter((item) => item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 2);
+
     const heroLines = [...document.querySelectorAll(".r3-hero-line")].map((line) => ({
       clientWidth: line.clientWidth,
       scrollWidth: line.scrollWidth,
@@ -73,6 +83,7 @@ async function diagnostics(page) {
       overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflowElements,
       internalOverflowElements,
+      criticalTextOverflows,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
       heroLines,
       workCards: document.querySelectorAll(".r3-work-card").length,
@@ -92,6 +103,10 @@ function assertHome(name, result, locale) {
   invariant(
     !result.overflowX,
     `${name}: horizontal overflow. viewport=${result.viewport[0]} html=${result.scrollWidth} body=${result.bodyScrollWidth} rect=${JSON.stringify(result.overflowElements)} internal=${JSON.stringify(result.internalOverflowElements)}`,
+  );
+  invariant(
+    result.criticalTextOverflows.length === 0,
+    `${name}: critical R3 display text clips its own column ${JSON.stringify(result.criticalTextOverflows)}`,
   );
   invariant(result.heroLines.length === 3, `${name}: expected 3 R3 hero lines`);
   invariant(result.heroLines.every((line) => line.scrollWidth <= line.clientWidth + 2), `${name}: clipped R3 hero line`);
@@ -143,7 +158,7 @@ try {
     invariant(result.reduced, `${spec.name}: reduced motion not active`);
     invariant(errors.length === 0, `${spec.name}: browser errors ${JSON.stringify(errors)}`);
 
-    await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: false, animations: "disabled" });
+    await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: true, animations: "disabled" });
     report[spec.name].pass = true;
     await persist();
     await context.close();
@@ -172,7 +187,7 @@ try {
   await tallerContext.close();
 
   await browser.close();
-  report.browserGate = { pass: true, profile: "R3_STANDARD_PRODUCT", screenshots: 4 };
+  report.browserGate = { pass: true, profile: "R3_STANDARD_PRODUCT", screenshots: 4, fullPage: true };
   await persist();
   console.log(JSON.stringify(report, null, 2));
 } finally {
