@@ -1,0 +1,90 @@
+[
+  {
+    "file": "public/work/all-star-restoration.jpg",
+    "sourceUrl": "https://asrservices.ca",
+    "finalUrl": "https://asrservices.ca/",
+    "title": "ALL STAR Restoration Services",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "8454c031f1a9bd04ad69f2ed3073fb8cf8aff4ee7c8492f108037635afbca202",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/baltica-salon.jpg",
+    "sourceUrl": "https://balticasalon.ca",
+    "finalUrl": "https://balticasalon.ca/",
+    "title": "Baltica Salon",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "0e37ea52c71cdbc07ac81a72613af3c9d2e5bdfb88612c7e36beca7f971f2bf4",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/cerka-marketing.jpg",
+    "sourceUrl": "https://cerkamarketing.com",
+    "finalUrl": "https://cerkamarketing.com/",
+    "title": "Agencia de Marketing Digital | CerKa Marketing",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "9acea195e28619f90cf804207973272c5764eb7542aea825b2dd501dae106515",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/lost-connection-games.jpg",
+    "sourceUrl": "https://lostconnectiongames.com",
+    "finalUrl": "https://lostconnectiongames.com/?playlist=6aa26a89&video=69f4c97",
+    "title": "The Lost Connection Games – Educational Game Cards for Children",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "e0098f9dd3bf81028a647a0409d284178c2607dcc124fd063fab0709605e9bb1",
+    "type": "Public website screenshot",
+    "viewport": "1440x650"
+  },
+  {
+    "file": "public/work/mastertax.jpg",
+    "sourceUrl": "https://mastertax.ca",
+    "finalUrl": "https://mastertax.ca/",
+    "title": "Mastertax – Professional Accounting – Bookeeping – Tax Services in Toronto.",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "ddf79c03d91d0b6f4ac151d6f9e46c1b0be4b3e0b3a92708e7aeded2a6621fb1",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/reveal-studio.jpg",
+    "sourceUrl": "https://virtual-hair-style.vercel.app",
+    "finalUrl": "https://virtual-hair-style.vercel.app/",
+    "title": "Reveal Studio — Try Before The Chair",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "00bf2b280d60b29885c9217a272cafff0e9aa964b74e5ed5ed593e79dee49d77",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/rina-group.jpg",
+    "sourceUrl": "https://rinagroup.ca",
+    "finalUrl": "https://rinagroup.ca/",
+    "title": "Rina Group – Premium Kitchen, Bathroom & Basement Renovations • Toronto & GT",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "42a57c294158e0464c6b659221076719109399d10295e391f21a5ec8b94b898a",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  },
+  {
+    "file": "public/work/seed-of-hope-miami.jpg",
+    "sourceUrl": "https://seedofhopemiami.org",
+    "finalUrl": "https://seedofhopemiami.org/",
+    "title": "Home - Seed Of Hope Ministries",
+    "captured": "2026-09-05",
+    "status": 200,
+    "sha256": "d97c910c3326122764dc6186a69bbb3a0817036a3560336486704526c26e6a30",
+    "type": "Public website screenshot",
+    "viewport": "1440x1000"
+  }
+]

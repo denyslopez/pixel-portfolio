@@ -200,6 +200,11 @@ html[lang="es"] .r3-close h2 {
   }
 }
 
+/* R3.1: keep existing case titles inside the tablet viewport. */
+@media (min-width: 561px) and (max-width: 900px) {
+  .case-study .case-hero h1 { font-size: 15vw; }
+}
+
 @media (max-width: 560px) {
   .case-study .case-hero h1 {
     max-width: 100%;

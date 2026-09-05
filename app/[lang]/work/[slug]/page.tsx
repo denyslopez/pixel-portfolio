@@ -4,15 +4,17 @@ import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { getContent, isLocale, locales, type Locale } from "@/lib/content";
 import { getProject, getProjectSlugs } from "@/lib/projects";
+import { getArchiveEntries, getArchiveEntry } from "@/lib/work-archive";
+import { ArchiveEntry } from "@/components/ArchiveEntry";
 
 export function generateStaticParams() {
-  return locales.flatMap((lang) => getProjectSlugs().map((slug) => ({ lang, slug })));
+  return locales.flatMap((lang) => [...getProjectSlugs(), ...getArchiveEntries(lang).map(entry => entry.slug)].map((slug) => ({ lang, slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }): Promise<Metadata> {
   const { lang, slug } = await params;
   if (!isLocale(lang)) return {};
-  const project = getProject(lang, slug);
+  const project = getProject(lang, slug) ?? getArchiveEntry(lang, slug);
   if (!project) return {};
 
   const title = `${project.title} — Denys Lopez`;
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: project.title,
     description: project.summary,
-    alternates: { languages: { en: `/en/work/${slug}`, es: `/es/work/${slug}` } },
+    alternates: { canonical: `/${lang}/work/${slug}`, languages: { en: `/en/work/${slug}`, es: `/es/work/${slug}` } },
     openGraph: {
       title,
       description: project.summary,
@@ -41,6 +43,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
   const locale = lang as Locale;
+  const entry = getArchiveEntry(locale, slug);
+  if (entry) return <ArchiveEntry locale={locale} entry={entry} />;
   const project = getProject(locale, slug);
   if (!project) notFound();
   const c = getContent(locale);
@@ -167,7 +171,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
       </section>
 
       <footer className="case-footer">
-        <Link href={`/${locale}#work`}>{labels.next} ↙</Link>
+        <Link href={`/${locale}/work`}>{labels.next} ↙</Link>
         <span>DENYS LOPEZ / PORTFOLIO 001</span>
       </footer>
     </main>
