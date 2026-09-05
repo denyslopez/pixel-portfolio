@@ -44,6 +44,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
   const project = getProject(locale, slug);
   if (!project) notFound();
   const c = getContent(locale);
+  const gallery = project.gallery as readonly { src: string; alt: string }[];
 
   const labels = locale === "en" ? {
     back: "Back to selected work",
@@ -134,10 +135,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ lang: 
         </div>
       </section>
 
-      {project.gallery.length > 0 ? (
+      {gallery.length > 0 ? (
         <section className="case-gallery" aria-label={labels.gallery}>
           <div className="case-gallery-heading"><span className="label">{labels.gallery}</span></div>
-          {project.gallery.map((item) => (
+          {gallery.map((item) => (
             <figure key={item.src}>
               <img src={item.src} alt={item.alt} loading="lazy" />
             </figure>
