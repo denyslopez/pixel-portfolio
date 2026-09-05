@@ -28,6 +28,46 @@
   text-align: right;
 }
 
+/* Canonical R3 hero atmosphere: original portfolio artwork, not client evidence. */
+.r3-hero-visual {
+  background:
+    linear-gradient(180deg, rgba(16,16,16,.02) 0%, rgba(16,16,16,.12) 48%, rgba(16,16,16,.74) 100%),
+    linear-gradient(100deg, rgba(16,16,16,.22), transparent 38%),
+    url("/r3/hero-cinematic.svg") 58% 50% / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(242,240,234,.025), 0 34px 90px rgba(0,0,0,.2);
+}
+
+.r3-hero-visual::before,
+.r3-hero-visual::after {
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+  right: 0;
+  bottom: 0;
+  border-radius: 0;
+  filter: none;
+  transform: none;
+}
+
+.r3-hero-visual::before {
+  background:
+    radial-gradient(circle at 68% 30%, rgba(255,110,61,.13), transparent 24%),
+    linear-gradient(180deg, transparent 60%, rgba(5,5,5,.28));
+}
+
+.r3-hero-visual::after {
+  background:
+    linear-gradient(90deg, transparent 0 49.8%, rgba(242,240,234,.04) 50%, transparent 50.2%),
+    repeating-linear-gradient(90deg, transparent 0 44px, rgba(242,240,234,.018) 45px 46px);
+  mix-blend-mode: screen;
+  opacity: .72;
+}
+
+.r3-visual-meta {
+  z-index: 2;
+  text-shadow: 0 1px 12px rgba(0,0,0,.72);
+}
+
 .r3-visual-meta,
 .r3-visual-meta > span {
   min-width: 0;
@@ -113,6 +153,10 @@ html[lang="es"] .r3-close h2 {
 
   .r3-axom-principles li > span:last-child {
     max-width: none;
+  }
+
+  .r3-hero-visual {
+    background-position: 60% 50%;
   }
 
   .r3-visual-meta {
