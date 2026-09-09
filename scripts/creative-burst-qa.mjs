@@ -22,21 +22,27 @@ async function waitForServer(url, attempts = 60) {
 }
 
 async function revealFullPage(page) {
-  await page.evaluate(async () => {
-    const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const maxY = Math.max(0, document.documentElement.scrollHeight - innerHeight);
-    const step = Math.max(360, Math.floor(innerHeight * 0.62));
+  const revealNodes = page.locator("[data-burst-reveal]");
+  const count = await revealNodes.count();
 
-    for (let y = 0; y <= maxY; y += step) {
-      scrollTo(0, Math.min(y, maxY));
-      await pause(90);
-    }
+  for (let index = 0; index < count; index += 1) {
+    await revealNodes.nth(index).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(75);
+  }
 
-    scrollTo(0, maxY);
-    await pause(180);
+  // The reveal animation lasts 800ms. Wait long enough for the last observed node
+  // to settle before treating the page as visual evidence.
+  await page.waitForTimeout(1000);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForTimeout(180);
+}
+
+async function resetCaptureState(page) {
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     scrollTo(0, 0);
   });
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(180);
 }
 
 async function diagnostics(page) {
@@ -175,9 +181,11 @@ try {
     const after = await page.locator("#navigator [aria-live=polite] h3").textContent();
     invariant(Boolean(before && after && before !== after), `${spec.name}: Navigator interaction did not change hypothesis`);
 
+    await resetCaptureState(page);
     await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: true, animations: "disabled" });
     report[spec.name].navigatorInteraction = true;
     report[spec.name].fullPageRevealVerified = true;
+    report[spec.name].captureStateReset = true;
     report[spec.name].pass = true;
     await persist();
     await context.close();
@@ -191,6 +199,7 @@ try {
     viewports: [390, 768, 1440],
     locales: ["en", "es"],
     fullPageRevealVerified: true,
+    captureStateReset: true,
     productionTouched: false,
   };
   await persist();
