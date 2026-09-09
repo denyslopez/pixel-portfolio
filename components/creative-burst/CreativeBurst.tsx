@@ -3,15 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import styles from "./creative-burst.module.css";
+import hardening from "./creative-burst-hardening.module.css";
 
 type Locale = "en" | "es";
-type WorkItem = {
-  slug: string;
-  title: string;
-  category: string;
-  summary: string;
-  image?: string;
-};
+type WorkItem = { slug: string; title: string; category: string; summary: string; image?: string };
 type ArchiveItem = WorkItem & { exploration: boolean };
 
 const copy = {
@@ -43,26 +38,10 @@ const copy = {
     workingHypothesis: "Working hypothesis—not a verdict",
     navigatorCta: "Turn this into a real diagnostic →",
     symptoms: [
-      {
-        label: "Traffic exists. Conversion stalls.",
-        signal: "The bottleneck may be offer clarity, trust, proof or friction at the decision point.",
-        move: "Inspect the journey from first impression to commitment before adding more traffic.",
-      },
-      {
-        label: "Leads arrive incomplete or unclear.",
-        signal: "The constraint may be intake design, information architecture or an undefined handoff.",
-        move: "Design the request path around the information needed to make the next decision well.",
-      },
-      {
-        label: "Operations depend too much on the owner.",
-        signal: "The bottleneck may be workflow clarity, authority boundaries or missing operational systems.",
-        move: "Model the work before automating it; separate guidance, decisions and authority explicitly.",
-      },
-      {
-        label: "AI exists, but nobody fully trusts it.",
-        signal: "The constraint may be evidence, evaluation, scope control or unclear human authority.",
-        move: "Define what AI may do, how it is evaluated and where human approval remains mandatory.",
-      },
+      { label: "Traffic exists. Conversion stalls.", signal: "The bottleneck may be offer clarity, trust, proof or friction at the decision point.", move: "Inspect the journey from first impression to commitment before adding more traffic." },
+      { label: "Leads arrive incomplete or unclear.", signal: "The constraint may be intake design, information architecture or an undefined handoff.", move: "Design the request path around the information needed to make the next decision well." },
+      { label: "Operations depend too much on the owner.", signal: "The bottleneck may be workflow clarity, authority boundaries or missing operational systems.", move: "Model the work before automating it; separate guidance, decisions and authority explicitly." },
+      { label: "AI exists, but nobody fully trusts it.", signal: "The constraint may be evidence, evaluation, scope control or unclear human authority.", move: "Define what AI may do, how it is evaluated and where human approval remains mandatory." },
     ],
     workEyebrow: "04 / SELECTED WORK",
     workTitle: "Proof before persuasion.",
@@ -71,6 +50,7 @@ const copy = {
     archiveEyebrow: "05 / PORTFOLIO ARCHIVE",
     archiveTitle: "A longer record of shipped work and exploration.",
     archiveNote: "Historical entries remain historical. Explorations remain explorations.",
+    noMedia: "TEXT-ONLY EVIDENCE / NO VERIFIED MEDIA",
     productsEyebrow: "06 / PRODUCTS + LABS",
     productsTitle: "Building systems, not just pages.",
     products: [
@@ -123,26 +103,10 @@ const copy = {
     workingHypothesis: "Hipótesis de trabajo—no un veredicto",
     navigatorCta: "Convertir esto en un diagnóstico real →",
     symptoms: [
-      {
-        label: "Hay tráfico. La conversión se estanca.",
-        signal: "El cuello de botella puede estar en claridad de oferta, confianza, evidencia o fricción en el punto de decisión.",
-        move: "Revisar el recorrido desde la primera impresión hasta el compromiso antes de agregar más tráfico.",
-      },
-      {
-        label: "Los leads llegan incompletos o poco claros.",
-        signal: "La restricción puede estar en intake, arquitectura de información o un handoff indefinido.",
-        move: "Diseñar la solicitud alrededor de la información necesaria para tomar bien la siguiente decisión.",
-      },
-      {
-        label: "La operación depende demasiado del dueño.",
-        signal: "El cuello de botella puede estar en claridad de workflow, límites de autoridad o sistemas operativos faltantes.",
-        move: "Modelar el trabajo antes de automatizarlo; separar explícitamente orientación, decisiones y autoridad.",
-      },
-      {
-        label: "Existe IA, pero nadie confía completamente en ella.",
-        signal: "La restricción puede ser evidencia, evaluación, control de alcance o autoridad humana poco clara.",
-        move: "Definir qué puede hacer la IA, cómo se evalúa y dónde la aprobación humana sigue siendo obligatoria.",
-      },
+      { label: "Hay tráfico. La conversión se estanca.", signal: "El cuello de botella puede estar en claridad de oferta, confianza, evidencia o fricción en el punto de decisión.", move: "Revisar el recorrido desde la primera impresión hasta el compromiso antes de agregar más tráfico." },
+      { label: "Los leads llegan incompletos o poco claros.", signal: "La restricción puede estar en intake, arquitectura de información o un handoff indefinido.", move: "Diseñar la solicitud alrededor de la información necesaria para tomar bien la siguiente decisión." },
+      { label: "La operación depende demasiado del dueño.", signal: "El cuello de botella puede estar en claridad de workflow, límites de autoridad o sistemas operativos faltantes.", move: "Modelar el trabajo antes de automatizarlo; separar explícitamente orientación, decisiones y autoridad." },
+      { label: "Existe IA, pero nadie confía completamente en ella.", signal: "La restricción puede ser evidencia, evaluación, control de alcance o autoridad humana poco clara.", move: "Definir qué puede hacer la IA, cómo se evalúa y dónde la aprobación humana sigue siendo obligatoria." },
     ],
     workEyebrow: "04 / TRABAJO SELECCIONADO",
     workTitle: "Evidencia antes que persuasión.",
@@ -151,6 +115,7 @@ const copy = {
     archiveEyebrow: "05 / ARCHIVO DE PORTAFOLIO",
     archiveTitle: "Una trayectoria más amplia de trabajo entregado y exploración.",
     archiveNote: "Los proyectos históricos siguen siendo históricos. Las exploraciones siguen siendo exploraciones.",
+    noMedia: "EVIDENCIA SOLO TEXTO / SIN MEDIA VERIFICADA",
     productsEyebrow: "06 / PRODUCTOS + LABS",
     productsTitle: "Construyendo sistemas, no solo páginas.",
     products: [
@@ -177,62 +142,38 @@ const copy = {
   },
 } as const;
 
-export function CreativeBurst({
-  locale,
-  selected,
-  archive,
-}: {
-  locale: Locale;
-  selected: WorkItem[];
-  archive: ArchiveItem[];
-}) {
+export function CreativeBurst({ locale, selected, archive }: { locale: Locale; selected: WorkItem[]; archive: ArchiveItem[] }) {
   const t = copy[locale];
   const rootRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [symptomIndex, setSymptomIndex] = useState(0);
   const activeSymptom = t.symptoms[symptomIndex];
   const languageHref = `/${locale === "en" ? "es" : "en"}/creative-burst`;
-
   const archiveItems = useMemo(() => archive.slice(0, 11), [archive]);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     const ctx = gsap.context(() => {
-      if (!reduced) {
-        gsap.from("[data-hero-reveal]", {
-          opacity: 0,
-          y: 36,
-          duration: 1.05,
-          stagger: 0.08,
-          ease: "power3.out",
-        });
-      }
+      if (!reduced) gsap.from("[data-hero-reveal]", { opacity: 0, y: 36, duration: 1.05, stagger: 0.08, ease: "power3.out" });
     }, root);
 
     const revealNodes = Array.from(root.querySelectorAll<HTMLElement>("[data-burst-reveal]"));
     let observer: IntersectionObserver | null = null;
     if (!reduced && "IntersectionObserver" in window) {
       revealNodes.forEach((node) => gsap.set(node, { opacity: 0, y: 28 }));
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            gsap.to(entry.target, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
-            observer?.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.14 },
-      );
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          gsap.to(entry.target, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
+          observer?.unobserve(entry.target);
+        });
+      }, { threshold: 0.14 });
       revealNodes.forEach((node) => observer?.observe(node));
     }
 
-    return () => {
-      observer?.disconnect();
-      ctx.revert();
-    };
+    return () => { observer?.disconnect(); ctx.revert(); };
   }, []);
 
   useEffect(() => {
@@ -250,22 +191,7 @@ export function CreativeBurst({
     let pointerX = 0;
     let pointerY = 0;
     let visible = true;
-
-    const particles = Array.from({ length: 30 }, (_, index) => ({
-      seed: index * 0.731 + 0.17,
-      size: 1.2 + (index % 4) * 0.8,
-      speed: 0.00008 + (index % 5) * 0.000018,
-    }));
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      width = Math.max(1, rect.width);
-      height = Math.max(1, rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+    const particles = Array.from({ length: 30 }, (_, index) => ({ seed: index * 0.731 + 0.17, size: 1.2 + (index % 4) * 0.8, speed: 0.00008 + (index % 5) * 0.000018 }));
 
     const polygon = (points: Array<[number, number]>, fill: string, stroke: string) => {
       context.beginPath();
@@ -281,13 +207,11 @@ export function CreativeBurst({
 
     const draw = (time = 0) => {
       context.clearRect(0, 0, width, height);
-
       const px = pointerX * 10;
       const py = pointerY * 6;
       const seamX = width * 0.69 + px;
       const seamY = height * 0.48 + py;
       const breathe = reduced ? 0 : Math.sin(time * 0.00055) * 5;
-
       const glow = context.createRadialGradient(seamX, seamY, 8, seamX, seamY, Math.max(width, height) * 0.42);
       glow.addColorStop(0, "rgba(254,81,47,0.38)");
       glow.addColorStop(0.18, "rgba(242,174,92,0.18)");
@@ -295,49 +219,11 @@ export function CreativeBurst({
       glow.addColorStop(1, "rgba(5,6,5,0)");
       context.fillStyle = glow;
       context.fillRect(0, 0, width, height);
-
       const slabStroke = "rgba(244,241,234,0.09)";
-      polygon(
-        [
-          [width * 0.48, height * 0.12],
-          [seamX - 84 + breathe, height * 0.08],
-          [seamX - 34, seamY - 18],
-          [width * 0.54, height * 0.58],
-        ],
-        "rgba(14,16,14,0.96)",
-        slabStroke,
-      );
-      polygon(
-        [
-          [width * 0.5, height * 0.62],
-          [seamX - 28, seamY + 12],
-          [seamX - 72 - breathe, height * 0.92],
-          [width * 0.44, height * 0.88],
-        ],
-        "rgba(9,11,9,0.98)",
-        slabStroke,
-      );
-      polygon(
-        [
-          [seamX + 26, height * 0.17],
-          [width * 0.86, height * 0.24],
-          [width * 0.9, height * 0.52],
-          [seamX + 46, seamY - 16],
-        ],
-        "rgba(25,24,21,0.88)",
-        slabStroke,
-      );
-      polygon(
-        [
-          [seamX + 44, seamY + 28],
-          [width * 0.92, height * 0.57],
-          [width * 0.82, height * 0.84],
-          [seamX + 24, height * 0.78],
-        ],
-        "rgba(19,20,18,0.92)",
-        slabStroke,
-      );
-
+      polygon([[width * 0.48, height * 0.12], [seamX - 84 + breathe, height * 0.08], [seamX - 34, seamY - 18], [width * 0.54, height * 0.58]], "rgba(14,16,14,0.96)", slabStroke);
+      polygon([[width * 0.5, height * 0.62], [seamX - 28, seamY + 12], [seamX - 72 - breathe, height * 0.92], [width * 0.44, height * 0.88]], "rgba(9,11,9,0.98)", slabStroke);
+      polygon([[seamX + 26, height * 0.17], [width * 0.86, height * 0.24], [width * 0.9, height * 0.52], [seamX + 46, seamY - 16]], "rgba(25,24,21,0.88)", slabStroke);
+      polygon([[seamX + 44, seamY + 28], [width * 0.92, height * 0.57], [width * 0.82, height * 0.84], [seamX + 24, height * 0.78]], "rgba(19,20,18,0.92)", slabStroke);
       context.save();
       context.shadowColor = "rgba(254,81,47,0.9)";
       context.shadowBlur = 22;
@@ -349,14 +235,12 @@ export function CreativeBurst({
       context.bezierCurveTo(seamX + 24, height * 0.61, seamX - 10, height * 0.72, seamX + 36, height * 0.9);
       context.stroke();
       context.restore();
-
       context.strokeStyle = "rgba(244,241,234,0.16)";
       context.lineWidth = 1;
       context.beginPath();
       context.moveTo(width * 0.52, height * 0.91);
       context.lineTo(width * 0.96, height * 0.91);
       context.stroke();
-
       particles.forEach((particle, index) => {
         const progress = reduced ? particle.seed % 1 : (particle.seed + time * particle.speed) % 1;
         const x = seamX + width * (0.035 + progress * 0.25);
@@ -369,10 +253,19 @@ export function CreativeBurst({
         context.fillRect(-particle.size, -particle.size * 0.6, particle.size * 2, particle.size * 1.2);
         context.restore();
       });
-
       if (!reduced && visible) raf = window.requestAnimationFrame(draw);
     };
 
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (reduced) draw(performance.now());
+    };
     const onPointer = (event: PointerEvent) => {
       const rect = root.getBoundingClientRect();
       pointerX = (event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
@@ -380,10 +273,7 @@ export function CreativeBurst({
     };
     const onVisibility = () => {
       visible = !document.hidden;
-      if (visible && !reduced) {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(draw);
-      }
+      if (visible && !reduced) { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
     };
 
     resize();
@@ -392,7 +282,6 @@ export function CreativeBurst({
     window.addEventListener("resize", resize);
     root.addEventListener("pointermove", onPointer, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
-
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
@@ -404,211 +293,63 @@ export function CreativeBurst({
   return (
     <main className={styles.root} ref={rootRef}>
       <a className={styles.skipLink} href="#main-content">Skip to content</a>
-
       <nav className={styles.nav} aria-label="Primary">
         <a className={styles.brand} href="#top" aria-label="Denysoft home">denysoft<span>.</span></a>
         <div className={styles.navLinks}>
-          <a href="#work">{t.nav.work}</a>
-          <a href="#capabilities">{t.nav.capabilities}</a>
-          <a href="#navigator">{t.nav.navigator}</a>
-          <a href="#contact">{t.nav.contact}</a>
+          <a href="#work">{t.nav.work}</a><a href="#capabilities">{t.nav.capabilities}</a><a href="#navigator">{t.nav.navigator}</a><a href="#contact">{t.nav.contact}</a>
         </div>
         <a className={styles.language} href={languageHref}>{locale === "en" ? "ES" : "EN"}</a>
       </nav>
 
-      <section className={styles.hero} id="top">
+      <section className={styles.hero} id="top" data-qa-section="hero">
         <canvas className={styles.fractureCanvas} ref={canvasRef} aria-hidden="true" />
         <div className={styles.heroGrid} id="main-content">
           <div className={styles.heroCopy}>
             <p className={styles.eyebrow} data-hero-reveal>{t.heroEyebrow}</p>
-            <h1 className={styles.heroTitle} data-hero-reveal>
-              <span>{t.heroTitleA}</span>
-              <span className={styles.heroTitleSignal}>{t.heroTitleB}</span>
-            </h1>
+            <h1 className={styles.heroTitle} data-hero-reveal><span>{t.heroTitleA}</span><span className={styles.heroTitleSignal}>{t.heroTitleB}</span></h1>
             <p className={styles.heroBody} data-hero-reveal>{t.heroBody}</p>
-            <div className={styles.heroActions} data-hero-reveal>
-              <a className={styles.primaryButton} href="#navigator">{t.heroPrimary} <span>↗</span></a>
-              <a className={styles.textLink} href="#work">{t.heroSecondary} <span>↓</span></a>
-            </div>
+            <div className={styles.heroActions} data-hero-reveal><a className={styles.primaryButton} href="#navigator">{t.heroPrimary} <span>↗</span></a><a className={styles.textLink} href="#work">{t.heroSecondary} <span>↓</span></a></div>
           </div>
-          <div className={styles.heroSignal} aria-hidden="true">
-            <span className={styles.signalIndex}>01</span>
-            <span className={styles.signalRule} />
-            <span>CONSTRAINT</span>
-            <span>DIAGNOSIS</span>
-            <span>MOVEMENT</span>
-          </div>
+          <div className={styles.heroSignal} aria-hidden="true"><span className={styles.signalIndex}>01</span><span className={styles.signalRule} /><span>CONSTRAINT</span><span>DIAGNOSIS</span><span>MOVEMENT</span></div>
         </div>
-        <div className={styles.heroFooter} data-hero-reveal>
-          <span>{t.heroNote}</span>
-          <span className={styles.scrollMark}>SCROLL ↓</span>
-        </div>
+        <div className={styles.heroFooter} data-hero-reveal><span>{t.heroNote}</span><span className={styles.scrollMark}>SCROLL ↓</span></div>
       </section>
 
-      <section className={styles.betterQuestion} data-burst-reveal>
-        <div>
-          <p className={styles.darkEyebrow}>{t.betterEyebrow}</p>
-          <h2>{t.betterTitle}</h2>
-        </div>
-        <div className={styles.betterAnswer}>
-          <p className={styles.betterLead}>{t.betterLead}</p>
-          <p>{t.betterBody}</p>
-        </div>
+      <section className={styles.betterQuestion} data-burst-reveal data-qa-section="better-question"><div><p className={styles.darkEyebrow}>{t.betterEyebrow}</p><h2>{t.betterTitle}</h2></div><div className={styles.betterAnswer}><p className={styles.betterLead}>{t.betterLead}</p><p>{t.betterBody}</p></div></section>
+
+      <section className={styles.capabilities} id="capabilities" data-qa-section="capabilities">
+        <div className={styles.sectionIntro} data-burst-reveal><p className={styles.eyebrow}>{t.capabilityEyebrow}</p><h2>{t.capabilityTitle}</h2></div>
+        <div className={styles.capabilityList}>{t.capabilities.map(([title, body], index) => <article className={styles.capabilityRow} key={title} data-burst-reveal><span className={styles.rowIndex}>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{body}</p><span className={styles.rowArrow} aria-hidden="true">↗</span></article>)}</div>
       </section>
 
-      <section className={styles.capabilities} id="capabilities">
-        <div className={styles.sectionIntro} data-burst-reveal>
-          <p className={styles.eyebrow}>{t.capabilityEyebrow}</p>
-          <h2>{t.capabilityTitle}</h2>
-        </div>
-        <div className={styles.capabilityList}>
-          {t.capabilities.map(([title, body], index) => (
-            <article className={styles.capabilityRow} key={title} data-burst-reveal>
-              <span className={styles.rowIndex}>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{title}</h3>
-              <p>{body}</p>
-              <span className={styles.rowArrow} aria-hidden="true">↗</span>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.navigator} id="navigator">
-        <div className={styles.navigatorIntro} data-burst-reveal>
-          <p className={styles.darkEyebrow}>{t.navigatorEyebrow}</p>
-          <h2>{t.navigatorTitle}</h2>
-          <p>{t.navigatorIntro}</p>
-        </div>
+      <section className={styles.navigator} id="navigator" data-qa-section="navigator">
+        <div className={styles.navigatorIntro} data-burst-reveal><p className={styles.darkEyebrow}>{t.navigatorEyebrow}</p><h2>{t.navigatorTitle}</h2><p>{t.navigatorIntro}</p></div>
         <div className={styles.navigatorInstrument} data-burst-reveal>
-          <div className={styles.symptomList} role="list" aria-label={locale === "en" ? "Growth symptoms" : "Síntomas de crecimiento"}>
-            {t.symptoms.map((symptom, index) => (
-              <button
-                className={`${styles.symptomButton} ${index === symptomIndex ? styles.symptomButtonActive : ""}`}
-                type="button"
-                onClick={() => setSymptomIndex(index)}
-                key={symptom.label}
-                aria-pressed={index === symptomIndex}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {symptom.label}
-              </button>
-            ))}
-          </div>
-          <div className={styles.hypothesis} aria-live="polite">
-            <p className={styles.hypothesisLabel}>{t.workingHypothesis}</p>
-            <h3>{activeSymptom.signal}</h3>
-            <p>{activeSymptom.move}</p>
-            <a href="#contact">{t.navigatorCta}</a>
-          </div>
+          <div className={styles.symptomList} role="list" aria-label={locale === "en" ? "Growth symptoms" : "Síntomas de crecimiento"}>{t.symptoms.map((symptom, index) => <button className={`${styles.symptomButton} ${index === symptomIndex ? styles.symptomButtonActive : ""}`} type="button" onClick={() => setSymptomIndex(index)} key={symptom.label} aria-pressed={index === symptomIndex}><span>{String(index + 1).padStart(2, "0")}</span>{symptom.label}</button>)}</div>
+          <div className={styles.hypothesis} aria-live="polite"><p className={styles.hypothesisLabel}>{t.workingHypothesis}</p><h3>{activeSymptom.signal}</h3><p>{activeSymptom.move}</p><a href="#contact">{t.navigatorCta}</a></div>
         </div>
       </section>
 
-      <section className={styles.selectedWork} id="work">
-        <div className={styles.workHeading} data-burst-reveal>
-          <p className={styles.eyebrow}>{t.workEyebrow}</p>
-          <h2>{t.workTitle}</h2>
-          <p>{t.workLead}</p>
-        </div>
-        <div className={styles.workStack}>
-          {selected.map((item, index) => (
-            <article className={styles.workCase} key={item.slug} data-burst-reveal>
-              <div className={styles.workMedia}>
-                {item.image ? <img src={item.image} alt="" loading={index === 0 ? "eager" : "lazy"} /> : null}
-                <span className={styles.mediaWash} aria-hidden="true" />
-                <span className={styles.workNumber}>0{index + 1}</span>
-              </div>
-              <div className={styles.workCopy}>
-                <p className={styles.workCategory}>{item.category}</p>
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-                <a href={`/${locale}/work/${item.slug}`}>{t.viewCase} ↗</a>
-              </div>
-            </article>
-          ))}
-        </div>
+      <section className={styles.selectedWork} id="work" data-qa-section="selected-work">
+        <div className={styles.workHeading} data-burst-reveal><p className={styles.eyebrow}>{t.workEyebrow}</p><h2>{t.workTitle}</h2><p>{t.workLead}</p></div>
+        <div className={styles.workStack}>{selected.map((item, index) => <article className={styles.workCase} key={item.slug} data-burst-reveal><div className={styles.workMedia}>{item.image ? <img src={item.image} alt="" loading={index === 0 ? "eager" : "lazy"} /> : null}<span className={styles.mediaWash} aria-hidden="true" /><span className={styles.workNumber}>0{index + 1}</span></div><div className={styles.workCopy}><p className={styles.workCategory}>{item.category}</p><h3>{item.title}</h3><p>{item.summary}</p><a href={`/${locale}/work/${item.slug}`}>{t.viewCase} ↗</a></div></article>)}</div>
       </section>
 
-      <section className={styles.archiveSection}>
-        <div className={styles.archiveHeading} data-burst-reveal>
-          <div>
-            <p className={styles.darkEyebrow}>{t.archiveEyebrow}</p>
-            <h2>{t.archiveTitle}</h2>
-          </div>
-          <p>{t.archiveNote}</p>
-        </div>
-        <div className={styles.archiveGrid}>
-          {archiveItems.map((item, index) => (
-            <a className={styles.archiveCard} href={`/${locale}/work/${item.slug}`} key={item.slug} data-burst-reveal>
-              <div className={styles.archiveTopline}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{item.exploration ? "LAB" : "ARCHIVE"}</span>
-              </div>
-              {item.image ? <img src={item.image} alt="" loading="lazy" /> : <span className={styles.archiveTexture} aria-hidden="true" />}
-              <div>
-                <p>{item.category}</p>
-                <h3>{item.title}</h3>
-              </div>
-            </a>
-          ))}
-        </div>
+      <section className={styles.archiveSection} data-qa-section="archive">
+        <div className={styles.archiveHeading} data-burst-reveal><div><p className={styles.darkEyebrow}>{t.archiveEyebrow}</p><h2>{t.archiveTitle}</h2></div><p>{t.archiveNote}</p></div>
+        <div className={styles.archiveGrid}>{archiveItems.map((item, index) => <a className={styles.archiveCard} href={`/${locale}/work/${item.slug}`} key={item.slug} data-burst-reveal><div className={styles.archiveTopline}><span>{String(index + 1).padStart(2, "0")}</span><span>{item.exploration ? "LAB" : "ARCHIVE"}</span></div>{item.image ? <img src={item.image} alt="" loading="lazy" /> : <span className={`${styles.archiveTexture} ${hardening.archiveNoMedia}`}><b>{t.noMedia}</b></span>}<div><p>{item.category}</p><h3>{item.title}</h3></div></a>)}</div>
       </section>
 
-      <section className={styles.products}>
-        <div className={styles.sectionIntro} data-burst-reveal>
-          <p className={styles.eyebrow}>{t.productsEyebrow}</p>
-          <h2>{t.productsTitle}</h2>
-        </div>
-        <div className={styles.productGrid}>
-          {t.products.map(([title, body], index) => (
-            <article className={styles.productPanel} key={title} data-burst-reveal>
-              <span>LAB / 0{index + 1}</span>
-              <h3>{title}</h3>
-              <p>{body}</p>
-              <div className={styles.productSignal} aria-hidden="true"><i /><i /><i /></div>
-            </article>
-          ))}
-        </div>
+      <section className={styles.products} data-qa-section="products-labs">
+        <div className={styles.sectionIntro} data-burst-reveal><p className={styles.eyebrow}>{t.productsEyebrow}</p><h2>{t.productsTitle}</h2></div>
+        <div className={styles.productGrid}>{t.products.map(([title, body], index) => <article className={styles.productPanel} key={title} data-burst-reveal><span>LAB / 0{index + 1}</span><h3>{title}</h3><p>{body}</p><div className={`${hardening.productTrace} ${hardening[`trace${index + 1}`]}`} aria-hidden="true"><i /><i /><i /><i /><i /></div></article>)}</div>
       </section>
 
-      <section className={styles.engage}>
-        <div className={styles.engageHeading} data-burst-reveal>
-          <p className={styles.eyebrow}>{t.engageEyebrow}</p>
-          <h2>{t.engageTitle}</h2>
-        </div>
-        <div className={styles.processList}>
-          {t.process.map(([number, title, body]) => (
-            <article key={number} data-burst-reveal>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <section className={styles.engage} data-qa-section="engage"><div className={styles.engageHeading} data-burst-reveal><p className={styles.eyebrow}>{t.engageEyebrow}</p><h2>{t.engageTitle}</h2></div><div className={styles.processList}>{t.process.map(([number, title, body]) => <article key={number} data-burst-reveal><span>{number}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
 
-      <section className={styles.market} data-burst-reveal>
-        <p className={styles.darkEyebrow}>{t.marketEyebrow}</p>
-        <h2>{t.marketTitle}</h2>
-        <p>{t.marketBody}</p>
-        <div className={styles.marketLine} aria-hidden="true"><span /><span /><span /></div>
-      </section>
-
-      <section className={styles.finalCta} id="contact">
-        <div data-burst-reveal>
-          <p>{t.finalEyebrow}</p>
-          <h2>{t.finalTitle}</h2>
-        </div>
-        <div className={styles.finalAction} data-burst-reveal>
-          <p>{t.finalBody}</p>
-          <a href="mailto:hello@denysoft.net">{t.finalCta} <span>↗</span></a>
-        </div>
-      </section>
-
-      <footer className={styles.footer}>
-        <a className={styles.brand} href="#top">denysoft<span>.</span></a>
-        <span>{t.footer}</span>
-        <span>ENG / ESP</span>
-      </footer>
+      <section className={styles.market} data-burst-reveal data-qa-section="market"><p className={styles.darkEyebrow}>{t.marketEyebrow}</p><h2>{t.marketTitle}</h2><p>{t.marketBody}</p><div className={styles.marketLine} aria-hidden="true"><span /><span /><span /></div></section>
+      <section className={styles.finalCta} id="contact" data-qa-section="final-cta"><div data-burst-reveal><p>{t.finalEyebrow}</p><h2>{t.finalTitle}</h2></div><div className={styles.finalAction} data-burst-reveal><p>{t.finalBody}</p><a href="mailto:hello@denysoft.net">{t.finalCta} <span>↗</span></a></div></section>
+      <footer className={styles.footer}><a className={styles.brand} href="#top">denysoft<span>.</span></a><span>{t.footer}</span><span>ENG / ESP</span></footer>
     </main>
   );
 }

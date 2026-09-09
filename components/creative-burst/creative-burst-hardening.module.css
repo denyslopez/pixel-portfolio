@@ -1,0 +1,163 @@
+.archiveNoMedia {
+  position: relative;
+  display: grid !important;
+  align-content: end;
+  padding: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(20, 21, 16, 0.035), rgba(20, 21, 16, 0.12)),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(20, 21, 16, 0.045) 31px 32px) !important;
+}
+
+.archiveNoMedia::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 46px;
+  height: 2px;
+  background: var(--signal);
+}
+
+.archiveNoMedia::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px 48px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(20, 21, 16, 0.28), transparent);
+}
+
+.archiveNoMedia b {
+  position: relative;
+  z-index: 1;
+  max-width: 19ch;
+  color: rgba(20, 21, 16, 0.66);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.productTrace {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+.productTrace i {
+  position: absolute;
+  display: block;
+}
+
+/* CARVIS: intake -> governed handoff. A directional trace, not an orbit. */
+.trace1 i:nth-child(1) {
+  left: 9%;
+  right: 18%;
+  top: 29%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(244, 241, 234, 0.14) 12%, rgba(254, 81, 47, 0.6) 72%, transparent);
+}
+
+.trace1 i:nth-child(2) {
+  right: 18%;
+  top: 18%;
+  width: 1px;
+  height: 23%;
+  background: rgba(254, 81, 47, 0.46);
+  box-shadow: 0 0 24px rgba(254, 81, 47, 0.18);
+}
+
+.trace1 i:nth-child(3),
+.trace1 i:nth-child(4),
+.trace1 i:nth-child(5) {
+  width: 8px;
+  height: 8px;
+  background: #fe512f;
+  box-shadow: 0 0 26px rgba(254, 81, 47, 0.36);
+}
+
+.trace1 i:nth-child(3) { left: 19%; top: calc(29% - 4px); }
+.trace1 i:nth-child(4) { left: 43%; top: calc(29% - 4px); background: rgba(232, 223, 208, 0.76); box-shadow: none; }
+.trace1 i:nth-child(5) { right: calc(18% - 4px); top: calc(29% - 4px); }
+
+/* Client Hub: stacked project surfaces and one shared operating spine. */
+.trace2 i:nth-child(1),
+.trace2 i:nth-child(2),
+.trace2 i:nth-child(3) {
+  right: -5%;
+  width: 64%;
+  height: 17%;
+  border: 1px solid rgba(244, 241, 234, 0.11);
+  background: linear-gradient(90deg, rgba(244, 241, 234, 0.015), rgba(254, 81, 47, 0.035));
+  transform: skewY(-8deg);
+}
+
+.trace2 i:nth-child(1) { top: 8%; }
+.trace2 i:nth-child(2) { top: 22%; right: 3%; }
+.trace2 i:nth-child(3) { top: 36%; right: 11%; }
+.trace2 i:nth-child(4) {
+  right: 31%;
+  top: 8%;
+  width: 1px;
+  height: 47%;
+  background: linear-gradient(180deg, transparent, rgba(254, 81, 47, 0.72), transparent);
+}
+.trace2 i:nth-child(5) {
+  right: calc(31% - 4px);
+  top: 30%;
+  width: 9px;
+  height: 9px;
+  background: var(--signal);
+  box-shadow: 0 0 30px rgba(254, 81, 47, 0.42);
+}
+
+/* Growth Navigator: symptom branches converge toward a bounded hypothesis. */
+.trace3 i:nth-child(1),
+.trace3 i:nth-child(2),
+.trace3 i:nth-child(3) {
+  left: 13%;
+  width: 45%;
+  height: 1px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(244, 241, 234, 0.08), rgba(254, 81, 47, 0.55));
+}
+
+.trace3 i:nth-child(1) { top: 16%; transform: rotate(13deg); }
+.trace3 i:nth-child(2) { top: 27%; transform: rotate(0deg); }
+.trace3 i:nth-child(3) { top: 38%; transform: rotate(-13deg); }
+.trace3 i:nth-child(4) {
+  left: 58%;
+  top: 16%;
+  width: 1px;
+  height: 25%;
+  background: rgba(254, 81, 47, 0.5);
+}
+.trace3 i:nth-child(5) {
+  left: calc(58% - 5px);
+  top: calc(27% - 5px);
+  width: 11px;
+  height: 11px;
+  background: var(--signal);
+  box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
+}
+
+@media (max-width: 760px) {
+  .archiveNoMedia b {
+    max-width: 24ch;
+  }
+
+  .productTrace {
+    opacity: 0.64;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .productTrace,
+  .archiveNoMedia {
+    transition: none !important;
+  }
+}
