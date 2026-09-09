@@ -95,7 +95,7 @@ export function CreativeBurstWorkDetail({
           <Link href={`/${locale}/creative-burst#navigator`}>{t.nav.navigator}</Link>
           <Link href={`/${locale}/creative-burst#contact`}>{t.nav.contact}</Link>
         </div>
-        <span className={`locale-switch ${styles.languageWrap}`}><Link className={styles.language} href={`/${otherLocale}/work/${slug}`}>{otherLocale.toUpperCase()}</Link></span>
+        <span className="locale-switch" style={{ justifySelf: "end" }}><Link className={styles.language} href={`/${otherLocale}/work/${slug}`}>{otherLocale.toUpperCase()}</Link></span>
       </nav>
 
       <header className={styles.hero}>
