@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 212" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070806"/>
+      <stop offset="0.56" stop-color="#171711"/>
+      <stop offset="1" stop-color="#050605"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22231d"/>
+      <stop offset="0.52" stop-color="#4a473d"/>
+      <stop offset="1" stop-color="#d8cdbb"/>
+    </linearGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eee7da"/>
+      <stop offset="1" stop-color="#b9aa95"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fe512f" stop-opacity="0"/>
+      <stop offset="0.18" stop-color="#fe512f" stop-opacity="0.95"/>
+      <stop offset="0.72" stop-color="#ff684a" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#fe512f" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" seed="19"/>
+      <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .13 0"/>
+    </filter>
+  </defs>
+  <rect width="960" height="212" fill="url(#bg)"/>
+  <path d="M-40 46 L600 22 L708 112 L56 132 Z" fill="#11120f"/>
+  <path d="M118 80 L676 56 L780 132 L206 151 Z" fill="url(#stone)" opacity="0.92"/>
+  <path d="M648 18 L1010 -6 L1010 116 L764 138 L680 86 Z" fill="url(#ivory)"/>
+  <path d="M474 123 L1002 93 L1002 126 L438 158 Z" fill="#090a08" opacity="0.88"/>
+  <path d="M410 139 L1000 105" stroke="url(#signal)" stroke-width="3"/>
+  <rect width="960" height="212" filter="url(#grain)" opacity="0.48"/>
+  <path d="M0 182 L960 146" stroke="#f4f1ea" stroke-opacity="0.08"/>
+</svg>
