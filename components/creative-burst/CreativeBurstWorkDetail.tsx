@@ -95,7 +95,7 @@ export function CreativeBurstWorkDetail({
           <Link href={`/${locale}/creative-burst#navigator`}>{t.nav.navigator}</Link>
           <Link href={`/${locale}/creative-burst#contact`}>{t.nav.contact}</Link>
         </div>
-        <Link className={styles.language} href={`/${otherLocale}/work/${slug}`}>{otherLocale.toUpperCase()}</Link>
+        <span className={`locale-switch ${styles.languageWrap}`}><Link className={styles.language} href={`/${otherLocale}/work/${slug}`}>{otherLocale.toUpperCase()}</Link></span>
       </nav>
 
       <header className={styles.hero}>
@@ -113,7 +113,7 @@ export function CreativeBurstWorkDetail({
         </div>
       </header>
 
-      <section className={styles.mediaStage} aria-label={`${item.title} evidence`}>
+      <section className={`${styles.mediaStage} case-media`} aria-label={`${item.title} evidence`}>
         {heroImage ? (
           <div className={styles.mediaFrame}>
             <img src={heroImage} alt="" />
@@ -143,7 +143,7 @@ export function CreativeBurstWorkDetail({
 
           <section className={styles.flowSection}>
             <p className={styles.sectionLabel}>03 / {t.flow}</p>
-            <ol>
+            <ol className="case-flow">
               {selected.flow.map((step, index) => (
                 <li key={step}><span>{String(index + 1).padStart(2, "0")}</span><strong>{step}</strong></li>
               ))}
@@ -152,7 +152,7 @@ export function CreativeBurstWorkDetail({
 
           <section className={styles.decisionSection}>
             <p className={styles.sectionLabel}>04 / {t.decisions}</p>
-            <div className={styles.decisionGrid}>
+            <div className={`${styles.decisionGrid} case-decision-grid`}>
               {selected.decisions.map((decision, index) => (
                 <article key={decision.title}>
                   <span>D{String(index + 1).padStart(2, "0")}</span>
