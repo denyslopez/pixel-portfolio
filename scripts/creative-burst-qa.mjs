@@ -21,6 +21,24 @@ async function waitForServer(url, attempts = 60) {
   throw new Error(`Creative Burst QA server did not become ready: ${url}`);
 }
 
+async function revealFullPage(page) {
+  await page.evaluate(async () => {
+    const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const maxY = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    const step = Math.max(360, Math.floor(innerHeight * 0.62));
+
+    for (let y = 0; y <= maxY; y += step) {
+      scrollTo(0, Math.min(y, maxY));
+      await pause(90);
+    }
+
+    scrollTo(0, maxY);
+    await pause(180);
+    scrollTo(0, 0);
+  });
+  await page.waitForTimeout(350);
+}
+
 async function diagnostics(page) {
   return page.evaluate(() => {
     const elements = [...document.querySelectorAll("body *")];
@@ -51,6 +69,10 @@ async function diagnostics(page) {
     const selectedWorkArticles = [...document.querySelectorAll("#work article")];
     const archiveCards = [...document.querySelectorAll('[class*="archiveGrid"] > a')];
     const productPanels = [...document.querySelectorAll('[class*="productGrid"] > article')];
+    const revealNodes = [...document.querySelectorAll("[data-burst-reveal]")].map((node) => ({
+      opacity: Number.parseFloat(getComputedStyle(node).opacity || "1"),
+      text: (node.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 80),
+    }));
 
     return {
       url: location.href,
@@ -79,6 +101,7 @@ async function diagnostics(page) {
       selectedWorkArticles: selectedWorkArticles.length,
       archiveCards: archiveCards.length,
       productPanels: productPanels.length,
+      unrevealedNodes: revealNodes.filter((item) => item.opacity < 0.95),
       imageFailures: images.filter((image) => image.complete && (image.naturalWidth === 0 || image.naturalHeight === 0)),
     };
   });
@@ -95,6 +118,7 @@ function assertCandidate(name, result, locale) {
   invariant(result.selectedWorkArticles === 3, `${name}: expected 3 selected-work evidence cases`);
   invariant(result.archiveCards === 11, `${name}: expected 11 archive entries`);
   invariant(result.productPanels === 3, `${name}: expected 3 Products + Labs panels`);
+  invariant(result.unrevealedNodes.length === 0, `${name}: full-page visual capture still contains unrevealed sections ${JSON.stringify(result.unrevealedNodes)}`);
   invariant(result.imageFailures.length === 0, `${name}: image failures ${JSON.stringify(result.imageFailures)}`);
 }
 
@@ -137,6 +161,7 @@ try {
     const response = await page.goto(`${baseUrl}/${spec.locale}/creative-burst`, { waitUntil: "networkidle", timeout: 30_000 });
     invariant(response?.status() === 200, `${spec.name}: expected HTTP 200`);
     await page.waitForTimeout(500);
+    await revealFullPage(page);
 
     const result = await diagnostics(page);
     report[spec.name] = { ...result, errors, pass: false };
@@ -152,6 +177,7 @@ try {
 
     await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: true, animations: "disabled" });
     report[spec.name].navigatorInteraction = true;
+    report[spec.name].fullPageRevealVerified = true;
     report[spec.name].pass = true;
     await persist();
     await context.close();
@@ -164,6 +190,7 @@ try {
     screenshots: specs.length,
     viewports: [390, 768, 1440],
     locales: ["en", "es"],
+    fullPageRevealVerified: true,
     productionTouched: false,
   };
   await persist();
