@@ -145,6 +145,49 @@
   box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
 }
 
+/* Market Position: one territorial axis, intentionally not another orbit. */
+:global([class*="marketLine"]) {
+  right: 6vw !important;
+  bottom: 11vw !important;
+  width: min(42vw, 620px) !important;
+  height: 150px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+:global([class*="marketLine"])::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(20, 21, 16, 0.06), rgba(20, 21, 16, 0.34) 18%, rgba(20, 21, 16, 0.34) 82%, rgba(20, 21, 16, 0.06));
+}
+
+:global([class*="marketLine"])::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  width: 1px;
+  height: 44%;
+  background: rgba(254, 81, 47, 0.44);
+}
+
+:global([class*="marketLine"]) span {
+  top: calc(50% - 4px) !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 0 !important;
+  background: var(--signal) !important;
+  box-shadow: 0 0 18px rgba(254, 81, 47, 0.22);
+}
+
+:global([class*="marketLine"]) span:nth-child(1) { left: 8% !important; }
+:global([class*="marketLine"]) span:nth-child(2) { left: calc(50% - 4px) !important; }
+:global([class*="marketLine"]) span:nth-child(3) { left: auto !important; right: 8% !important; }
+
 @media (max-width: 760px) {
   .archiveNoMedia b {
     max-width: 24ch;
@@ -152,6 +195,13 @@
 
   .productTrace {
     opacity: 0.64;
+  }
+
+  :global([class*="marketLine"]) {
+    right: -4vw !important;
+    bottom: 12vw !important;
+    width: 76vw !important;
+    height: 110px !important;
   }
 }
 
