@@ -8,7 +8,7 @@ async function waitForServer(url, attempts = 60) {
     try { const response = await fetch(url); if (response.ok) return; } catch {}
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
-  throw new Error(`R3 structure QA server did not become ready: ${url}`);
+  throw new Error(`VD6 structure QA server did not become ready: ${url}`);
 }
 
 const server = spawn(process.execPath, ["server.js"], {
@@ -26,12 +26,14 @@ try {
   for (const locale of ["en", "es"]) {
     const response = await page.goto(`${baseUrl}/${locale}`, { waitUntil: "domcontentloaded" });
     invariant(response?.status() === 200, `${locale}: home must return 200`);
-    invariant(await page.locator(".r3-work-card").count() === 3, `${locale}: expected 3 flagship work cards`);
-    invariant(await page.locator(".r3-capability-item").count() === 5, `${locale}: expected 5 capability-rail items`);
-    invariant(await page.locator(".r3-product").count() === 3, `${locale}: expected 3 AXOM evidence products`);
-    invariant(await page.locator(".desktop-nav a").count() === 4, `${locale}: expected 4 primary navigation destinations`);
-    invariant(await page.locator(".lab-section").count() === 0, `${locale}: Lab must remain deferred`);
-    invariant(await page.locator(".practice-section").count() === 0, `${locale}: Practice must remain retired from R3 home`);
+    invariant(await page.locator('[data-qa-section="selected-work"] article').count() === 3, `${locale}: expected 3 flagship work cases`);
+    invariant(await page.locator('[data-qa-section="capabilities"] article').count() === 5, `${locale}: expected 5 connected capabilities`);
+    invariant(await page.locator('[data-qa-section="products-labs"] article').count() === 3, `${locale}: expected 3 product/lab evidence panels`);
+    invariant(await page.locator('[data-qa-section="better-question"]').count() === 1, `${locale}: Better Question missing`);
+    invariant(await page.locator('[data-qa-section="navigator"]').count() === 1, `${locale}: Growth Navigator missing`);
+    invariant(await page.locator('[data-qa-section="final-cta"]').count() === 1, `${locale}: final CTA missing`);
+    invariant(await page.locator('nav[aria-label="Primary"]').count() === 1, `${locale}: primary navigation missing`);
+    invariant(await page.locator(".practice-section").count() === 0, `${locale}: retired Practice surface must remain absent`);
   }
 
   const cases = [
@@ -49,7 +51,7 @@ try {
 
   await context.close();
   await browser.close();
-  console.log("R3 structure QA: PASS");
+  console.log("VD6 structure QA: PASS");
 } finally {
   server.kill("SIGTERM");
 }

@@ -8,7 +8,7 @@ async function waitForServer(url, attempts = 60) {
     try { const response = await fetch(url); if (response.ok) return; } catch {}
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
-  throw new Error(`R3 visual-contract server did not become ready: ${url}`);
+  throw new Error(`VD6 visual-contract server did not become ready: ${url}`);
 }
 
 const server = spawn(process.execPath, ["server.js"], {
@@ -27,31 +27,31 @@ try {
     await page.goto(`${baseUrl}/${locale}`, { waitUntil: "domcontentloaded" });
 
     const state = await page.evaluate(() => {
-      const hero = document.querySelector(".r3-hero");
-      const visual = document.querySelector(".r3-hero-visual");
-      const close = document.querySelector(".r3-close");
-      const signal = getComputedStyle(document.documentElement).getPropertyValue("--signal").trim().toLowerCase();
+      const root = document.querySelector('main[class*="root"]');
+      const hero = document.querySelector('[data-qa-section="hero"]');
+      const finalCta = document.querySelector('[data-qa-section="final-cta"]');
+      const heroBefore = hero ? getComputedStyle(hero, "::before") : null;
+      const signal = root ? getComputedStyle(root).getPropertyValue("--signal").trim().toLowerCase() : "";
       return {
-        desktopNav: getComputedStyle(document.querySelector(".desktop-nav")).display,
-        mobileNav: getComputedStyle(document.querySelector(".r3-mobile-nav")).display,
         hero: Boolean(hero),
-        visual: Boolean(visual),
-        closeBackground: close ? getComputedStyle(close).backgroundImage : "none",
+        finalCta: Boolean(finalCta),
+        heroBackground: heroBefore?.backgroundImage ?? "none",
         signal,
+        qaSections: document.querySelectorAll("[data-qa-section]").length,
+        reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
         immersiveField: Boolean(document.querySelector(".immersive-field")),
-        lab: Boolean(document.querySelector(".lab-section")),
         practice: Boolean(document.querySelector(".practice-section")),
       };
     });
 
-    invariant(state.desktopNav !== "none", `${locale}-desktop: desktop navigation hidden`);
-    invariant(state.mobileNav === "none", `${locale}-desktop: mobile navigation leaked into desktop`);
-    invariant(state.hero && state.visual, `${locale}-desktop: R3 hero composition incomplete`);
-    invariant(state.signal === "#ff4a1c" || state.signal === "rgb(255, 74, 28)", `${locale}-desktop: Signal Vermilion drift (${state.signal})`);
-    invariant(state.closeBackground && state.closeBackground !== "none", `${locale}-desktop: cinematic commercial close missing`);
+    invariant(state.hero, `${locale}-desktop: VD6 hero missing`);
+    invariant(state.finalCta, `${locale}-desktop: final CTA missing`);
+    invariant(state.heroBackground.includes("denysoft-hero-system-spatial.svg"), `${locale}-desktop: authored hero world missing`);
+    invariant(state.signal === "#fe512f" || state.signal === "rgb(254, 81, 47)", `${locale}-desktop: Signal Vermilion drift (${state.signal})`);
+    invariant(state.qaSections >= 9, `${locale}-desktop: incomplete VD6 section surface`);
+    invariant(state.reduced, `${locale}-desktop: reduced-motion preference not active`);
     invariant(!state.immersiveField, `${locale}-desktop: retired GPU field reintroduced`);
-    invariant(!state.lab, `${locale}-desktop: deferred Lab reintroduced`);
-    invariant(!state.practice, `${locale}-desktop: retired Practice reintroduced`);
+    invariant(!state.practice, `${locale}-desktop: retired Practice surface reintroduced`);
     await desktop.close();
   }
 
@@ -61,22 +61,21 @@ try {
     await page.goto(`${baseUrl}/${locale}`, { waitUntil: "domcontentloaded" });
 
     const state = await page.evaluate(() => {
-      const heroTitle = document.querySelector(".r3-hero-title");
-      const heroVisual = document.querySelector(".r3-hero-visual");
+      const heroTitle = document.querySelector('[data-qa-section="hero"] h1');
+      const hero = document.querySelector('[data-qa-section="hero"]');
+      const heroBefore = hero ? getComputedStyle(hero, "::before") : null;
       return {
-        mobileNav: getComputedStyle(document.querySelector(".r3-mobile-nav")).display,
-        desktopNav: getComputedStyle(document.querySelector(".desktop-nav")).display,
         titleWidth: heroTitle?.scrollWidth ?? 0,
         titleClient: heroTitle?.clientWidth ?? 0,
-        visualHeight: heroVisual?.getBoundingClientRect().height ?? 0,
+        heroHeight: hero?.getBoundingClientRect().height ?? 0,
+        heroBackground: heroBefore?.backgroundImage ?? "none",
         reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
       };
     });
 
-    invariant(state.mobileNav !== "none", `${locale}-mobile: mobile navigation missing`);
-    invariant(state.desktopNav === "none", `${locale}-mobile: desktop navigation should collapse`);
     invariant(state.titleWidth <= state.titleClient + 2, `${locale}-mobile: hero title overflows`);
-    invariant(state.visualHeight > 240, `${locale}-mobile: cinematic visual aperture collapsed`);
+    invariant(state.heroHeight >= 700, `${locale}-mobile: hero composition collapsed`);
+    invariant(state.heroBackground.includes("denysoft-hero-system-spatial.svg"), `${locale}-mobile: authored hero world missing`);
     invariant(state.reduced, `${locale}-mobile: reduced-motion preference not active`);
     await mobile.close();
   }
@@ -84,14 +83,14 @@ try {
   const workContext = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
   const workPage = await workContext.newPage();
   await workPage.goto(`${baseUrl}/en`, { waitUntil: "domcontentloaded" });
-  const workTitles = await workPage.locator(".r3-work-card h3").allTextContents();
+  const workTitles = await workPage.locator('[data-qa-section="selected-work"] article h3').allTextContents();
   invariant(JSON.stringify(workTitles) === JSON.stringify(["Baltica Salon", "Taller Express", "MasterTax"]), `Selected Work drift: ${JSON.stringify(workTitles)}`);
-  const statuses = await workPage.locator(".r3-status").allTextContents();
-  invariant(statuses.length === 3 && statuses.every(Boolean), "AXOM product evidence must expose explicit status");
+  const productTitles = await workPage.locator('[data-qa-section="products-labs"] article h3').allTextContents();
+  invariant(JSON.stringify(productTitles) === JSON.stringify(["CARVIS", "AXOM Client Hub", "Growth Navigator"]), `Products + Labs drift: ${JSON.stringify(productTitles)}`);
   await workContext.close();
 
   await browser.close();
-  console.log("R3 visual contract QA: PASS");
+  console.log("VD6 visual contract QA: PASS");
 } finally {
   server.kill("SIGTERM");
 }
