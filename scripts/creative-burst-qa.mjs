@@ -74,6 +74,7 @@ async function diagnostics(page) {
     const images = [...document.images].map((image) => ({ src: image.currentSrc || image.src, complete: image.complete, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight }));
     const hero = document.querySelector("h1");
     const canvas = document.querySelector("canvas");
+    const marketLine = document.querySelector('[class*="marketLine"]');
     const revealNodes = [...document.querySelectorAll("[data-burst-reveal]")].map((node) => ({ opacity: Number.parseFloat(getComputedStyle(node).opacity || "1"), text: (node.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 80) }));
     const archiveCards = [...document.querySelectorAll('[class*="archiveGrid"] > a')];
     const noMediaCards = archiveCards.filter((card) => !card.querySelector("img"));
@@ -99,6 +100,7 @@ async function diagnostics(page) {
       legacyProductSignals: document.querySelectorAll('[class*="productSignal"]').length,
       noMediaCards: noMediaCards.length,
       noMediaLabels,
+      marketAxis: marketLine ? { borderRadius: getComputedStyle(marketLine).borderRadius, width: Math.round(marketLine.getBoundingClientRect().width), height: Math.round(marketLine.getBoundingClientRect().height) } : null,
       unrevealedNodes: revealNodes.filter((item) => item.opacity < 0.95),
       imageFailures: images.filter((image) => image.complete && (image.naturalWidth === 0 || image.naturalHeight === 0)),
     };
@@ -120,20 +122,29 @@ function assertCandidate(name, result, locale, canvasPaint) {
   invariant(result.productTraces === 3, `${name}: expected one semantic product trace per product`);
   invariant(result.legacyProductSignals === 0, `${name}: legacy orbit product signal reappeared`);
   invariant(result.noMediaCards === result.noMediaLabels, `${name}: text-only archive evidence is not explicitly labeled (${result.noMediaLabels}/${result.noMediaCards})`);
+  invariant(result.marketAxis && result.marketAxis.borderRadius === "0px", `${name}: legacy circular market motif reappeared (${JSON.stringify(result.marketAxis)})`);
   invariant(result.unrevealedNodes.length === 0, `${name}: unrevealed sections ${JSON.stringify(result.unrevealedNodes)}`);
   invariant(result.imageFailures.length === 0, `${name}: image failures ${JSON.stringify(result.imageFailures)}`);
 }
 
+async function prepareCapture(page) {
+  await page.addStyleTag({ content: 'nav, a[href="#main-content"] { visibility: hidden !important; transition: none !important; }' });
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(80);
+}
+
 async function captureSections(page, prefix, sectionNames) {
-  await page.locator("nav").evaluate((node) => { node.style.visibility = "hidden"; });
-  await page.evaluate(() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); });
+  await prepareCapture(page);
   for (const section of sectionNames) {
     const locator = page.locator(`[data-qa-section="${section}"]`);
     invariant(await locator.count() === 1, `${prefix}: missing QA section ${section}`);
     await locator.screenshot({ path: `${outputDir}/${prefix}-section-${section}.png`, animations: "disabled" });
   }
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(80);
   await page.screenshot({ path: `${outputDir}/${prefix}.png`, fullPage: true, animations: "disabled" });
 }
 
@@ -192,14 +203,15 @@ try {
         : [];
     if (sections.length) await captureSections(page, spec.name, sections);
     else {
-      await page.locator("nav").evaluate((node) => { node.style.visibility = "hidden"; });
-      await page.evaluate(() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); window.scrollTo(0, 0); });
+      await prepareCapture(page);
       await page.screenshot({ path: `${outputDir}/${spec.name}.png`, fullPage: true, animations: "disabled" });
     }
 
     report[spec.name].navigatorInteraction = true;
     report[spec.name].fullPageRevealVerified = true;
     report[spec.name].canvasResizePaintVerified = true;
+    report[spec.name].marketAxisVerified = true;
+    report[spec.name].cleanCaptureChrome = true;
     report[spec.name].pass = true;
     await persist();
     await context.close();
@@ -208,7 +220,7 @@ try {
   await browser.close();
   report.gate = {
     pass: true,
-    candidate: "VD6_WHOLE_PAGE_CREATIVE_BURST_HARDENED",
+    candidate: "VD6_WHOLE_PAGE_CREATIVE_BURST_REVIEW_READY",
     screenshots: specs.length,
     sectionEvidence: 16,
     viewports: [390, 768, 1440],
@@ -217,6 +229,8 @@ try {
     reducedMotionCanvasResizeVerified: true,
     semanticProductTracesVerified: true,
     textOnlyEvidenceLabelsVerified: true,
+    marketAxisVerified: true,
+    cleanCaptureChrome: true,
     productionTouched: false,
   };
   await persist();
