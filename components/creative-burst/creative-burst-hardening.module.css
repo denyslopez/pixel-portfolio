@@ -53,7 +53,6 @@
   display: block;
 }
 
-/* CARVIS: intake -> governed handoff. A directional trace, not an orbit. */
 .trace1 i:nth-child(1) {
   left: 9%;
   right: 18%;
@@ -84,7 +83,6 @@
 .trace1 i:nth-child(4) { left: 43%; top: calc(29% - 4px); background: rgba(232, 223, 208, 0.76); box-shadow: none; }
 .trace1 i:nth-child(5) { right: calc(18% - 4px); top: calc(29% - 4px); }
 
-/* Client Hub: stacked project surfaces and one shared operating spine. */
 .trace2 i:nth-child(1),
 .trace2 i:nth-child(2),
 .trace2 i:nth-child(3) {
@@ -115,7 +113,6 @@
   box-shadow: 0 0 30px rgba(254, 81, 47, 0.42);
 }
 
-/* Growth Navigator: symptom branches converge toward a bounded hypothesis. */
 .trace3 i:nth-child(1),
 .trace3 i:nth-child(2),
 .trace3 i:nth-child(3) {
@@ -145,17 +142,17 @@
   box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
 }
 
-/* Hero: cinematic human-scale visual is now the primary storefront medium. */
+/* Hero: reuse the previously generated authored visual system rather than another one-off image. */
 :global([data-qa-section="hero"]) {
   isolation: isolate;
   background:
-    linear-gradient(90deg, rgba(5, 6, 5, 0.98) 0%, rgba(5, 6, 5, 0.95) 32%, rgba(5, 6, 5, 0.63) 52%, rgba(5, 6, 5, 0.12) 74%, rgba(5, 6, 5, 0.3) 100%),
-    linear-gradient(180deg, rgba(5, 6, 5, 0.08) 0%, rgba(5, 6, 5, 0.02) 66%, rgba(5, 6, 5, 0.72) 100%),
-    url('/creative/denysoft-hero-cinematic.svg') center right / cover no-repeat !important;
+    linear-gradient(90deg, rgba(5, 6, 5, 0.99) 0%, rgba(5, 6, 5, 0.96) 31%, rgba(5, 6, 5, 0.78) 48%, rgba(5, 6, 5, 0.18) 72%, rgba(5, 6, 5, 0.38) 100%),
+    linear-gradient(180deg, rgba(5, 6, 5, 0.04) 0%, rgba(5, 6, 5, 0) 68%, rgba(5, 6, 5, 0.72) 100%),
+    url('/creative/denysoft-hero-triptych.svg') center center / cover no-repeat !important;
 }
 
 :global([data-qa-section="hero"]) canvas {
-  opacity: 0.08 !important;
+  opacity: 0.045 !important;
   filter: contrast(1.04) saturate(0.55);
   mix-blend-mode: screen;
 }
@@ -167,20 +164,20 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 73% 39%, rgba(255, 186, 113, 0.11), transparent 22%),
-    linear-gradient(90deg, transparent 0 58%, rgba(254, 81, 47, 0.05) 77%, transparent 100%);
+    linear-gradient(90deg, rgba(5, 6, 5, 0.22), transparent 47%, transparent 100%),
+    radial-gradient(circle at 72% 24%, rgba(255, 198, 138, 0.08), transparent 22%);
 }
 
 :global([data-qa-section="hero"])::after {
   content: "";
   position: absolute;
   z-index: 0;
-  left: 50%;
+  left: 0;
   right: 0;
   bottom: 0;
-  height: 36%;
+  height: 28%;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(5, 6, 5, 0.62));
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 5, 0.74));
 }
 
 :global([data-qa-section="hero"] [class*="heroGrid"]),
@@ -193,7 +190,6 @@
   text-shadow: 0 0 36px rgba(254, 81, 47, 0.08);
 }
 
-/* Market Position: one territorial axis, intentionally not another orbit. */
 :global([class*="marketLine"]) {
   right: 6vw !important;
   bottom: 11vw !important;
@@ -247,21 +243,20 @@
 
   :global([data-qa-section="hero"]) {
     background:
-      linear-gradient(180deg, rgba(5, 6, 5, 0.91) 0%, rgba(5, 6, 5, 0.73) 46%, rgba(5, 6, 5, 0.2) 68%, rgba(5, 6, 5, 0.86) 100%),
-      url('/creative/denysoft-hero-cinematic.svg') 63% center / cover no-repeat !important;
+      linear-gradient(180deg, rgba(5, 6, 5, 0.94) 0%, rgba(5, 6, 5, 0.82) 40%, rgba(5, 6, 5, 0.36) 66%, rgba(5, 6, 5, 0.9) 100%),
+      url('/creative/denysoft-hero-triptych.svg') 64% center / cover no-repeat !important;
   }
 
   :global([data-qa-section="hero"]) canvas {
-    opacity: 0.05 !important;
+    opacity: 0.03 !important;
   }
 
   :global([data-qa-section="hero"])::before {
-    background: linear-gradient(180deg, rgba(5, 6, 5, 0.2), transparent 52%, rgba(5, 6, 5, 0.48));
+    background: linear-gradient(180deg, rgba(5, 6, 5, 0.24), transparent 54%, rgba(5, 6, 5, 0.52));
   }
 
   :global([data-qa-section="hero"])::after {
-    left: 0;
-    height: 40%;
+    height: 42%;
   }
 
   :global([class*="marketLine"]) {
