@@ -142,30 +142,34 @@
   box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
 }
 
-/* Hero: reuse the previously generated authored visual system rather than another one-off image. */
+/* Hero: a human-scale threshold scene carries the emotional storefront role.
+   Copy communicates the commercial proposition; the image supplies scale,
+   tension and forward possibility without literally illustrating the headline. */
 :global([data-qa-section="hero"]) {
   isolation: isolate;
-  background:
-    linear-gradient(90deg, rgba(5, 6, 5, 0.99) 0%, rgba(5, 6, 5, 0.96) 31%, rgba(5, 6, 5, 0.78) 48%, rgba(5, 6, 5, 0.18) 72%, rgba(5, 6, 5, 0.38) 100%),
-    linear-gradient(180deg, rgba(5, 6, 5, 0.04) 0%, rgba(5, 6, 5, 0) 68%, rgba(5, 6, 5, 0.72) 100%),
-    url('/creative/denysoft-hero-triptych.svg') center center / cover no-repeat !important;
+  background: #050605 !important;
 }
 
 :global([data-qa-section="hero"]) canvas {
-  opacity: 0.045 !important;
-  filter: contrast(1.04) saturate(0.55);
+  opacity: 0.025 !important;
+  filter: contrast(1.02) saturate(0.5);
   mix-blend-mode: screen;
 }
 
 :global([data-qa-section="hero"])::before {
   content: "";
   position: absolute;
-  inset: 0;
   z-index: 0;
+  left: 38%;
+  right: -4%;
+  top: 13%;
+  bottom: 16%;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(5, 6, 5, 0.22), transparent 47%, transparent 100%),
-    radial-gradient(circle at 72% 24%, rgba(255, 198, 138, 0.08), transparent 22%);
+    linear-gradient(90deg, rgba(5, 6, 5, 0.96) 0%, rgba(5, 6, 5, 0.58) 18%, rgba(5, 6, 5, 0.08) 46%, rgba(5, 6, 5, 0.2) 100%),
+    linear-gradient(180deg, rgba(5, 6, 5, 0.24) 0%, transparent 28%, transparent 70%, rgba(5, 6, 5, 0.72) 100%),
+    url('/creative/denysoft-hero-silhouette-wide.svg') 50% 52% / 170% auto no-repeat;
+  filter: saturate(0.92) contrast(1.04);
 }
 
 :global([data-qa-section="hero"])::after {
@@ -175,9 +179,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 28%;
+  height: 32%;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(5, 6, 5, 0.74));
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 5, 0.78));
 }
 
 :global([data-qa-section="hero"] [class*="heroGrid"]),
@@ -241,22 +245,25 @@
     opacity: 0.64;
   }
 
-  :global([data-qa-section="hero"]) {
-    background:
-      linear-gradient(180deg, rgba(5, 6, 5, 0.94) 0%, rgba(5, 6, 5, 0.82) 40%, rgba(5, 6, 5, 0.36) 66%, rgba(5, 6, 5, 0.9) 100%),
-      url('/creative/denysoft-hero-triptych.svg') 64% center / cover no-repeat !important;
-  }
-
   :global([data-qa-section="hero"]) canvas {
-    opacity: 0.03 !important;
+    opacity: 0.015 !important;
   }
 
   :global([data-qa-section="hero"])::before {
-    background: linear-gradient(180deg, rgba(5, 6, 5, 0.24), transparent 54%, rgba(5, 6, 5, 0.52));
+    left: 0;
+    right: 0;
+    top: 25%;
+    bottom: auto;
+    height: 43%;
+    background:
+      linear-gradient(180deg, rgba(5, 6, 5, 0.82) 0%, rgba(5, 6, 5, 0.28) 28%, rgba(5, 6, 5, 0.12) 62%, rgba(5, 6, 5, 0.9) 100%),
+      linear-gradient(90deg, rgba(5, 6, 5, 0.38), transparent 42%, rgba(5, 6, 5, 0.08)),
+      url('/creative/denysoft-hero-silhouette-mobile.svg') 18% 50% / 118% auto no-repeat;
+    filter: saturate(0.88) contrast(1.03);
   }
 
   :global([data-qa-section="hero"])::after {
-    height: 42%;
+    height: 46%;
   }
 
   :global([class*="marketLine"]) {
