@@ -249,15 +249,25 @@
     opacity: 0.012 !important;
   }
 
+  :global([data-qa-section="hero"] [class*="heroGrid"]) {
+    padding-top: 92px !important;
+    padding-bottom: 96px !important;
+    align-content: center !important;
+  }
+
+  :global([data-qa-section="hero"] [class*="heroCopy"]) {
+    padding-top: 10vh !important;
+  }
+
   :global([data-qa-section="hero"])::before {
     left: 0;
     right: 0;
-    top: 20%;
+    top: 17%;
     bottom: auto;
-    height: 47%;
+    height: 50%;
     background:
-      linear-gradient(180deg, rgba(5, 6, 5, 0.72) 0%, rgba(5, 6, 5, 0.18) 26%, rgba(5, 6, 5, 0.1) 64%, rgba(5, 6, 5, 0.92) 100%),
-      linear-gradient(90deg, rgba(5, 6, 5, 0.3), transparent 44%, rgba(5, 6, 5, 0.08)),
+      linear-gradient(180deg, rgba(5, 6, 5, 0.68) 0%, rgba(5, 6, 5, 0.14) 25%, rgba(5, 6, 5, 0.1) 64%, rgba(5, 6, 5, 0.92) 100%),
+      linear-gradient(90deg, rgba(5, 6, 5, 0.28), transparent 44%, rgba(5, 6, 5, 0.08)),
       url('/creative/denysoft-hero-silhouette-mobile.svg') 18% 50% / 116% auto no-repeat;
     filter: saturate(0.9) contrast(1.04);
   }
