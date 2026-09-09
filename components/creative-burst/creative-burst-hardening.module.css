@@ -145,6 +145,60 @@
   box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
 }
 
+/* Hero: compressed operating field -> diagnosed constraint -> controlled release.
+   The old procedural slabs remain only as low-opacity material depth; they are
+   no longer the primary meaning-bearing visual. */
+:global([data-qa-section="hero"]) {
+  isolation: isolate;
+}
+
+:global([data-qa-section="hero"]) canvas {
+  opacity: 0.22 !important;
+  filter: contrast(1.08) saturate(0.72);
+}
+
+:global([data-qa-section="hero"])::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 1.5vw;
+  top: 12%;
+  width: min(52vw, 820px);
+  height: 72%;
+  pointer-events: none;
+  opacity: 0.88;
+  clip-path: polygon(0 5%, 52% 31%, 67% 43%, 100% 17%, 100% 83%, 67% 57%, 52% 69%, 0 95%);
+  background:
+    linear-gradient(90deg, rgba(244, 241, 234, 0.02), rgba(244, 241, 234, 0.08) 48%, rgba(254, 81, 47, 0.16) 66%, rgba(244, 241, 234, 0.04) 70%, transparent 100%),
+    repeating-linear-gradient(0deg, transparent 0 25px, rgba(244, 241, 234, 0.11) 25px 26px);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 13%, #000 88%, transparent 100%);
+}
+
+:global([data-qa-section="hero"])::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: clamp(22vw, 34.8vw, 545px);
+  top: 24%;
+  width: 2px;
+  height: 52%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(254, 81, 47, 0.28) 12%, #fe512f 46%, rgba(255, 198, 138, 0.86) 54%, rgba(254, 81, 47, 0.24) 88%, transparent);
+  box-shadow: 0 0 34px rgba(254, 81, 47, 0.34), 0 0 110px rgba(254, 81, 47, 0.08);
+  transform: rotate(2deg);
+  transform-origin: center;
+}
+
+:global([data-qa-section="hero"] [class*="heroGrid"]),
+:global([data-qa-section="hero"] [class*="heroFooter"]) {
+  position: relative;
+  z-index: 2;
+}
+
+:global([data-qa-section="hero"] [class*="heroTitleSignal"]) {
+  text-shadow: 0 0 36px rgba(254, 81, 47, 0.08);
+}
+
 /* Market Position: one territorial axis, intentionally not another orbit. */
 :global([class*="marketLine"]) {
   right: 6vw !important;
@@ -197,6 +251,26 @@
     opacity: 0.64;
   }
 
+  :global([data-qa-section="hero"]) canvas {
+    opacity: 0.14 !important;
+  }
+
+  :global([data-qa-section="hero"])::before {
+    right: -42vw;
+    top: 34%;
+    width: 118vw;
+    height: 48%;
+    opacity: 0.62;
+    clip-path: polygon(0 12%, 50% 34%, 64% 44%, 100% 20%, 100% 80%, 64% 56%, 50% 66%, 0 88%);
+  }
+
+  :global([data-qa-section="hero"])::after {
+    right: 29vw;
+    top: 45%;
+    height: 35%;
+    opacity: 0.78;
+  }
+
   :global([class*="marketLine"]) {
     right: -4vw !important;
     bottom: 12vw !important;
@@ -208,6 +282,11 @@
 @media (prefers-reduced-motion: reduce) {
   .productTrace,
   .archiveNoMedia {
+    transition: none !important;
+  }
+
+  :global([data-qa-section="hero"])::before,
+  :global([data-qa-section="hero"])::after {
     transition: none !important;
   }
 }
