@@ -145,48 +145,42 @@
   box-shadow: 0 0 34px rgba(254, 81, 47, 0.5);
 }
 
-/* Hero: compressed operating field -> diagnosed constraint -> controlled release.
-   The old procedural slabs remain only as low-opacity material depth; they are
-   no longer the primary meaning-bearing visual. */
+/* Hero: cinematic human-scale visual is now the primary storefront medium. */
 :global([data-qa-section="hero"]) {
   isolation: isolate;
+  background:
+    linear-gradient(90deg, rgba(5, 6, 5, 0.98) 0%, rgba(5, 6, 5, 0.95) 32%, rgba(5, 6, 5, 0.63) 52%, rgba(5, 6, 5, 0.12) 74%, rgba(5, 6, 5, 0.3) 100%),
+    linear-gradient(180deg, rgba(5, 6, 5, 0.08) 0%, rgba(5, 6, 5, 0.02) 66%, rgba(5, 6, 5, 0.72) 100%),
+    url('/creative/denysoft-hero-cinematic.svg') center right / cover no-repeat !important;
 }
 
 :global([data-qa-section="hero"]) canvas {
-  opacity: 0.22 !important;
-  filter: contrast(1.08) saturate(0.72);
+  opacity: 0.08 !important;
+  filter: contrast(1.04) saturate(0.55);
+  mix-blend-mode: screen;
 }
 
 :global([data-qa-section="hero"])::before {
   content: "";
   position: absolute;
+  inset: 0;
   z-index: 0;
-  right: 1.5vw;
-  top: 12%;
-  width: min(52vw, 820px);
-  height: 72%;
   pointer-events: none;
-  opacity: 0.88;
-  clip-path: polygon(0 5%, 25% 31%, 36% 43%, 100% 17%, 100% 83%, 36% 57%, 25% 69%, 0 95%);
   background:
-    linear-gradient(90deg, rgba(244, 241, 234, 0.02), rgba(244, 241, 234, 0.08) 48%, rgba(254, 81, 47, 0.16) 66%, rgba(244, 241, 234, 0.04) 70%, transparent 100%),
-    repeating-linear-gradient(0deg, transparent 0 25px, rgba(244, 241, 234, 0.11) 25px 26px);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 13%, #000 88%, transparent 100%);
+    radial-gradient(circle at 73% 39%, rgba(255, 186, 113, 0.11), transparent 22%),
+    linear-gradient(90deg, transparent 0 58%, rgba(254, 81, 47, 0.05) 77%, transparent 100%);
 }
 
 :global([data-qa-section="hero"])::after {
   content: "";
   position: absolute;
   z-index: 0;
-  right: clamp(22vw, 34.8vw, 545px);
-  top: 24%;
-  width: 2px;
-  height: 52%;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+  height: 36%;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(254, 81, 47, 0.28) 12%, #fe512f 46%, rgba(255, 198, 138, 0.86) 54%, rgba(254, 81, 47, 0.24) 88%, transparent);
-  box-shadow: 0 0 34px rgba(254, 81, 47, 0.34), 0 0 110px rgba(254, 81, 47, 0.08);
-  transform: rotate(2deg);
-  transform-origin: center;
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 5, 0.62));
 }
 
 :global([data-qa-section="hero"] [class*="heroGrid"]),
@@ -251,24 +245,23 @@
     opacity: 0.64;
   }
 
+  :global([data-qa-section="hero"]) {
+    background:
+      linear-gradient(180deg, rgba(5, 6, 5, 0.91) 0%, rgba(5, 6, 5, 0.73) 46%, rgba(5, 6, 5, 0.2) 68%, rgba(5, 6, 5, 0.86) 100%),
+      url('/creative/denysoft-hero-cinematic.svg') 63% center / cover no-repeat !important;
+  }
+
   :global([data-qa-section="hero"]) canvas {
-    opacity: 0.14 !important;
+    opacity: 0.05 !important;
   }
 
   :global([data-qa-section="hero"])::before {
-    right: -42vw;
-    top: 34%;
-    width: 118vw;
-    height: 48%;
-    opacity: 0.62;
-    clip-path: polygon(0 12%, 27% 34%, 40% 44%, 100% 20%, 100% 80%, 40% 56%, 27% 66%, 0 88%);
+    background: linear-gradient(180deg, rgba(5, 6, 5, 0.2), transparent 52%, rgba(5, 6, 5, 0.48));
   }
 
   :global([data-qa-section="hero"])::after {
-    right: 29vw;
-    top: 45%;
-    height: 35%;
-    opacity: 0.78;
+    left: 0;
+    height: 40%;
   }
 
   :global([class*="marketLine"]) {
