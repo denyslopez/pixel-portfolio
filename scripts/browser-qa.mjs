@@ -52,17 +52,7 @@ async function diagnostics(page) {
       .sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth))
       .slice(0, 20);
 
-    const criticalTextOverflows = [...document.querySelectorAll(
-      ".r3-section-heading h2, .r3-axom-copy h2, .r3-products-heading h2, .r3-about h2, .r3-close h2, .r3-visual-meta > span",
-    )]
-      .map((element) => ({
-        text: (element.textContent ?? "").trim().replace(/\s+/g, " "),
-        clientWidth: element.clientWidth,
-        scrollWidth: element.scrollWidth,
-      }))
-      .filter((item) => item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 2);
-
-    const heroLines = [...document.querySelectorAll(".r3-hero-line")].map((line) => ({
+    const heroSegments = [...document.querySelectorAll('[data-qa-section="hero"] h1 > span')].map((line) => ({
       clientWidth: line.clientWidth,
       scrollWidth: line.scrollWidth,
       text: line.textContent?.trim() ?? "",
@@ -83,16 +73,17 @@ async function diagnostics(page) {
       overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflowElements,
       internalOverflowElements,
-      criticalTextOverflows,
       reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
-      heroLines,
-      workCards: document.querySelectorAll(".r3-work-card").length,
-      capabilities: document.querySelectorAll(".r3-capability-item").length,
-      axomProducts: document.querySelectorAll(".r3-product").length,
+      heroSegments,
+      qaSections: document.querySelectorAll("[data-qa-section]").length,
+      betterQuestion: document.querySelectorAll('[data-qa-section="better-question"]').length,
+      selectedWorkCases: document.querySelectorAll('[data-qa-section="selected-work"] article').length,
+      capabilities: document.querySelectorAll('[data-qa-section="capabilities"] article').length,
+      navigator: document.querySelectorAll('[data-qa-section="navigator"]').length,
+      productLabs: document.querySelectorAll('[data-qa-section="products-labs"] article').length,
+      finalCta: document.querySelectorAll('[data-qa-section="final-cta"]').length,
       immersiveField: Boolean(document.querySelector(".immersive-field")),
-      lab: Boolean(document.querySelector(".lab-section")),
       practice: Boolean(document.querySelector(".practice-section")),
-      switchHref: document.querySelector(".locale-switch a")?.getAttribute("href") ?? null,
       imageFailures: images.filter((image) => image.complete && image.naturalWidth === 0),
     };
   });
@@ -104,17 +95,17 @@ function assertHome(name, result, locale) {
     !result.overflowX,
     `${name}: horizontal overflow. viewport=${result.viewport[0]} html=${result.scrollWidth} body=${result.bodyScrollWidth} rect=${JSON.stringify(result.overflowElements)} internal=${JSON.stringify(result.internalOverflowElements)}`,
   );
-  invariant(
-    result.criticalTextOverflows.length === 0,
-    `${name}: critical R3 display text clips its own column ${JSON.stringify(result.criticalTextOverflows)}`,
-  );
-  invariant(result.heroLines.length === 3, `${name}: expected 3 R3 hero lines`);
-  invariant(result.heroLines.every((line) => line.scrollWidth <= line.clientWidth + 2), `${name}: clipped R3 hero line`);
-  invariant(result.workCards === 3, `${name}: expected 3 selected-work cards`);
-  invariant(result.capabilities === 5, `${name}: expected 5 business-readable capabilities`);
-  invariant(result.axomProducts === 3, `${name}: expected 3 AXOM product-evidence items`);
+  invariant(result.heroSegments.length === 2, `${name}: expected 2 VD6 hero title segments`);
+  invariant(result.heroSegments.every((line) => line.scrollWidth <= line.clientWidth + 2), `${name}: clipped VD6 hero title segment`);
+  invariant(result.qaSections >= 9, `${name}: expected complete VD6 section surface`);
+  invariant(result.betterQuestion === 1, `${name}: Better Question missing`);
+  invariant(result.selectedWorkCases === 3, `${name}: expected 3 selected-work cases`);
+  invariant(result.capabilities === 5, `${name}: expected 5 connected capabilities`);
+  invariant(result.navigator === 1, `${name}: Growth Navigator missing`);
+  invariant(result.productLabs === 3, `${name}: expected 3 Products + Labs panels`);
+  invariant(result.finalCta === 1, `${name}: final CTA missing`);
+  invariant(result.imageFailures.length === 0, `${name}: broken images ${JSON.stringify(result.imageFailures)}`);
   invariant(!result.immersiveField, `${name}: retired global immersive GPU field reappeared`);
-  invariant(!result.lab, `${name}: deferred Lab reappeared`);
   invariant(!result.practice, `${name}: retired Practice section reappeared`);
 }
 
@@ -175,7 +166,7 @@ try {
 
   await casePage.goto(`${baseUrl}/en/work/baltica-salon`, { waitUntil: "domcontentloaded" });
   const switchHref = await casePage.locator(".locale-switch a").getAttribute("href");
-  invariant(switchHref === "/es/work/baltica-salon", `Locale switch must preserve R3 case route, got ${switchHref}`);
+  invariant(switchHref === "/es/work/baltica-salon", `Locale switch must preserve case route, got ${switchHref}`);
   await caseContext.close();
 
   const tallerContext = await browser.newContext({ viewport: { width: 1200, height: 900 }, reducedMotion: "reduce" });
@@ -187,7 +178,7 @@ try {
   await tallerContext.close();
 
   await browser.close();
-  report.browserGate = { pass: true, profile: "R3_STANDARD_PRODUCT", screenshots: 4, fullPage: true };
+  report.browserGate = { pass: true, profile: "VD6_CANONICAL_HOME", screenshots: 4, fullPage: true };
   await persist();
   console.log(JSON.stringify(report, null, 2));
 } finally {
