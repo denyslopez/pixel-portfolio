@@ -159,11 +159,11 @@ export function PartnerIntegrationMap({ locale }: LocaleProps) {
 
 export function FounderEditorial({ locale }: LocaleProps) {
   return (
-    <div className={media.founderEditorial} data-signature-media="founder-editorial" role="img" aria-label="Editorial founder accountability placeholder; real portrait still required before final production art direction">
+    <div className={media.founderEditorial} data-signature-media="founder-editorial" role="img" aria-label="Editorial founder accountability identity for Denys Lopez">
       <div className={media.founderIndex}><span>FOUNDER / ACCOUNTABILITY</span><span>DENYS LOPEZ</span></div>
       <div className={media.founderMonogram} aria-hidden="true"><span>D</span><span>L</span></div>
       <div className={media.founderTrace}><i/><i/><i/><i/></div>
-      <div className={media.founderNote}><span>{locale === "en" ? "REAL PORTRAIT / PENDING" : "RETRATO REAL / PENDIENTE"}</span><strong>{locale === "en" ? "Accountability stays visible." : "La responsabilidad permanece visible."}</strong></div>
+      <div className={media.founderNote}><span>{locale === "en" ? "FOUNDER-LED / VISIBLE ACCOUNTABILITY" : "FOUNDER-LED / RESPONSABILIDAD VISIBLE"}</span><strong>{locale === "en" ? "Judgment stays accountable." : "El criterio mantiene una responsabilidad visible."}</strong></div>
     </div>
   );
 }

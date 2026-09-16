@@ -31,8 +31,8 @@ type ArchiveItem = {
 
 const labels = {
   en: {
-    nav: { work: "Work", capabilities: "Capabilities", navigator: "Navigator", contact: "Contact" },
-    back: "Back to the Denysoft experience",
+    nav: { work: "Work", capabilities: "Solutions", navigator: "AXOM", contact: "Discuss" },
+    back: "Back to selected work",
     selected: "SELECTED WORK / CASE STUDY",
     archive: "PORTFOLIO ARCHIVE / EVIDENCE RECORD",
     challenge: "The constraint",
@@ -49,8 +49,8 @@ const labels = {
     next: "Return to Selected Work",
   },
   es: {
-    nav: { work: "Trabajo", capabilities: "Capacidades", navigator: "Navigator", contact: "Contacto" },
-    back: "Volver a la experiencia Denysoft",
+    nav: { work: "Trabajo", capabilities: "Soluciones", navigator: "AXOM", contact: "Hablar de un reto" },
+    back: "Volver al trabajo seleccionado",
     selected: "TRABAJO SELECCIONADO / CASO",
     archive: "ARCHIVO DE PORTAFOLIO / REGISTRO DE EVIDENCIA",
     challenge: "La restricción",
@@ -86,21 +86,21 @@ export function CreativeBurstWorkDetail({
   const heroImage = selected?.image ?? archive?.image;
 
   return (
-    <main className={styles.root} data-qa-surface="creative-burst-work-detail">
+    <main className={styles.root} data-qa-surface="denysoft-work-detail">
       <nav className={styles.nav} aria-label="Primary">
-        <Link className={styles.brand} href={`/${locale}/creative-burst#top`}>denysoft<span>.</span></Link>
+        <Link className={styles.brand} href={`/${locale}`}>denysoft<span>.</span></Link>
         <div className={styles.navLinks}>
-          <Link href={`/${locale}/creative-burst#work`}>{t.nav.work}</Link>
-          <Link href={`/${locale}/creative-burst#capabilities`}>{t.nav.capabilities}</Link>
-          <Link href={`/${locale}/creative-burst#navigator`}>{t.nav.navigator}</Link>
-          <Link href={`/${locale}/creative-burst#contact`}>{t.nav.contact}</Link>
+          <Link href={`/${locale}/work`}>{t.nav.work}</Link>
+          <Link href={`/${locale}/solutions`}>{t.nav.capabilities}</Link>
+          <Link href={`/${locale}/axom`}>{t.nav.navigator}</Link>
+          <Link href={`/${locale}/discuss`}>{t.nav.contact}</Link>
         </div>
         <span className="locale-switch" style={{ justifySelf: "end" }}><Link className={styles.language} href={`/${otherLocale}/work/${slug}`}>{otherLocale.toUpperCase()}</Link></span>
       </nav>
 
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
-          <Link className={styles.back} href={`/${locale}/creative-burst#work`}>← {t.back}</Link>
+          <Link className={styles.back} href={`/${locale}/work`}>← {t.back}</Link>
           <p className={styles.eyebrow}>{kind === "selected" ? t.selected : t.archive}</p>
           <p className={styles.meta}>{item.category}{selected ? ` · ${selected.year}` : ` · ${archive?.exploration ? t.exploration : t.historical}`}</p>
           <h1>{item.title}</h1>
@@ -190,8 +190,8 @@ export function CreativeBurstWorkDetail({
       )}
 
       <footer className={styles.footer}>
-        <Link href={`/${locale}/creative-burst#work`}>← {t.next}</Link>
-        <span>DENYSOFT · STRATEGY × DESIGN × ENGINEERING × GROWTH × AI</span>
+        <Link href={`/${locale}/work`}>← {t.next}</Link>
+        <span>DENYSOFT · PRODUCT × SYSTEMS × AI</span>
       </footer>
     </main>
   );
