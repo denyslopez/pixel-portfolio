@@ -163,7 +163,7 @@ export function FounderEditorial({ locale }: LocaleProps) {
       <div className={media.founderIndex}><span>FOUNDER / ACCOUNTABILITY</span><span>DENYS LOPEZ</span></div>
       <div className={media.founderMonogram} aria-hidden="true"><span>D</span><span>L</span></div>
       <div className={media.founderTrace}><i/><i/><i/><i/></div>
-      <div className={media.founderNote}><span>{locale === "en" ? "FOUNDER-LED / VISIBLE ACCOUNTABILITY" : "FOUNDER-LED / RESPONSABILIDAD VISIBLE"}</span><strong>{locale === "en" ? "Judgment stays accountable." : "El criterio mantiene responsable visible."}</strong></div>
+      <div className={media.founderNote}><span>{locale === "en" ? "FOUNDER-LED / VISIBLE ACCOUNTABILITY" : "FOUNDER-LED / RESPONSABILIDAD VISIBLE"}</span><strong>{locale === "en" ? "Judgment stays accountable." : "El criterio mantiene una responsabilidad visible."}</strong></div>
     </div>
   );
 }
