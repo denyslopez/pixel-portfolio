@@ -12,20 +12,20 @@ import "../r4.css";
 import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
 
-const title = "Denys Lopez — AI Product Engineer & Design Engineer";
-const description = "AI Product Engineer and Design Engineer building intelligent digital products across Canada, the United States and El Salvador.";
+const title = "Denysoft — Digital Products, Systems & Applied AI";
+const description = "Denysoft builds digital products and AI-enabled business systems with product judgment, design, software and governed implementation.";
 
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: {
     default: title,
-    template: "%s — Denys Lopez",
+    template: "%s — Denysoft",
   },
   description,
-  applicationName: "Denys Lopez Portfolio",
+  applicationName: "Denysoft",
   authors: [{ name: "Denys Lopez" }],
   creator: "Denys Lopez",
-  publisher: "Denys Lopez",
+  publisher: "Denysoft",
   category: "technology",
   robots: {
     index: true,
