@@ -38,13 +38,23 @@ async function inspect(page) {
       .slice(0, 20);
     const heroSplitRect = heroSplit?.getBoundingClientRect();
     const signalRect = signal?.getBoundingClientRect();
+    const heroTitleRect = heroTitle?.getBoundingClientRect();
+    const heroSpans = heroTitle ? [...heroTitle.querySelectorAll(":scope > span")] : [];
+    const heroVisualLines = heroSpans.reduce((total, span) => {
+      const style = getComputedStyle(span);
+      const lineHeight = Number.parseFloat(style.lineHeight) || Number.parseFloat(style.fontSize) || 1;
+      return total + Math.max(1, Math.round(span.getBoundingClientRect().height / lineHeight));
+    }, 0);
     return {
       viewport: [innerWidth, innerHeight],
+      lang: document.documentElement.lang,
       overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflow,
       motionReady: root?.getAttribute("data-motion-ready") ?? null,
       revealedSections: root?.querySelectorAll('#main-content > section[data-revealed="true"]').length ?? 0,
       heroTitleSize: heroTitle ? Number.parseFloat(getComputedStyle(heroTitle).fontSize) : 0,
+      heroTitleHeight: heroTitleRect?.height ?? 0,
+      heroVisualLines,
       heroSplitWidth: heroSplitRect?.width ?? 0,
       heroSplitLeft: heroSplitRect?.left ?? 0,
       heroSplitRight: heroSplitRect?.right ?? 0,
@@ -77,23 +87,33 @@ try {
     { name: "mobile-390", width: 390, height: 844 },
   ];
 
-  for (const viewport of viewports) {
-    const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
-    await page.goto(`${baseUrl}/en`, { waitUntil: "networkidle" });
-    await page.waitForTimeout(120);
-    const state = await inspect(page);
-    invariant(!state.overflowX, `${viewport.name}: horizontal overflow ${JSON.stringify(state.overflow)}`);
-    invariant(state.motionReady !== null, `${viewport.name}: browser experience layer did not mount`);
-    invariant(state.heroTitleSize >= (viewport.width >= 1440 ? 82 : 44), `${viewport.name}: hero title lost visual authority (${state.heroTitleSize}px)`);
-    if (viewport.width >= 1440) {
-      const minimumCompositionWidth = Math.min(1500, viewport.width * 0.72);
-      invariant(state.heroSplitWidth >= minimumCompositionWidth, `${viewport.name}: hero composition still behaves like a narrow fixed canvas (${state.heroSplitWidth}px < ${minimumCompositionWidth}px)`);
-      invariant(state.heroSplitLeft >= 0 && state.heroSplitRight <= viewport.width + 2, `${viewport.name}: hero composition escaped viewport`);
-      invariant(state.signalWidth >= 520, `${viewport.name}: signature signal is visually undersized (${state.signalWidth}px)`);
+  for (const locale of ["en", "es"]) {
+    for (const viewport of viewports) {
+      const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+      await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
+      await page.waitForTimeout(120);
+      const state = await inspect(page);
+      invariant(state.lang === locale, `${locale}/${viewport.name}: lang drift ${state.lang}`);
+      invariant(!state.overflowX, `${locale}/${viewport.name}: horizontal overflow ${JSON.stringify(state.overflow)}`);
+      invariant(state.motionReady !== null, `${locale}/${viewport.name}: browser experience layer did not mount`);
+      const minimumTitleSize = locale === "es" ? (viewport.width >= 1440 ? 76 : 42) : (viewport.width >= 1440 ? 82 : 44);
+      invariant(state.heroTitleSize >= minimumTitleSize, `${locale}/${viewport.name}: hero title lost visual authority (${state.heroTitleSize}px < ${minimumTitleSize}px)`);
+      if (viewport.width >= 1440) {
+        const minimumCompositionWidth = Math.min(1500, viewport.width * 0.72);
+        invariant(state.heroSplitWidth >= minimumCompositionWidth, `${locale}/${viewport.name}: hero composition behaves like a narrow fixed canvas (${state.heroSplitWidth}px < ${minimumCompositionWidth}px)`);
+        invariant(state.heroSplitLeft >= 0 && state.heroSplitRight <= viewport.width + 2, `${locale}/${viewport.name}: hero composition escaped viewport`);
+        invariant(state.signalWidth >= 520, `${locale}/${viewport.name}: signature signal is visually undersized (${state.signalWidth}px)`);
+      }
+      if (locale === "es") {
+        const maxLines = viewport.width >= 1440 ? 4 : 5;
+        const maxHeight = viewport.height * (viewport.width >= 1440 ? 0.48 : 0.42);
+        invariant(state.heroVisualLines <= maxLines, `${locale}/${viewport.name}: Spanish hero expanded to ${state.heroVisualLines} visual lines (max ${maxLines})`);
+        invariant(state.heroTitleHeight <= maxHeight, `${locale}/${viewport.name}: Spanish hero title consumes ${Math.round(state.heroTitleHeight)}px of ${viewport.height}px viewport`);
+      }
+      await page.screenshot({ path: `${outputDir}/${locale}-${viewport.name}.png`, fullPage: true });
+      results.push({ locale, viewport: viewport.name, state });
+      await page.close();
     }
-    await page.screenshot({ path: `${outputDir}/${viewport.name}.png`, fullPage: true });
-    results.push({ viewport: viewport.name, state });
-    await page.close();
   }
 
   const interactionPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -115,7 +135,7 @@ try {
   await reducedPage.close();
 
   await writeFile(`${outputDir}/report.json`, JSON.stringify({ status: "PASS", results }, null, 2));
-  console.log("Denysoft browser elevation QA PASS — responsive composition, wide viewports, motion layer and reduced-motion fallback verified.");
+  console.log("Denysoft browser elevation QA PASS — EN/ES responsive composition, wide viewports, Spanish visual fit, motion layer and reduced-motion fallback verified.");
 } catch (error) {
   await writeFile(`${outputDir}/server.log`, serverLog);
   await writeFile(`${outputDir}/failure.txt`, String(error?.stack ?? error));
