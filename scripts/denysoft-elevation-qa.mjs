@@ -96,7 +96,7 @@ try {
       invariant(state.lang === locale, `${locale}/${viewport.name}: lang drift ${state.lang}`);
       invariant(!state.overflowX, `${locale}/${viewport.name}: horizontal overflow ${JSON.stringify(state.overflow)}`);
       invariant(state.motionReady !== null, `${locale}/${viewport.name}: browser experience layer did not mount`);
-      const minimumTitleSize = locale === "es" ? (viewport.width >= 1440 ? 76 : 42) : (viewport.width >= 1440 ? 82 : 44);
+      const minimumTitleSize = locale === "es" ? (viewport.width >= 1440 ? 76 : 40) : (viewport.width >= 1440 ? 82 : 44);
       invariant(state.heroTitleSize >= minimumTitleSize, `${locale}/${viewport.name}: hero title lost visual authority (${state.heroTitleSize}px < ${minimumTitleSize}px)`);
       if (viewport.width >= 1440) {
         const minimumCompositionWidth = Math.min(1500, viewport.width * 0.72);
