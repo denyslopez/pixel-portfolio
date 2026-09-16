@@ -30,6 +30,15 @@ async function inspect(page) {
       return { tag: node.tagName.toLowerCase(), className: typeof node.className === "string" ? node.className : "", left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width) };
     }).filter((item) => item.width > 0 && (item.left < -2 || item.right > innerWidth + 2)).slice(0, 20);
     const images = [...document.images].filter((image) => image.complete && image.naturalWidth === 0).map((image) => image.currentSrc || image.src);
+    const homeHeroTitle = document.querySelector('[data-qa="home-hero"] h1');
+    const pageHeroTitle = document.querySelector('[data-qa="page-hero"] h1');
+    const homeHeroSpans = homeHeroTitle ? [...homeHeroTitle.querySelectorAll(":scope > span")] : [];
+    const homeHeroVisualLines = homeHeroSpans.reduce((total, span) => {
+      const style = getComputedStyle(span);
+      const lineHeight = Number.parseFloat(style.lineHeight) || Number.parseFloat(style.fontSize) || 1;
+      const height = span.getBoundingClientRect().height;
+      return total + Math.max(1, Math.round(height / lineHeight));
+    }, 0);
     return {
       lang: document.documentElement.lang,
       authority: Boolean(root),
@@ -45,6 +54,9 @@ async function inspect(page) {
       h1: document.querySelector("h1")?.textContent?.replace(/\s+/g, " ").trim() ?? "",
       navText: document.querySelector('[data-qa="site-header"]')?.textContent?.replace(/\s+/g, " ").trim() ?? "",
       bodyFont: getComputedStyle(document.body).fontFamily,
+      homeHeroVisualLines,
+      homeHeroTitleHeight: homeHeroTitle?.getBoundingClientRect().height ?? 0,
+      pageHeroTitleHeight: pageHeroTitle?.getBoundingClientRect().height ?? 0,
     };
   });
 }
@@ -85,8 +97,18 @@ try {
           invariant(state.homeHero === 1, `${url} ${viewport.name}: home hero missing`);
           invariant(state.evidence === 4, `${url} ${viewport.name}: expected four governed evidence cards`);
           invariant(state.machineRoom >= 1, `${url} ${viewport.name}: AXOM machine room missing on home`);
+          if (locale === "es") {
+            const maxLines = viewport.name === "desktop" ? 4 : 5;
+            const maxHeight = viewport.height * (viewport.name === "desktop" ? 0.48 : 0.42);
+            invariant(state.homeHeroVisualLines <= maxLines, `${url} ${viewport.name}: Spanish hero expanded to ${state.homeHeroVisualLines} visual lines (max ${maxLines})`);
+            invariant(state.homeHeroTitleHeight <= maxHeight, `${url} ${viewport.name}: Spanish hero title consumes ${Math.round(state.homeHeroTitleHeight)}px of ${viewport.height}px viewport`);
+          }
         } else {
           invariant(state.pageHero === 1, `${url} ${viewport.name}: page hero missing`);
+          if (locale === "es") {
+            const maxHeight = viewport.height * (viewport.name === "desktop" ? 0.44 : 0.38);
+            invariant(state.pageHeroTitleHeight <= maxHeight, `${url} ${viewport.name}: Spanish page hero title consumes ${Math.round(state.pageHeroTitleHeight)}px of ${viewport.height}px viewport`);
+          }
         }
         if (pageName === "work") invariant(state.evidence === 4, `${url} ${viewport.name}: work evidence set incomplete`);
         if (pageName === "axom") invariant(state.machineRoom === 1, `${url} ${viewport.name}: AXOM machine room missing`);
@@ -122,7 +144,7 @@ try {
   await formPage.close();
 
   await writeFile(`${outputDir}/report.json`, JSON.stringify({ status: "PASS", routes: results.length, results }, null, 2));
-  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks.`);
+  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks with Spanish visual-fit guards.`);
 } catch (error) {
   await writeFile(`${outputDir}/server.log`, serverLog);
   await writeFile(`${outputDir}/failure.txt`, String(error?.stack ?? error));
