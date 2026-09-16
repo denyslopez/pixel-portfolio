@@ -11,6 +11,7 @@ on:
       - feature/portfolio-001-edition-001-r3-design
       - feature/portfolio-001-edition-001-r3-implementation
       - feature/denysoft-engineering-run001
+      - feature/denysoft-commercial-readiness-run001
 
 permissions:
   contents: read

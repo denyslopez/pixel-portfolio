@@ -134,17 +134,33 @@ try {
   invariant(!reducedState.overflowX, "Reduced-motion mobile home overflowed");
   await reducedPage.close();
 
-  const formPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await formPage.goto(`${baseUrl}/en/discuss`, { waitUntil: "networkidle" });
-  await formPage.locator('input[name="name"]').fill("Preview QA");
-  await formPage.locator('input[name="email"]').fill("qa@example.com");
-  await formPage.locator('textarea[name="challenge"]').fill("Validate preview intake behavior");
-  await formPage.getByRole("button", { name: "Discuss a Challenge" }).last().click();
-  invariant(await formPage.getByText("Preview confirmed: no data was sent or stored.").count() === 1, "Preview-only intake guard missing");
-  await formPage.close();
+  for (const locale of ["en", "es"]) {
+    const legacyPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await legacyPage.goto(`${baseUrl}/${locale}/creative-burst`, { waitUntil: "networkidle" });
+    invariant(new URL(legacyPage.url()).pathname === `/${locale}`, `${locale}: creative-burst did not retire to locale home`);
+    await legacyPage.close();
+  }
+
+  for (const locale of ["en", "es"]) {
+    const formPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await formPage.goto(`${baseUrl}/${locale}/discuss`, { waitUntil: "networkidle" });
+    const form = formPage.locator('form[data-commercial-intake="email-handoff"]');
+    invariant(await form.count() === 1, `${locale}: commercial intake handoff not mounted`);
+    invariant(await form.locator('input[name="name"][required]').count() === 1, `${locale}: name must be required`);
+    invariant(await form.locator('input[name="email"][required]').count() === 1, `${locale}: email must be required`);
+    invariant(await form.locator('textarea[name="challenge"][required]').count() === 1, `${locale}: challenge must be required`);
+    const buttonName = locale === "en" ? "Prepare email" : "Preparar correo";
+    invariant(await formPage.getByRole("button", { name: buttonName }).count() === 1, `${locale}: commercial intake submit label missing`);
+    const note = locale === "en"
+      ? "This intake prepares an email in your email app. Denysoft receives it only after you send it."
+      : "Este intake prepara un correo en tu aplicación de email. Denysoft lo recibe únicamente cuando tú lo envías.";
+    invariant(await formPage.getByText(note).count() === 1, `${locale}: governed email handoff disclosure missing`);
+    invariant(await formPage.getByText(/Preview confirmed|Preview intake only|Intake de Preview únicamente/).count() === 0, `${locale}: preview-only intake language still exposed`);
+    await formPage.close();
+  }
 
   await writeFile(`${outputDir}/report.json`, JSON.stringify({ status: "PASS", routes: results.length, results }, null, 2));
-  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks with Spanish visual-fit guards.`);
+  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks with Spanish visual-fit and commercial-readiness guards.`);
 } catch (error) {
   await writeFile(`${outputDir}/server.log`, serverLog);
   await writeFile(`${outputDir}/failure.txt`, String(error?.stack ?? error));
