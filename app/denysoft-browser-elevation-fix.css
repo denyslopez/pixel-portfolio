@@ -1,0 +1,17 @@
+main[data-design-authority="denysoft-run001"][data-motion-ready="true"] #main-content > section {
+  opacity: 1;
+  transform: translateY(24px);
+  transition: transform 760ms cubic-bezier(.22,1,.36,1);
+}
+
+main[data-design-authority="denysoft-run001"][data-motion-ready="true"] #main-content > section[data-revealed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main[data-design-authority="denysoft-run001"] #main-content > section {
+    transform: none !important;
+    transition: none !important;
+  }
+}
