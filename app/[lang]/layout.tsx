@@ -12,6 +12,7 @@ import "../r4.css";
 import "../denysoft-browser-elevation.css";
 import "../denysoft-browser-elevation-fix.css";
 import "../denysoft-browser-review-remediation.css";
+import "../denysoft-spanish-localization-fit.css";
 import { BrowserExperience } from "@/components/denysoft-current/BrowserExperience";
 import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
