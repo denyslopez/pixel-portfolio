@@ -2,6 +2,31 @@
 
 import { useEffect } from "react";
 
+const CONTACT_EMAIL = "denys.lopez@gmail.com";
+
+function prepareCommercialIntake(root: ParentNode) {
+  const form = root.querySelector<HTMLFormElement>('form:has(textarea[name="challenge"])');
+  if (!form) return;
+
+  const locale = document.documentElement.lang === "es" ? "es" : "en";
+  form.dataset.commercialIntake = "email-handoff";
+
+  for (const name of ["name", "email", "challenge"]) {
+    const field = form.elements.namedItem(name);
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) field.required = true;
+  }
+
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submit) submit.textContent = locale === "es" ? "Preparar correo" : "Prepare email";
+
+  const note = form.querySelector<HTMLParagraphElement>("p:last-of-type");
+  if (note) {
+    note.textContent = locale === "es"
+      ? "Este intake prepara un correo en tu aplicación de email. Denysoft lo recibe únicamente cuando tú lo envías."
+      : "This intake prepares an email in your email app. Denysoft receives it only after you send it.";
+  }
+}
+
 export function BrowserExperience() {
   useEffect(() => {
     const root = document.querySelector<HTMLElement>('[data-design-authority="denysoft-run001"]');
@@ -43,15 +68,70 @@ export function BrowserExperience() {
       root.style.setProperty("--scroll-progress", String(Math.min(1, Math.max(0, window.scrollY / max))));
     };
 
+    const onSubmit = (event: SubmitEvent) => {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement) || form.dataset.commercialIntake !== "email-handoff") return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      if (!form.reportValidity()) return;
+
+      const locale = document.documentElement.lang === "es" ? "es" : "en";
+      const data = new FormData(form);
+      const read = (name: string) => String(data.get(name) ?? "").trim();
+      const name = read("name");
+      const email = read("email");
+      const context = read("context");
+      const challenge = read("challenge");
+      const value = read("value");
+      const subject = locale === "es"
+        ? `Reto Denysoft — ${context || name || "nueva consulta"}`
+        : `Denysoft challenge — ${context || name || "new inquiry"}`;
+      const body = locale === "es"
+        ? [
+            `Nombre: ${name}`,
+            `Email: ${email}`,
+            `Empresa / contexto: ${context || "—"}`,
+            "",
+            "Reto:",
+            challenge,
+            "",
+            "Qué lo haría valioso:",
+            value || "—",
+          ].join("\n")
+        : [
+            `Name: ${name}`,
+            `Email: ${email}`,
+            `Company / context: ${context || "—"}`,
+            "",
+            "Challenge:",
+            challenge,
+            "",
+            "What would make this valuable:",
+            value || "—",
+          ].join("\n");
+
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    };
+
+    const intakeObserver = new MutationObserver(() => prepareCommercialIntake(document));
+    prepareCommercialIntake(document);
+    intakeObserver.observe(document.body, { childList: true, subtree: true });
+
     window.addEventListener("pointermove", onPointer, { passive: true });
     window.addEventListener("scroll", applyScroll, { passive: true });
+    document.addEventListener("submit", onSubmit, true);
     applyPointer();
     applyScroll();
 
     return () => {
       observer.disconnect();
+      intakeObserver.disconnect();
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("scroll", applyScroll);
+      document.removeEventListener("submit", onSubmit, true);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
