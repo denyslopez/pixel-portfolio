@@ -1,3 +1,37 @@
+main[data-design-authority="denysoft-run001"] [class*="__sectionIntro"],
+main[data-design-authority="denysoft-run001"] [class*="__sectionTitle"],
+main[data-design-authority="denysoft-run001"] [class*="__sectionLead"] {
+  min-height: 0;
+  padding: 0;
+}
+
+main[data-design-authority="denysoft-run001"] [class*="__footerRule"] {
+  min-height: 0;
+  width: 100%;
+  height: 1px;
+  display: block;
+  padding: 0;
+  position: static;
+  overflow: visible;
+  background: #bfbdb2;
+}
+
+main[data-design-authority="denysoft-run001"] [class*="__footerRule"]::after,
+main[data-design-authority="denysoft-run001"] [class*="__footerMeta"]::after {
+  content: none;
+}
+
+main[data-design-authority="denysoft-run001"] [class*="__footerMeta"] {
+  min-height: 0;
+  display: flex;
+  align-content: initial;
+  align-items: center;
+  gap: 28px;
+  padding: 10px 0 0;
+  position: static;
+  overflow: visible;
+}
+
 main[data-design-authority="denysoft-run001"][data-motion-ready="true"] #main-content > section {
   opacity: 1;
   transform: translateY(24px);
@@ -7,6 +41,13 @@ main[data-design-authority="denysoft-run001"][data-motion-ready="true"] #main-co
 main[data-design-authority="denysoft-run001"][data-motion-ready="true"] #main-content > section[data-revealed="true"] {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (max-width: 820px) {
+  main[data-design-authority="denysoft-run001"] [class*="__footerMeta"] {
+    flex-wrap: wrap;
+    gap: 14px 22px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
