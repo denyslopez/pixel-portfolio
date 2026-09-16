@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { getCurrentContent, type CurrentLocale, type CurrentPage } from "@/lib/denysoft-current-content";
+import { getProject, getProjectSlugs } from "@/lib/projects";
 import {
   AxomSystemMap,
   DecisionField,
@@ -72,7 +73,7 @@ function Footer({ locale }: { locale: CurrentLocale }) {
       <h2>{t.footer.prompt}</h2>
       <Link className={styles.primaryButton} href={routeFor(locale, "discuss")}>{t.nav.discuss}</Link>
       <div className={styles.footerMeta}>
-        <strong>DENYSOFT</strong><span>{t.footer.descriptor}</span><LanguageSwitch locale={locale} />
+        <strong>DENYSOFT</strong><span>{t.footer.descriptor}</span><a href="mailto:info@denysoft.net">info@denysoft.net</a><LanguageSwitch locale={locale} />
       </div>
     </footer>
   );
@@ -125,6 +126,58 @@ function EvidenceGrid({ locale }: { locale: CurrentLocale }) {
   );
 }
 
+function SelectedWork({ locale, compact = false }: { locale: CurrentLocale; compact?: boolean }) {
+  return (
+    <section className={styles.section} data-qa="selected-client-work">
+      <div className={styles.sectionIntro}>
+        <div>
+          <p className={styles.kicker}>{locale === "en" ? "SELECTED CLIENT / PRODUCT WORK" : "TRABAJO SELECCIONADO / CLIENTES Y PRODUCTO"}</p>
+          <h2>{locale === "en" ? "Three projects. Three different business contexts." : "Tres proyectos. Tres contextos de negocio distintos."}</h2>
+        </div>
+        <p>{locale === "en" ? "Each case study stays bounded to the work and evidence we can actually support." : "Cada caso se mantiene limitado al trabajo y la evidencia que realmente podemos respaldar."}</p>
+      </div>
+      <div className={styles.cardGrid}>
+        {getProjectSlugs().map((slug) => {
+          const project = getProject(locale, slug);
+          if (!project) return null;
+          return (
+            <article key={slug}>
+              <span>{project.category}</span>
+              <h3>{project.title}</h3>
+              <p>{project.summary}</p>
+              <Link className={styles.secondaryButton} href={`/${locale}/work/${slug}`}>{locale === "en" ? "View case study" : "Ver caso"}</Link>
+            </article>
+          );
+        })}
+      </div>
+      {!compact && <p className={styles.monoNote}>{locale === "en" ? "LIVE PROJECT LINKS AND CLAIM BOUNDARIES REMAIN EXPLICIT INSIDE EACH CASE." : "LOS LINKS A PROYECTOS EN VIVO Y LOS LÍMITES DE EVIDENCIA PERMANECEN EXPLÍCITOS EN CADA CASO."}</p>}
+    </section>
+  );
+}
+
+function DeliveryProcess({ locale }: { locale: CurrentLocale }) {
+  const steps = locale === "en"
+    ? [
+        ["01 / Frame", "Clarify the signal, user, business context, constraints and evidence before prescribing output."],
+        ["02 / Specify", "Turn the challenge into explicit product behavior, boundaries, acceptance criteria and decision points."],
+        ["03 / Build", "Design and implement the smallest justified system with architecture and authority kept visible."],
+        ["04 / Evaluate", "Verify behavior, quality, accessibility, performance and evidence before release or handoff."],
+      ]
+    : [
+        ["01 / Enmarcar", "Aclarar la señal, usuario, contexto de negocio, restricciones y evidencia antes de prescribir una salida."],
+        ["02 / Especificar", "Convertir el reto en comportamiento explícito, límites, criterios de aceptación y puntos de decisión."],
+        ["03 / Construir", "Diseñar e implementar el sistema mínimo justificado manteniendo visibles arquitectura y autoridad."],
+        ["04 / Evaluar", "Verificar comportamiento, calidad, accesibilidad, performance y evidencia antes de release o handoff."],
+      ];
+  return (
+    <section className={styles.section} data-qa="delivery-process">
+      <p className={styles.kicker}>{locale === "en" ? "DELIVERY PROCESS" : "PROCESO DE ENTREGA"}</p>
+      <h2 className={styles.sectionTitle}>{locale === "en" ? "A disciplined path from ambiguity to evidence." : "Un camino disciplinado desde la ambigüedad hasta la evidencia."}</h2>
+      <div className={styles.cardGrid}>{steps.map(([title, body]) => <article key={title}><span>{title}</span><p>{body}</p></article>)}</div>
+    </section>
+  );
+}
+
 function Home({ locale }: { locale: CurrentLocale }) {
   const t = getCurrentContent(locale);
   return (
@@ -138,6 +191,7 @@ function Home({ locale }: { locale: CurrentLocale }) {
         </div>
       </section>
       <section className={styles.darkThesis}><p className={styles.kickerAccent}>{t.home.thesisKicker}</p><h2>{t.home.thesis}</h2><p className={styles.monoNote}>{t.home.thesisNote}</p></section>
+      <SelectedWork locale={locale} compact />
       <section className={styles.section}><div className={styles.sectionIntro}><div><p className={styles.kicker}>{t.home.evidenceKicker}</p><h2>{t.home.evidenceTitle}</h2></div><p>{t.home.evidenceBody}</p></div><EvidenceGrid locale={locale}/></section>
       <section className={styles.storySection}><div className={styles.badges}><span className={styles.typeBadge}>{locale === "en" ? "PROJECT STORY" : "HISTORIA DE PROYECTO"}</span><span className={styles.maturityBadge} data-state="active">{locale === "en" ? "ACTIVE" : "ACTIVO"}</span></div><p className={styles.kicker}>{t.home.projectStory.label}</p><h2>{t.home.projectStory.title}</h2><div className={styles.storySplit}><div><p>{t.home.projectStory.body}</p><hr/><p className={styles.kicker}>{locale === "en" ? "EVIDENCE PATH" : "RUTA DE EVIDENCIA"}</p><p className={styles.monoNote}>{t.home.projectStory.path}</p></div><ServiceJourney /></div></section>
       <section className={styles.axomSection}><p className={styles.kickerAccent}>{t.home.axom.kicker}</p><h2>{t.home.axom.title}</h2><p className={styles.axomLead}>{t.home.axom.body}</p><div className={styles.axomSplit}><AxomSystemMap locale={locale}/><div className={styles.capabilityNotes}>{t.home.axom.notes.map(([a,b]) => <div key={a}><span>{a}</span><p>{b}</p></div>)}</div></div></section>
@@ -150,13 +204,13 @@ function Home({ locale }: { locale: CurrentLocale }) {
 function Solutions({ locale }: { locale: CurrentLocale }) {
   const t = getCurrentContent(locale);
   const [active, setActive] = useState(0);
-  return <><PageHero locale={locale} kicker={t.solutions.kicker} title={t.solutions.title} body={t.solutions.body}/><section className={styles.section}><p className={styles.kicker}>{t.solutions.lensKicker}</p><h2 className={styles.sectionTitle}>{t.solutions.lensTitle}</h2><p className={styles.sectionLead}>{t.solutions.lensIntro}</p><DecisionField locale={locale}/><div className={styles.decisionLens}>{t.solutions.lens.map(([a,b,c], index) => <button type="button" key={a} className={active === index ? styles.activeLens : undefined} onClick={() => setActive(index)}><span>{a}</span><strong>{b}</strong><p>{c}</p></button>)}<div className={styles.lensOutput}><span>{locale === "en" ? "RECOMMENDED PATH" : "RUTA RECOMENDADA"}</span><strong>{t.solutions.lens[active][2]}</strong></div></div></section><section className={styles.section}><h2 className={styles.sectionTitle}>{t.solutions.pathwaysTitle}</h2><div className={styles.cardGrid}>{t.solutions.pathways.map(([a,b]) => <article key={a}><i/><h3>{a}</h3><p>{b}</p></article>)}</div></section><section className={styles.darkThesis}><p className={styles.kickerAccent}>{t.solutions.modelKicker}</p><h2>{t.solutions.modelTitle}</h2><p>{t.solutions.modelBody}</p></section></>;
+  return <><PageHero locale={locale} kicker={t.solutions.kicker} title={t.solutions.title} body={t.solutions.body}/><section className={styles.section}><p className={styles.kicker}>{t.solutions.lensKicker}</p><h2 className={styles.sectionTitle}>{t.solutions.lensTitle}</h2><p className={styles.sectionLead}>{t.solutions.lensIntro}</p><DecisionField locale={locale}/><div className={styles.decisionLens}>{t.solutions.lens.map(([a,b,c], index) => <button type="button" key={a} className={active === index ? styles.activeLens : undefined} onClick={() => setActive(index)}><span>{a}</span><strong>{b}</strong><p>{c}</p></button>)}<div className={styles.lensOutput}><span>{locale === "en" ? "RECOMMENDED PATH" : "RUTA RECOMENDADA"}</span><strong>{t.solutions.lens[active][2]}</strong></div></div></section><section className={styles.section}><h2 className={styles.sectionTitle}>{t.solutions.pathwaysTitle}</h2><div className={styles.cardGrid}>{t.solutions.pathways.map(([a,b]) => <article key={a}><i/><h3>{a}</h3><p>{b}</p></article>)}</div></section><DeliveryProcess locale={locale}/><section className={styles.darkThesis}><p className={styles.kickerAccent}>{t.solutions.modelKicker}</p><h2>{t.solutions.modelTitle}</h2><p>{t.solutions.modelBody}</p></section></>;
 }
 
 function Work({ locale }: { locale: CurrentLocale }) {
   const t = getCurrentContent(locale);
   const story = t.home.projectStory;
-  return <><PageHero locale={locale} kicker={t.work.kicker} title={t.work.title} body={t.work.body}/><section className={styles.section}><div className={styles.sectionIntro}><div><p className={styles.kicker}>{t.work.evidenceKicker}</p><h2>{t.work.evidenceTitle}</h2></div><p>{t.work.evidenceBody}</p></div><EvidenceGrid locale={locale}/></section><section className={styles.storySection}><div className={styles.badges}><span className={styles.typeBadge}>{locale === "en" ? "PROJECT STORY" : "HISTORIA DE PROYECTO"}</span><span className={styles.maturityBadge} data-state="active">{locale === "en" ? "ACTIVE" : "ACTIVO"}</span></div><p className={styles.kicker}>{story.label}</p><h2>{story.title}</h2><div className={styles.storySplit}><div><p>{story.body}</p><hr/><p className={styles.monoNote}>{story.path}</p></div><ServiceJourney/></div></section></>;
+  return <><PageHero locale={locale} kicker={t.work.kicker} title={t.work.title} body={t.work.body}/><SelectedWork locale={locale}/><section className={styles.section}><div className={styles.sectionIntro}><div><p className={styles.kicker}>{t.work.evidenceKicker}</p><h2>{t.work.evidenceTitle}</h2></div><p>{t.work.evidenceBody}</p></div><EvidenceGrid locale={locale}/></section><section className={styles.storySection}><div className={styles.badges}><span className={styles.typeBadge}>{locale === "en" ? "PROJECT STORY" : "HISTORIA DE PROYECTO"}</span><span className={styles.maturityBadge} data-state="active">{locale === "en" ? "ACTIVE" : "ACTIVO"}</span></div><p className={styles.kicker}>{story.label}</p><h2>{story.title}</h2><div className={styles.storySplit}><div><p>{story.body}</p><hr/><p className={styles.monoNote}>{story.path}</p></div><ServiceJourney/></div></section></>;
 }
 
 function Axom({ locale }: { locale: CurrentLocale }) {
@@ -176,9 +230,10 @@ function About({ locale }: { locale: CurrentLocale }) {
 
 function Discuss({ locale }: { locale: CurrentLocale }) {
   const t = getCurrentContent(locale);
-  const [submitted, setSubmitted] = useState(false);
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setSubmitted(true); };
-  return <><PageHero locale={locale} kicker={t.discuss.kicker} title={t.discuss.title} body={t.discuss.body} showSecondary={false}/><section className={styles.section}><p className={styles.kicker}>{t.discuss.lensKicker}</p><h2 className={styles.sectionTitle}>{t.discuss.lensTitle}</h2><div className={styles.framingLens}>{t.discuss.prompts.map(([a,b]) => <div key={a}><span>{a}</span><p>{b}</p></div>)}</div></section><section className={styles.storySection}><h2>{t.discuss.intakeTitle}</h2><form className={styles.intakeForm} onSubmit={onSubmit}><label>{t.discuss.fields.name}<input name="name" autoComplete="name" placeholder={locale === "en" ? "Your name" : "Tu nombre"}/></label><label>{t.discuss.fields.email}<input name="email" type="email" autoComplete="email" placeholder="you@company.com"/></label><label>{t.discuss.fields.context}<input name="context" placeholder={locale === "en" ? "Company, organization or project" : "Empresa, organización o proyecto"}/></label><label>{t.discuss.fields.challenge}<textarea name="challenge" rows={4} placeholder={locale === "en" ? "Describe the challenge, opportunity, product or system." : "Describe el reto, oportunidad, producto o sistema."}/></label><label>{t.discuss.fields.value}<textarea name="value" rows={3} placeholder={locale === "en" ? "Outcome, urgency, constraints or success signals." : "Resultado, urgencia, restricciones o señales de éxito."}/></label><button className={styles.primaryButton} type="submit">{t.nav.discuss}</button><p className={styles.previewNote}>{submitted ? (locale === "en" ? "Preview confirmed: no data was sent or stored." : "Preview confirmado: no se envió ni almacenó información.") : t.discuss.previewNote}</p></form></section><section className={styles.darkThesis}><p className={styles.kickerAccent}>{t.discuss.nextKicker}</p><h2>{t.discuss.nextTitle}</h2><p>{t.discuss.nextBody}</p></section></>;
+  const disclosure = locale === "en"
+    ? "This intake prepares an email in your email app. Denysoft receives it only after you send it."
+    : "Este intake prepara un correo en tu aplicación de email. Denysoft lo recibe únicamente cuando tú lo envías.";
+  return <><PageHero locale={locale} kicker={t.discuss.kicker} title={t.discuss.title} body={t.discuss.body} showSecondary={false}/><section className={styles.section}><p className={styles.kicker}>{t.discuss.lensKicker}</p><h2 className={styles.sectionTitle}>{t.discuss.lensTitle}</h2><div className={styles.framingLens}>{t.discuss.prompts.map(([a,b]) => <div key={a}><span>{a}</span><p>{b}</p></div>)}</div></section><section className={styles.storySection}><h2>{t.discuss.intakeTitle}</h2><form className={styles.intakeForm} onSubmit={(event) => event.preventDefault()}><label>{t.discuss.fields.name}<input name="name" required autoComplete="name" placeholder={locale === "en" ? "Your name" : "Tu nombre"}/></label><label>{t.discuss.fields.email}<input name="email" required type="email" autoComplete="email" placeholder="you@company.com"/></label><label>{t.discuss.fields.context}<input name="context" placeholder={locale === "en" ? "Company, organization or project" : "Empresa, organización o proyecto"}/></label><label>{t.discuss.fields.challenge}<textarea name="challenge" required rows={4} placeholder={locale === "en" ? "Describe the challenge, opportunity, product or system." : "Describe el reto, oportunidad, producto o sistema."}/></label><label>{t.discuss.fields.value}<textarea name="value" rows={3} placeholder={locale === "en" ? "Outcome, urgency, constraints or success signals." : "Resultado, urgencia, restricciones o señales de éxito."}/></label><button className={styles.primaryButton} type="submit">{locale === "en" ? "Prepare email" : "Preparar correo"}</button><p className={styles.previewNote}>{disclosure}</p></form></section><section className={styles.darkThesis}><p className={styles.kickerAccent}>{t.discuss.nextKicker}</p><h2>{t.discuss.nextTitle}</h2><p>{t.discuss.nextBody}</p></section></>;
 }
 
 export function DenysoftExperience({ locale, page }: { locale: CurrentLocale; page: CurrentPage }) {
