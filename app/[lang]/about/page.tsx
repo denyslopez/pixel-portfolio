@@ -6,11 +6,11 @@ import { currentMetadata } from "@/lib/denysoft-current-seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  return isCurrentLocale(lang) ? currentMetadata(lang, "work") : {};
+  return isCurrentLocale(lang) ? currentMetadata(lang, "about") : {};
 }
 
-export default async function WorkPage({ params }: { params: Promise<{ lang: string }> }) {
+export default async function AboutPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   if (!isCurrentLocale(lang)) notFound();
-  return <DenysoftExperience locale={lang} page="work" />;
+  return <DenysoftExperience locale={lang} page="about" />;
 }

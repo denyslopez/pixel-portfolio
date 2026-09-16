@@ -10,6 +10,7 @@ on:
       - feature/portfolio-001-edition-001-r2
       - feature/portfolio-001-edition-001-r3-design
       - feature/portfolio-001-edition-001-r3-implementation
+      - feature/denysoft-engineering-run001
 
 permissions:
   contents: read
@@ -45,7 +46,7 @@ jobs:
       - name: Upload standalone QA build
         uses: actions/upload-artifact@v4
         with:
-          name: portfolio-001-standalone
+          name: denysoft-run001-standalone
           path: .next/standalone
           include-hidden-files: true
           if-no-files-found: error
@@ -61,7 +62,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: portfolio-001-browser-qa
-          path: qa/browser
+          name: denysoft-run001-browser-qa
+          path: |
+            qa/browser-current
+            qa/browser-elevation
           if-no-files-found: warn
           retention-days: 3

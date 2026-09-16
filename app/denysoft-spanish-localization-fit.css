@@ -1,0 +1,117 @@
+/* Spanish Localization Visual-Fit Remediation — Run 001
+   Spanish display copy is naturally longer than English. Preserve the same
+   visual authority without forcing Spanish into English line lengths.
+   This layer adjusts only display typography and composition for es. */
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__homeHero"] h1 {
+  max-width: min(22ch, 1480px);
+  font-size: clamp(60px, 5.95vw, 116px);
+  line-height: .92;
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__pageHero"] h1 {
+  max-width: min(17ch, 1180px);
+  font-size: clamp(52px, 5.35vw, 80px);
+  line-height: .98;
+  letter-spacing: -.026em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__darkThesis"] h2 {
+  max-width: min(20ch, 1240px);
+  font-size: clamp(46px, 4.55vw, 80px);
+  line-height: 1.04;
+  letter-spacing: -.026em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionIntro"] h2,
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionTitle"] {
+  max-width: min(15ch, 1120px);
+  font-size: clamp(48px, 4.75vw, 86px);
+  line-height: 1;
+  letter-spacing: -.026em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__storySection"] h2 {
+  max-width: min(14ch, 1040px);
+  font-size: clamp(52px, 5.35vw, 96px);
+  line-height: .98;
+  letter-spacing: -.034em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__axomSection"] h2 {
+  max-width: min(13ch, 980px);
+  font-size: clamp(56px, 5.55vw, 102px);
+  line-height: .96;
+  letter-spacing: -.034em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__founderSection"] h2 {
+  max-width: min(16ch, 920px);
+  font-size: clamp(46px, 4.55vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -.028em;
+  text-wrap: balance;
+}
+
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__footer"] h2 {
+  max-width: min(15ch, 1040px);
+  font-size: clamp(46px, 4.8vw, 86px);
+  line-height: 1.04;
+  letter-spacing: -.028em;
+  text-wrap: balance;
+}
+
+/* Body copy should remain comfortably readable; Spanish gets a little more
+   measure rather than smaller body text. */
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__lead"],
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionLead"],
+html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__axomLead"] {
+  max-width: 39em;
+}
+
+@media (max-width: 820px) {
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__homeHero"] h1 {
+    max-width: 100%;
+    font-size: clamp(40px, 10.2vw, 50px);
+    line-height: .99;
+    letter-spacing: -.028em;
+  }
+
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__pageHero"] h1 {
+    max-width: 100%;
+    font-size: clamp(43px, 11vw, 55px);
+    line-height: 1;
+  }
+
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__darkThesis"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionIntro"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionTitle"],
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__storySection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__axomSection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__founderSection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__footer"] h2 {
+    max-width: 100%;
+    line-height: 1.03;
+    letter-spacing: -.022em;
+  }
+
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__darkThesis"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionIntro"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__sectionTitle"] {
+    font-size: clamp(38px, 10.2vw, 50px);
+  }
+
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__storySection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__axomSection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__founderSection"] h2,
+  html[lang="es"] main[data-design-authority="denysoft-run001"] [class*="__footer"] h2 {
+    font-size: clamp(40px, 10.6vw, 52px);
+  }
+}
