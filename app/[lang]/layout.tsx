@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 import "../experience.css";
@@ -54,9 +56,11 @@ export default async function LocaleRootLayout({
 
   return (
     <html lang={lang} className={fontVariables}>
-      <body>
+      <body data-measurement-foundation="vercel-native-run001">
         <BrowserExperience />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
