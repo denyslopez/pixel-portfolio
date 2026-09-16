@@ -13,18 +13,18 @@ function prepareCommercialIntake(root: ParentNode) {
 
   for (const name of ["name", "email", "challenge"]) {
     const field = form.elements.namedItem(name);
-    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) field.required = true;
+    if ((field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) && !field.required) field.required = true;
   }
 
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-  if (submit) submit.textContent = locale === "es" ? "Preparar correo" : "Prepare email";
+  const submitLabel = locale === "es" ? "Preparar correo" : "Prepare email";
+  if (submit && submit.textContent !== submitLabel) submit.textContent = submitLabel;
 
   const note = form.querySelector<HTMLParagraphElement>("p:last-of-type");
-  if (note) {
-    note.textContent = locale === "es"
-      ? "Este intake prepara un correo en tu aplicación de email. Denysoft lo recibe únicamente cuando tú lo envías."
-      : "This intake prepares an email in your email app. Denysoft receives it only after you send it.";
-  }
+  const disclosure = locale === "es"
+    ? "Este intake prepara un correo en tu aplicación de email. Denysoft lo recibe únicamente cuando tú lo envías."
+    : "This intake prepares an email in your email app. Denysoft receives it only after you send it.";
+  if (note && note.textContent !== disclosure) note.textContent = disclosure;
 }
 
 export function BrowserExperience() {
