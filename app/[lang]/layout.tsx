@@ -10,6 +10,7 @@ import "../r3.css";
 import "../r3-responsive-fixes.css";
 import "../r4.css";
 import "../denysoft-browser-elevation.css";
+import "../denysoft-browser-elevation-fix.css";
 import { BrowserExperience } from "@/components/denysoft-current/BrowserExperience";
 import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
