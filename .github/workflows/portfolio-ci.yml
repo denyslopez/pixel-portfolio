@@ -63,6 +63,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: denysoft-run001-browser-qa
-          path: qa/browser-current
+          path: |
+            qa/browser-current
+            qa/browser-elevation
           if-no-files-found: warn
           retention-days: 3
