@@ -9,6 +9,8 @@ import "../r1-expansion.css";
 import "../r3.css";
 import "../r3-responsive-fixes.css";
 import "../r4.css";
+import "../denysoft-browser-elevation.css";
+import { BrowserExperience } from "@/components/denysoft-current/BrowserExperience";
 import { getSiteUrl } from "@/lib/site-url";
 import { isLocale, locales } from "@/lib/content";
 
@@ -49,7 +51,10 @@ export default async function LocaleRootLayout({
 
   return (
     <html lang={lang} className={fontVariables}>
-      <body>{children}</body>
+      <body>
+        <BrowserExperience />
+        {children}
+      </body>
     </html>
   );
 }
