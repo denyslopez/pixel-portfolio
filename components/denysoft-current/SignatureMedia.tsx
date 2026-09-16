@@ -112,7 +112,7 @@ export function ServiceJourney({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`${media.journey} ${compact ? media.journeyCompact : ""}`} data-signature-media="taller-journey" role="img" aria-label="Taller Express evidence journey with Human authority">
       <div className={media.journeyTrack} aria-hidden="true" />
-      {labels.map((label,index) => <div key={label} className={media.journeyNode} data-human={label === "HUMAN"} style={{ "--journey": index } as CSSProperties}><span>{String(index+1).padStart(2,"0")}</span><strong>{label}</strong></div>)}
+      {labels.map((label,index) => <div key={label} className={media.journeyNode} data-human={label === "HUMAN"} style={{ "--journey": index, left: `${4 + index * 19.75}%` } as CSSProperties}><span>{String(index+1).padStart(2,"0")}</span><strong>{label}</strong></div>)}
       <p>REQUEST → OPERATOR DECISION → WORKFLOW → QA / SECURITY EVIDENCE</p>
     </div>
   );
