@@ -1,0 +1,9 @@
+account_id,account,country,preferred_channel,public_contact_or_profile,language,utm_content,status,notes
+B01-01,CSN Avenue Collision / CSN 427 Auto,Canada,LinkedIn,https://ca.linkedin.com/in/lorenzo-d-alessandro-9430ab15,en,csn_avenue,PREPARED_NOT_AUTHORIZED,"Fallback public company email: info@avenuecollision.com"
+B01-02,Atlantic Collision Group,Canada,LinkedIn,https://ca.linkedin.com/in/joe-da-cunha-25069144,en,atlantic_collision_group,PREPARED_NOT_AUTHORIZED,"Director of Business Development & Vendor Relations; consumer estimate form intentionally avoided for B2B outreach"
+B01-03,Taza Real Estate,Canada,email,info@tazarealestate.com,en,taza_real_estate,PREPARED_NOT_AUTHORIZED,"Address to Nancy / Taza team; public brokerage inbox"
+B01-04,ALDESA Logística,El Salvador,email,dianaguardado@aldesa.com.sv,es,aldesa_logistica,PREPARED_NOT_AUTHORIZED,"Publicly listed Gerente Comercial email on official ALDESA contact page; fallback servicioalcliente@aldesa.com.sv"
+B01-05,T&L Transportes y Logística,El Salvador,email,info@ttylogistica.com,es,tyl_logistica,PREPARED_NOT_AUTHORIZED,"Official website business inbox; alternate official contact form"
+B01-06,JSN Auto Repair,United States,LinkedIn,https://www.linkedin.com/in/josephramsay,en,jsn_auto_repair,PREPARED_NOT_AUTHORIZED,"Fallback official JSN contact form; no data broker/private contact used"
+B01-07,Lumena Realty,United States,email,info@lumenarealty.com,en,lumena_realty,PREPARED_NOT_AUTHORIZED,"Address to Daniel / Lumena team; official brokerage inbox"
+B01-08,Partnerly,United States,partner-form,https://partnerly.us/agency-partners/,en,partnerly,PREPARED_NOT_AUTHORIZED,"Fallback public company email: hello@partnerly.ai"
