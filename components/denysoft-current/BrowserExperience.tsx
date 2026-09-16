@@ -1,8 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
+import { track } from "@vercel/analytics";
 
-const CONTACT_EMAIL = "denys.lopez@gmail.com";
+const CONTACT_EMAIL = "info@denysoft.net";
+
+function trackBusinessEvent(name: string, data: Record<string, string>) {
+  try {
+    track(name, data);
+  } catch {
+    // Measurement must never interrupt the user journey.
+  }
+}
 
 function prepareCommercialIntake(root: ParentNode) {
   const form = root.querySelector<HTMLFormElement>('form:has(textarea[name="challenge"])');
@@ -10,6 +19,7 @@ function prepareCommercialIntake(root: ParentNode) {
 
   const locale = document.documentElement.lang === "es" ? "es" : "en";
   form.dataset.commercialIntake = "email-handoff";
+  form.dataset.contactEmail = CONTACT_EMAIL;
 
   for (const name of ["name", "email", "challenge"]) {
     const field = form.elements.namedItem(name);
@@ -68,6 +78,21 @@ export function BrowserExperience() {
       root.style.setProperty("--scroll-progress", String(Math.min(1, Math.max(0, window.scrollY / max))));
     };
 
+    const onClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest<HTMLAnchorElement>("a[href]");
+      if (!link) return;
+
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || !/^\/(en|es)\/discuss\/?$/.test(url.pathname)) return;
+
+      trackBusinessEvent("commercial_cta_click", {
+        locale: document.documentElement.lang === "es" ? "es" : "en",
+        source_path: window.location.pathname,
+      });
+    };
+
     const onSubmit = (event: SubmitEvent) => {
       const form = event.target;
       if (!(form instanceof HTMLFormElement) || form.dataset.commercialIntake !== "email-handoff") return;
@@ -113,6 +138,11 @@ export function BrowserExperience() {
             value || "—",
           ].join("\n");
 
+      trackBusinessEvent("commercial_email_prepare", {
+        locale,
+        source_path: window.location.pathname,
+      });
+
       window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     };
 
@@ -122,6 +152,7 @@ export function BrowserExperience() {
 
     window.addEventListener("pointermove", onPointer, { passive: true });
     window.addEventListener("scroll", applyScroll, { passive: true });
+    document.addEventListener("click", onClick, true);
     document.addEventListener("submit", onSubmit, true);
     applyPointer();
     applyScroll();
@@ -131,6 +162,7 @@ export function BrowserExperience() {
       intakeObserver.disconnect();
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("scroll", applyScroll);
+      document.removeEventListener("click", onClick, true);
       document.removeEventListener("submit", onSubmit, true);
       if (frame) window.cancelAnimationFrame(frame);
     };
