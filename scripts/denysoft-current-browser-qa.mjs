@@ -43,6 +43,7 @@ async function inspect(page) {
       lang: document.documentElement.lang,
       authority: Boolean(root),
       pageName: root?.getAttribute("data-page") ?? null,
+      measurementFoundation: document.body.dataset.measurementFoundation ?? null,
       overflowX: document.documentElement.scrollWidth > innerWidth + 1,
       overflow,
       brokenImages: images,
@@ -76,6 +77,20 @@ let browser;
 
 try {
   await waitForServer(`${baseUrl}/en`);
+
+  const robotsResponse = await fetch(`${baseUrl}/robots.txt`);
+  invariant(robotsResponse.ok, "robots.txt is not available");
+  const robotsText = await robotsResponse.text();
+  invariant(robotsText.includes("User-Agent: *") || robotsText.includes("User-agent: *"), "robots.txt does not expose a default crawler rule");
+  invariant(robotsText.includes("sitemap.xml"), "robots.txt does not advertise the sitemap");
+
+  const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
+  invariant(sitemapResponse.ok, "sitemap.xml is not available");
+  const sitemapText = await sitemapResponse.text();
+  for (const path of ["/en", "/es", "/en/solutions", "/es/solutions", "/en/work/baltica-salon", "/es/work/taller-express", "/en/work/mastertax"]) {
+    invariant(sitemapText.includes(path), `sitemap.xml missing ${path}`);
+  }
+
   browser = await chromium.launch({ headless: true });
 
   for (const locale of ["en", "es"]) {
@@ -89,6 +104,7 @@ try {
         invariant(state.lang === locale, `${url} ${viewport.name}: lang drift ${state.lang}`);
         invariant(state.authority, `${url} ${viewport.name}: current design authority root missing`);
         invariant(state.pageName === pageName, `${url} ${viewport.name}: page marker ${state.pageName} != ${pageName}`);
+        invariant(state.measurementFoundation === "vercel-native-run001", `${url} ${viewport.name}: measurement foundation marker missing`);
         invariant(!state.overflowX, `${url} ${viewport.name}: horizontal overflow ${JSON.stringify(state.overflow)}`);
         invariant(state.brokenImages.length === 0, `${url} ${viewport.name}: broken images ${JSON.stringify(state.brokenImages)}`);
         invariant(state.header === 1, `${url} ${viewport.name}: site header missing`);
@@ -146,6 +162,7 @@ try {
     await formPage.goto(`${baseUrl}/${locale}/discuss`, { waitUntil: "networkidle" });
     const form = formPage.locator('form[data-commercial-intake="email-handoff"]');
     invariant(await form.count() === 1, `${locale}: commercial intake handoff not mounted`);
+    invariant(await form.getAttribute("data-contact-email") === "info@denysoft.net", `${locale}: commercial intake is not using the Denysoft role inbox`);
     invariant(await form.locator('input[name="name"][required]').count() === 1, `${locale}: name must be required`);
     invariant(await form.locator('input[name="email"][required]').count() === 1, `${locale}: email must be required`);
     invariant(await form.locator('textarea[name="challenge"][required]').count() === 1, `${locale}: challenge must be required`);
@@ -159,8 +176,8 @@ try {
     await formPage.close();
   }
 
-  await writeFile(`${outputDir}/report.json`, JSON.stringify({ status: "PASS", routes: results.length, results }, null, 2));
-  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks with Spanish visual-fit and commercial-readiness guards.`);
+  await writeFile(`${outputDir}/report.json`, JSON.stringify({ status: "PASS", routes: results.length, measurement: "vercel-native-run001", results }, null, 2));
+  console.log(`Denysoft current browser QA PASS — ${results.length} route/viewport checks with Spanish visual-fit, commercial-readiness, SEO discovery and measurement guards.`);
 } catch (error) {
   await writeFile(`${outputDir}/server.log`, serverLog);
   await writeFile(`${outputDir}/failure.txt`, String(error?.stack ?? error));
