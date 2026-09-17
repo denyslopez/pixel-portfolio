@@ -16,10 +16,10 @@
     --font: 'Instrument Sans', sans-serif;
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; width:100%; height:100%; background:var(--bg); overflow:hidden; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; width:100%; height:100%; height:100dvh; background:var(--bg); overflow:hidden; -webkit-tap-highlight-color:transparent; }
   body{ font-family:var(--font); color:var(--ink); user-select:none; }
 
-  #stage{ position:fixed; inset:0; z-index:1; touch-action:none; cursor:grab; outline:none; }
+  #stage{ position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; z-index:1; touch-action:none; cursor:grab; outline:none; }
   #stage.dragging{ cursor:grabbing; }
   #stage:focus-visible{ box-shadow: inset 0 0 0 2px var(--accent); }
   canvas#webgl{ position:absolute; inset:0; display:block; }
@@ -294,7 +294,16 @@
       camera.updateProjectionMatrix();
     }
     fitCamera();
+    // en moviles, la barra de direcciones cambia el viewport DESPUES de este
+    // primer calculo -- reforzamos con varios reintentos y con visualViewport,
+    // que es la fuente mas confiable del tamano real visible.
     window.addEventListener('resize', fitCamera);
+    window.addEventListener('orientationchange', function(){ setTimeout(fitCamera, 250); });
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize', fitCamera);
+    }
+    [50, 150, 400, 900].forEach(function(delay){ setTimeout(fitCamera, delay); });
+    window.addEventListener('load', fitCamera);
 
     // ---------------------------------------------------------------
     // Overlays (About + Case study)
