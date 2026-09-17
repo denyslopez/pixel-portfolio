@@ -46,6 +46,35 @@
 
   #nav-hint{ position:absolute; top:clamp(20px,5vw,32px); right:clamp(20px,5vw,48px); font-size:11px; color:var(--muted); letter-spacing:0.02em; text-align:right; max-width:180px; transition:opacity .6s ease; }
 
+  #swipe-hint{ display:none; }
+  @media (max-width:680px){
+    #swipe-hint{ display:block; }
+    .swipe-arrow{
+      position:absolute; top:50%; font-size:28px; line-height:1; color:var(--muted);
+      animation-duration:1.4s; animation-timing-function:ease-in-out; animation-iteration-count:3; animation-fill-mode:forwards;
+    }
+    .swipe-arrow-left{ left:clamp(8px,3vw,18px); animation-name:swipeBounceLeft; }
+    .swipe-arrow-right{ right:clamp(8px,3vw,18px); animation-name:swipeBounceRight; }
+  }
+  .swipe-arrow.faded{ opacity:0 !important; animation:none; transition:opacity .3s ease; }
+  @keyframes swipeBounceLeft{
+    0%{ transform:translateY(-50%) translateX(6px); opacity:0; }
+    15%{ opacity:0.65; }
+    50%{ transform:translateY(-50%) translateX(-6px); opacity:0.85; }
+    85%{ opacity:0.65; }
+    100%{ transform:translateY(-50%) translateX(6px); opacity:0; }
+  }
+  @keyframes swipeBounceRight{
+    0%{ transform:translateY(-50%) translateX(-6px); opacity:0; }
+    15%{ opacity:0.65; }
+    50%{ transform:translateY(-50%) translateX(6px); opacity:0.85; }
+    85%{ opacity:0.65; }
+    100%{ transform:translateY(-50%) translateX(-6px); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .swipe-arrow{ animation:none !important; opacity:0.45; transform:translateY(-50%); }
+  }
+
   .overlay{ position:fixed; inset:0; z-index:10; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:clamp(24px,6vw,64px); overflow-y:auto; opacity:0; pointer-events:none; transform:translateY(10px); transition:opacity .3s ease, transform .3s ease; }
   .overlay.open{ opacity:1; pointer-events:auto; transform:translateY(0); }
   .overlay-close{ position:absolute; top:clamp(16px,4vw,32px); right:clamp(16px,4vw,32px); width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:none; color:var(--ink); font-size:18px; cursor:pointer; }
@@ -74,6 +103,10 @@
       <button class="about-link" id="about-trigger" type="button">About</button>
     </div>
     <div id="nav-hint"><span>Arrastra para explorar</span></div>
+    <div id="swipe-hint" aria-hidden="true">
+      <span class="swipe-arrow swipe-arrow-left">&#8249;</span>
+      <span class="swipe-arrow swipe-arrow-right">&#8250;</span>
+    </div>
     <div id="caption">
       <button id="caption-btn" type="button">
         <span id="caption-name">Taller Express</span>
@@ -211,6 +244,7 @@
     var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 
     var CARD_W = 1.7, CARD_H = CARD_W / POSTER_ASPECT, SPACING = 2.35;
+    var MOBILE_PEEK_RATIO = 0.16; // fraccion de CARD_W que se asoma de la tarjeta vecina en pantallas angostas
     var COUNT = SPECIMENS.length;
     var TOTAL = SPACING * COUNT;
 
@@ -288,9 +322,19 @@
     function fitCamera(){
       var w = stage.clientWidth, h = stage.clientHeight;
       renderer.setSize(w,h,false);
-      camera.aspect = w/h;
       var aspect = w/h;
-      camera.position.z = aspect < 0.85 ? 5.2/Math.max(aspect,0.42)*0.72 : 5.2;
+      camera.aspect = aspect;
+      if(aspect < 0.85){
+        // pantallas angostas: acomoda el zoom para que se asome un pedacito
+        // de la tarjeta vecina a cada lado (indicador de carrusel), en vez
+        // de encuadrar la tarjeta activa a todo lo ancho.
+        var halfTanV = Math.tan((camera.fov / 2) * Math.PI / 180);
+        var neighborEdge = SPACING - CARD_W / 2;
+        var peek = CARD_W * MOBILE_PEEK_RATIO;
+        camera.position.z = (neighborEdge + peek) / (halfTanV * aspect);
+      } else {
+        camera.position.z = 5.2;
+      }
       camera.updateProjectionMatrix();
     }
     fitCamera();
@@ -371,7 +415,11 @@
     }, { passive:false });
 
     var hintFaded = false;
-    function fadeHint(){ if(hintFaded) return; hintFaded = true; document.getElementById('nav-hint').style.opacity = 0; }
+    function fadeHint(){
+      if(hintFaded) return; hintFaded = true;
+      document.getElementById('nav-hint').style.opacity = 0;
+      document.querySelectorAll('.swipe-arrow').forEach(function(el){ el.classList.add('faded'); });
+    }
     stage.addEventListener('pointerdown', fadeHint);
 
     var captionName = document.getElementById('caption-name');
