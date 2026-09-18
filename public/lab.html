@@ -66,14 +66,18 @@
   #pagination{ display:flex; justify-content:center; align-items:center; gap:7px; margin-bottom:12px; }
   #pagination .dot{ width:5px; height:5px; border-radius:50%; background:var(--line); transition:background .25s ease, transform .25s ease; flex:0 0 auto; }
   #pagination .dot.active{ background:var(--accent); transform:scale(1.7); }
-  #caption-btn{ background:none; border:none; padding:0; margin:0; font:inherit; cursor:pointer; text-align:center; }
+  /* #caption-btn es un link directo al sitio real del specimen activo (ver
+     setActive) -- sin url todavia (aria-disabled) no navega a ningun lado. */
+  #caption-btn{ display:block; background:none; border:none; padding:0; margin:0; font:inherit; text-align:center; text-decoration:none; color:inherit; cursor:pointer; }
+  #caption-btn[aria-disabled="true"]{ cursor:default; }
   #caption-name{
     display:block; font-family:var(--mono); font-size:11px; font-weight:600;
     letter-spacing:0.14em; text-transform:uppercase; color:var(--accent);
     transition:opacity .2s ease, color .2s ease;
   }
   #caption-desc{ display:block; font-size:15px; color:var(--ink); opacity:0.82; line-height:1.5; margin-top:8px; transition:opacity .2s ease; }
-  #caption-btn:hover #caption-name, #caption-btn:focus-visible #caption-name{ text-decoration:underline; text-underline-offset:4px; }
+  #caption-btn:not([aria-disabled="true"]):hover #caption-name,
+  #caption-btn:not([aria-disabled="true"]):focus-visible #caption-name{ text-decoration:underline; text-underline-offset:4px; }
 
   #nav-hint{ position:absolute; top:clamp(20px,5vw,32px); right:clamp(20px,5vw,48px); font-size:11px; color:var(--muted); letter-spacing:0.02em; text-align:right; max-width:180px; transition:opacity .6s ease; }
 
@@ -112,28 +116,6 @@
   .overlay-close:hover{ border-color:var(--ink); }
   .overlay-inner{ max-width:640px; width:100%; text-align:center; }
   .kicker{ display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin:0 0 16px; }
-  .overlay-name{ font-size:clamp(26px,5vw,40px); font-weight:600; margin:0 0 20px; }
-  .shot-row{ display:flex; gap:14px; overflow-x:auto; margin:0 auto 22px; padding-bottom:6px; justify-content:center; }
-  .shot{
-    position:relative; flex:0 0 auto; width:min(220px,60vw); aspect-ratio:16/10;
-    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-size:11px; letter-spacing:0.04em; color:var(--muted); background:var(--bg-deep);
-    overflow:hidden;
-  }
-  /* esquina doblada tipo "dog-ear" -- mismo gesto de papel fisico que el
-     borde rasgado de las tarjetas y el caption, aplicado a los placeholders. */
-  .shot::after{
-    content:''; position:absolute; top:0; right:0; width:16px; height:16px;
-    background:linear-gradient(135deg, transparent 50%, var(--line) 50%);
-  }
-  .overlay-desc{ font-size:14px; line-height:1.7; color:var(--ink); max-width:56ch; margin:0 auto 26px; }
-  .overlay-link{
-    display:inline-block; font-weight:600; font-size:14px; color:#fff; background:var(--accent);
-    padding:11px 22px; border-radius:999px; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 6px 16px rgba(232,93,44,0.28);
-  }
-  .overlay-link:hover, .overlay-link:focus-visible{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(232,93,44,0.36); }
-  .overlay-link.is-empty{ display:none; }
 
   .about-card{
     position:relative; background:var(--bg-deep); margin:0 auto;
@@ -171,10 +153,10 @@
     </div>
     <div id="caption">
       <div id="pagination" aria-hidden="true"></div>
-      <button id="caption-btn" type="button">
+      <a id="caption-btn" target="_blank" rel="noopener">
         <span id="caption-name">Taller Express</span>
         <span id="caption-desc">Contenido y un asistente de IA para el mantenimiento de tu carro en El Salvador.</span>
-      </button>
+      </a>
     </div>
   </div>
 
@@ -185,17 +167,6 @@
         <p class="kicker">Denysoft &middot; About</p>
         <p class="about-message">Denysoft es un estudio de diseño y desarrollo AI-native con sede en El Salvador, trabajando con clientes en Canada y LATAM.</p>
       </div>
-    </div>
-  </div>
-
-  <div class="overlay" id="case-overlay" aria-hidden="true">
-    <button class="overlay-close" id="case-close" aria-label="Cerrar caso de estudio">&times;</button>
-    <div class="overlay-inner">
-      <p class="kicker">Caso de estudio</p>
-      <h2 class="overlay-name" id="case-name">Taller Express</h2>
-      <div class="shot-row"><div class="shot">Captura 1</div><div class="shot">Captura 2</div><div class="shot">Captura 3</div></div>
-      <p class="overlay-desc" id="case-desc"></p>
-      <a href="#" id="case-link" class="overlay-link is-empty" target="_blank" rel="noopener">Ver sitio en vivo</a>
     </div>
   </div>
 
@@ -469,7 +440,7 @@
     window.addEventListener('load', fitCamera);
 
     // ---------------------------------------------------------------
-    // Overlays (About + Case study)
+    // Overlay (About)
     // ---------------------------------------------------------------
     var overlayOpen = false, currentOverlay = null;
     function escHandler(e){ if(e.key==='Escape' && currentOverlay){ closeOverlay(currentOverlay); } }
@@ -480,16 +451,12 @@
     document.getElementById('about-trigger').addEventListener('click', function(){ openOverlay(aboutOverlay); });
     document.getElementById('about-close').addEventListener('click', function(){ closeOverlay(aboutOverlay); });
 
-    var caseOverlay = document.getElementById('case-overlay');
-    document.getElementById('case-close').addEventListener('click', function(){ closeOverlay(caseOverlay); });
-    document.getElementById('caption-btn').addEventListener('click', function(){
-      var spec = SPECIMENS[lastActive < 0 ? 0 : lastActive];
-      document.getElementById('case-name').textContent = spec.name;
-      document.getElementById('case-desc').textContent = spec.caseStudy.desc;
-      var link = document.getElementById('case-link');
-      if(spec.caseStudy.url){ link.href = spec.caseStudy.url; link.classList.remove('is-empty'); }
-      else { link.removeAttribute('href'); link.classList.add('is-empty'); }
-      openOverlay(caseOverlay);
+    // El caption ya no abre una ventana de "caso de estudio" -- es un link
+    // directo al sitio real del specimen activo (ver setActive). Sin url
+    // todavia queda deshabilitado (aria-disabled), no manda a ningun lado.
+    var captionBtn = document.getElementById('caption-btn');
+    captionBtn.addEventListener('click', function(e){
+      if(captionBtn.getAttribute('aria-disabled') === 'true') e.preventDefault();
     });
 
     // ---------------------------------------------------------------
@@ -578,6 +545,15 @@
         captionName.style.opacity = 1; captionDesc.style.opacity = 1;
       }, 150);
       dots.forEach(function(d, idx){ d.classList.toggle('active', idx === i); });
+
+      var url = spec.caseStudy && spec.caseStudy.url;
+      if(url){
+        captionBtn.href = url;
+        captionBtn.removeAttribute('aria-disabled');
+      } else {
+        captionBtn.removeAttribute('href');
+        captionBtn.setAttribute('aria-disabled', 'true');
+      }
     }
 
     // ---------------------------------------------------------------
