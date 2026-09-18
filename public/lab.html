@@ -66,18 +66,26 @@
   #pagination{ display:flex; justify-content:center; align-items:center; gap:7px; margin-bottom:12px; }
   #pagination .dot{ width:5px; height:5px; border-radius:50%; background:var(--line); transition:background .25s ease, transform .25s ease; flex:0 0 auto; }
   #pagination .dot.active{ background:var(--accent); transform:scale(1.7); }
-  /* #caption-btn es un link directo al sitio real del specimen activo (ver
-     setActive) -- sin url todavia (aria-disabled) no navega a ningun lado. */
-  #caption-btn{ display:block; background:none; border:none; padding:0; margin:0; font:inherit; text-align:center; text-decoration:none; color:inherit; cursor:pointer; }
-  #caption-btn[aria-disabled="true"]{ cursor:default; }
+  /* #caption-name es un link directo al sitio real del specimen activo (ver
+     setActive) -- sin url todavia (aria-disabled) se ve igual pero sin
+     flecha/subrayado ni cursor de link, para no prometer algo que no hace. */
   #caption-name{
-    display:block; font-family:var(--mono); font-size:11px; font-weight:600;
-    letter-spacing:0.14em; text-transform:uppercase; color:var(--accent);
-    transition:opacity .2s ease, color .2s ease;
+    display:inline-block; font-family:var(--mono); font-size:17px; font-weight:700;
+    letter-spacing:0.03em; text-transform:uppercase; color:var(--accent);
+    text-decoration:none; transition:opacity .2s ease, color .2s ease;
   }
-  #caption-desc{ display:block; font-size:15px; color:var(--ink); opacity:0.82; line-height:1.5; margin-top:8px; transition:opacity .2s ease; }
-  #caption-btn:not([aria-disabled="true"]):hover #caption-name,
-  #caption-btn:not([aria-disabled="true"]):focus-visible #caption-name{ text-decoration:underline; text-underline-offset:4px; }
+  #caption-name::after{
+    content:'\2197'; display:inline-block; margin-left:5px; font-size:0.8em;
+    transition:transform .15s ease;
+  }
+  #caption-name:not([aria-disabled="true"]){ text-decoration:underline; text-underline-offset:5px; cursor:pointer; }
+  #caption-name:not([aria-disabled="true"]):hover,
+  #caption-name:not([aria-disabled="true"]):focus-visible{ opacity:0.72; }
+  #caption-name:not([aria-disabled="true"]):hover::after,
+  #caption-name:not([aria-disabled="true"]):focus-visible::after{ transform:translate(2px,-2px); }
+  #caption-name[aria-disabled="true"]{ cursor:default; }
+  #caption-name[aria-disabled="true"]::after{ display:none; }
+  #caption-desc{ display:block; font-size:15px; color:var(--ink); opacity:0.82; line-height:1.5; margin:8px 0 0; transition:opacity .2s ease; }
 
   #nav-hint{ position:absolute; top:clamp(20px,5vw,32px); right:clamp(20px,5vw,48px); font-size:11px; color:var(--muted); letter-spacing:0.02em; text-align:right; max-width:180px; transition:opacity .6s ease; }
 
@@ -153,10 +161,8 @@
     </div>
     <div id="caption">
       <div id="pagination" aria-hidden="true"></div>
-      <a id="caption-btn" target="_blank" rel="noopener">
-        <span id="caption-name">Taller Express</span>
-        <span id="caption-desc">Contenido y un asistente de IA para el mantenimiento de tu carro en El Salvador.</span>
-      </a>
+      <a id="caption-name" target="_blank" rel="noopener">Taller Express</a>
+      <p id="caption-desc">Contenido y un asistente de IA para el mantenimiento de tu carro en El Salvador.</p>
     </div>
   </div>
 
@@ -451,14 +457,6 @@
     document.getElementById('about-trigger').addEventListener('click', function(){ openOverlay(aboutOverlay); });
     document.getElementById('about-close').addEventListener('click', function(){ closeOverlay(aboutOverlay); });
 
-    // El caption ya no abre una ventana de "caso de estudio" -- es un link
-    // directo al sitio real del specimen activo (ver setActive). Sin url
-    // todavia queda deshabilitado (aria-disabled), no manda a ningun lado.
-    var captionBtn = document.getElementById('caption-btn');
-    captionBtn.addEventListener('click', function(e){
-      if(captionBtn.getAttribute('aria-disabled') === 'true') e.preventDefault();
-    });
-
     // ---------------------------------------------------------------
     // Drag / momentum / snap / wheel / hover-raycast -- motor original
     // ---------------------------------------------------------------
@@ -525,6 +523,11 @@
 
     var captionName = document.getElementById('caption-name');
     var captionDesc = document.getElementById('caption-desc');
+    // sin url todavia (aria-disabled) el nombre no manda a ningun lado --
+    // ver setActive, que rellena caseStudy.url por specimen.
+    captionName.addEventListener('click', function(e){
+      if(captionName.getAttribute('aria-disabled') === 'true') e.preventDefault();
+    });
 
     var paginationEl = document.getElementById('pagination');
     var dots = SPECIMENS.map(function(){
@@ -548,11 +551,11 @@
 
       var url = spec.caseStudy && spec.caseStudy.url;
       if(url){
-        captionBtn.href = url;
-        captionBtn.removeAttribute('aria-disabled');
+        captionName.href = url;
+        captionName.removeAttribute('aria-disabled');
       } else {
-        captionBtn.removeAttribute('href');
-        captionBtn.setAttribute('aria-disabled', 'true');
+        captionName.removeAttribute('href');
+        captionName.setAttribute('aria-disabled', 'true');
       }
     }
 
