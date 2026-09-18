@@ -33,8 +33,13 @@
   .about-link:hover, .about-link:focus-visible{ color:var(--ink); }
 
   #caption{
+    /* width explicito -- con solo "left:50%" (sin "right") el shrink-to-fit
+       de un absolute usa como disponible unicamente el espacio a la derecha
+       de "left" (la mitad de la pantalla), no el ancho completo, y el cuadro
+       queda angosto de mas envolviendo el texto en muchas lineas. */
     position:absolute; bottom:clamp(24px,6vw,48px); left:50%; transform:translateX(-50%);
-    text-align:center; max-width:360px;
+    width:min(92vw, 360px);
+    text-align:center;
     background:rgba(241,238,231,0.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     padding:14px 26px; border-radius:16px;
     box-shadow:0 8px 24px rgba(51,46,39,0.08);
@@ -320,16 +325,34 @@
     }
     buildCards();
 
+    var TOP_GAP_FRACTION = 0.14; // pantallas angostas: cuanto del alto de pantalla queda libre arriba de la tarjeta activa
+    var ACTIVE_CARD_SCALE = 1.14; // debe igualar el boost de escala que aplica animate() cuando centerFactor=1 (tarjeta activa en reposo)
+
     function fitCamera(){
       var w = stage.clientWidth, h = stage.clientHeight;
       renderer.setSize(w,h,false);
       var aspect = w/h;
       camera.aspect = aspect;
-      camera.position.z = aspect < 0.85 ? 5.2/Math.max(aspect,0.42)*0.72 : 5.2;
-      // pantallas angostas: el header y el caption son overlays fijos que no
-      // reservan espacio real, asi que el centrado vertical por defecto deja
-      // un hueco grande arriba. Bajamos la camara para subir la tarjeta.
-      camera.position.y = aspect < 0.85 ? -0.68 : 0;
+      var z = aspect < 0.85 ? 5.2/Math.max(aspect,0.42)*0.72 : 5.2;
+      camera.position.z = z;
+      if(aspect < 0.85){
+        // el header y el caption son overlays fijos que no reservan espacio
+        // real, asi que el centrado vertical por defecto deja un hueco
+        // desproporcionado arriba (o, en telefonos con aspecto menos angosto,
+        // puede llegar a tapar el header). En vez de un offset fijo en
+        // unidades de mundo (que no escala igual en todos los aspectos),
+        // resolvemos camera.position.y para que el borde superior de la
+        // tarjeta activa quede siempre a TOP_GAP_FRACTION del alto de
+        // pantalla, sin importar el aspecto real del dispositivo.
+        var halfTanV = Math.tan((camera.fov / 2) * Math.PI / 180);
+        var cardTopY = (CARD_H / 2) * ACTIVE_CARD_SCALE;
+        var depth = z - 0.32; // z aproximado de la tarjeta activa en su punto de mayor "bulge"
+        var halfHeightAtDepth = depth * halfTanV;
+        var ndcTarget = 1 - 2 * TOP_GAP_FRACTION;
+        camera.position.y = cardTopY - ndcTarget * halfHeightAtDepth;
+      } else {
+        camera.position.y = 0;
+      }
       camera.updateProjectionMatrix();
       spacingScale = aspect < 0.85 ? MOBILE_SPACING_SCALE : 1;
     }
