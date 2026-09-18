@@ -376,10 +376,18 @@
     var DRAG_SENS = 0.0062, lastActive = -1;
     var raycaster = new THREE.Raycaster();
     var pointerNDC = new THREE.Vector2(-10,-10);
+    // en touch no existe "hover" real -- mientras el dedo esta apoyado y no se
+    // ha movido lo suficiente para contar como arrastre, lo tratamos como
+    // "presionar para ver" (equivalente al hover de mouse). PRESS_TOLERANCE
+    // esta en pixeles de pantalla.
+    var PRESS_TOLERANCE = 8, dragStartX = 0, dragStartY = 0, dragMoved = false;
 
     function pointerDown(e){
       if(overlayOpen) return;
       dragging = true; lastX = e.clientX; momentum = 0;
+      dragStartX = e.clientX; dragStartY = e.clientY; dragMoved = false;
+      pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
       stage.classList.add('dragging');
       if(stage.setPointerCapture && e.pointerId != null){ try{ stage.setPointerCapture(e.pointerId); }catch(err){} }
     }
@@ -387,13 +395,20 @@
       pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
       if(!dragging) return;
+      if(!dragMoved){
+        var moved = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+        if(moved > PRESS_TOLERANCE) dragMoved = true;
+      }
       var dx = e.clientX - lastX; lastX = e.clientX;
       offset += dx * DRAG_SENS;
       velocitySmoothed += (dx*0.05 - velocitySmoothed) * 0.4;
     }
-    function pointerUp(){
+    function pointerUp(e){
       if(!dragging) return;
       dragging = false; stage.classList.remove('dragging');
+      // el touch no deja un "cursor" apoyado tras soltar -- sin esto la
+      // ultima posicion tocada se quedaria marcada como hover indefinidamente.
+      if(e && e.pointerType === 'touch') pointerNDC.set(-10,-10);
       momentum = velocitySmoothed * 0.55;
       snapTarget = null;
     }
@@ -480,7 +495,7 @@
       }
 
       var hoveredMesh = null;
-      if(!dragging && !overlayOpen){
+      if((!dragging || !dragMoved) && !overlayOpen){
         raycaster.setFromCamera(pointerNDC, camera);
         var hits = raycaster.intersectObjects(cards);
         if(hits.length) hoveredMesh = hits[0].object;
