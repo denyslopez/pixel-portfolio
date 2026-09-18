@@ -341,19 +341,21 @@
       'uniform sampler2D uMapB;',
       'uniform float uCenter;',
       'uniform float uHover;',
+      'uniform float uFade;',
       'void main(){',
       '  vec4 texA = texture2D(uMapA, vUv);',
       '  vec4 texB = texture2D(uMapB, vUv);',
       '  vec4 tex = mix(texA, texB, uHover);',
-      // jerarquia activa/inactiva: la tarjeta central se mantiene a todo
-      // color; las vecinas (uCenter=0) se atenuan y desaturan para que el
-      // ojo vaya directo a la activa sin ambiguedad.
-      '  float inactive = 1.0 - uCenter;',
+      // jerarquia activa/inactiva: solo en pantallas angostas (uFade, ver
+      // fitCamera) porque en el carrusel de escritorio las tarjetas vecinas
+      // ya se ven completas y apagarlas se sentia mal -- ahi uFade=0 y este
+      // bloque no hace nada, queda igual que antes de este ajuste.
+      '  float inactive = (1.0 - uCenter) * uFade;',
       '  float gray = dot(tex.rgb, vec3(0.299, 0.587, 0.114));',
       '  tex.rgb = mix(tex.rgb, vec3(gray), inactive * 0.5);',
-      '  tex.rgb *= mix(0.74, 1.0, uCenter);',
+      '  tex.rgb *= mix(1.0, 0.74, inactive);',
       '  tex.rgb += uCenter * 0.04;',
-      '  gl_FragColor = vec4(tex.rgb, tex.a * mix(0.7, 1.0, uCenter));',
+      '  gl_FragColor = vec4(tex.rgb, tex.a * mix(1.0, 0.7, inactive));',
       '}'
     ].join('\n');
 
@@ -398,7 +400,8 @@
             uCenter:{ value: 0 },
             uHover:{ value: 0 },
             uVelocity:{ value: 0 },
-            uTime:{ value: 0 }
+            uTime:{ value: 0 },
+            uFade:{ value: 0 }
           },
           vertexShader: vertexShader,
           fragmentShader: fragmentShader,
@@ -450,6 +453,8 @@
       }
       camera.updateProjectionMatrix();
       spacingScale = aspect < 0.85 ? MOBILE_SPACING_SCALE : 1;
+      var fade = aspect < 0.85 ? 1 : 0;
+      cards.forEach(function(mesh){ mesh.material.uniforms.uFade.value = fade; });
     }
     fitCamera();
     // en moviles, la barra de direcciones cambia el viewport DESPUES de este
