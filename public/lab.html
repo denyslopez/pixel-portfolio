@@ -425,6 +425,7 @@
     var CARD_W = 1.7, CARD_H = CARD_W / POSTER_ASPECT, SPACING = 2.35;
     var MOBILE_SPACING_SCALE = 0.86; // pantallas angostas: acerca visualmente las tarjetas vecinas (solo en pantalla, no en la logica de drag/snap) para asomar un pedacito y sugerir carrusel, sin encoger la tarjeta activa
     var spacingScale = 1;
+    var isMobileLayout = false;
     var COUNT = SPECIMENS.length;
     var TOTAL = SPACING * COUNT;
 
@@ -564,8 +565,9 @@
         camera.position.y = 0;
       }
       camera.updateProjectionMatrix();
-      spacingScale = aspect < 0.85 ? MOBILE_SPACING_SCALE : 1;
-      var fade = aspect < 0.85 ? 1 : 0;
+      isMobileLayout = aspect < 0.85;
+      spacingScale = isMobileLayout ? MOBILE_SPACING_SCALE : 1;
+      var fade = isMobileLayout ? 1 : 0;
       cards.forEach(function(mesh){ mesh.material.uniforms.uFade.value = fade; });
     }
     fitCamera();
@@ -760,9 +762,20 @@
       return d;
     });
 
+    // en mobile no hay hover real -- "presionar para ver" (arriba) existe,
+    // pero no es un affordance obvio. Para que el efecto se descubra solo,
+    // cada vez que una tarjeta se vuelve la activa se le muestra brevemente
+    // su cara alterna (auto-reveal), sin reemplazar el press-and-hold.
+    var AUTO_REVEAL_SECONDS = 1.8;
+    var autoRevealIndex = -1, autoRevealUntil = 0;
+
     function setActive(i){
       if(i === lastActive) return;
       lastActive = i;
+      if(isMobileLayout){
+        autoRevealIndex = i;
+        autoRevealUntil = clock.getElapsedTime() + AUTO_REVEAL_SECONDS;
+      }
       var spec = SPECIMENS[i];
       captionName.style.opacity = 0; captionDesc.style.opacity = 0;
       setTimeout(function(){
@@ -848,8 +861,9 @@
         var hits = raycaster.intersectObjects(cards);
         if(hits.length) hoveredMesh = hits[0].object;
       }
+      var autoRevealing = isMobileLayout && t < autoRevealUntil;
       cards.forEach(function(mesh){
-        var target = (mesh === hoveredMesh) ? 1 : 0;
+        var target = (mesh === hoveredMesh || (autoRevealing && mesh.userData.index === autoRevealIndex)) ? 1 : 0;
         mesh.userData.hoverProgress += (target - mesh.userData.hoverProgress) * 0.15;
         mesh.material.uniforms.uHover.value = mesh.userData.hoverProgress;
       });
