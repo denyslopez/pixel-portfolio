@@ -597,10 +597,11 @@
     // vez de capas CSS. Se crea una vez (perezoso, al primer open) y el
     // loop de render solo corre mientras el overlay esta abierto.
     // ---------------------------------------------------------------
-    var aboutRenderer = null, aboutScene = null, aboutMaterial = null, aboutRAF = null, aboutClock = null;
+    var aboutRenderer = null, aboutScene = null, aboutMaterial = null, aboutRAF = null, aboutClock = null, aboutOpenAt = 0;
+    var aboutPointerTarget = new THREE.Vector2(0.5, 0.5), aboutPointerSmooth = new THREE.Vector2(0.5, 0.5);
     var ABOUT_FRAG = [
       'precision mediump float;',
-      'uniform float uTime; uniform vec2 uResolution;',
+      'uniform float uTime; uniform vec2 uResolution; uniform vec2 uPointer; uniform float uIntensity;',
       'varying vec2 vUv;',
       'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }',
       'float noise(vec2 p){',
@@ -619,8 +620,17 @@
       // corrige el aspect ratio -- sin esto el ruido se estira en pantallas
       // angostas y altas (mobile) y las formas pierden definicion.
       '  float aspect = uResolution.x / uResolution.y;',
-      '  vec2 ap = vec2((uv.x - 0.5) * max(aspect, 1.0) + 0.5, (uv.y - 0.5) * max(1.0/aspect, 1.0) + 0.5);',
-      '  vec2 p = ap * 3.0;',
+      '  vec2 asp = vec2(max(aspect, 1.0), max(1.0/aspect, 1.0));',
+      '  vec2 ap = (uv - 0.5) * asp + 0.5;',
+      '  vec2 ptr = (uPointer - 0.5) * asp + 0.5;',
+      // lente de calor: cerca del cursor/touch, el muestreo se empuja hacia
+      // afuera -- una distorsion que sigue al puntero en vez de un loop
+      // puramente pasivo (ver toPtr/lens mas abajo).
+      '  vec2 toPtr = ap - ptr;',
+      '  float distPtr = length(toPtr);',
+      '  float lens = smoothstep(0.5, 0.0, distPtr) * uIntensity;',
+      '  vec2 warpedAp = ap + toPtr * lens * 0.5;',
+      '  vec2 p = warpedAp * 3.0;',
       '  float t = uTime * 0.045;',
       '  float n = fbm(p + vec2(t, -t*0.7));',
       '  float n2 = fbm(p*1.6 - vec2(-t*0.5, t*0.32) + 4.0);',
@@ -628,9 +638,17 @@
       '  vec3 colB = vec3(0.225,0.17,0.125);',
       '  vec3 colC = vec3(0.95,0.38,0.175);',
       '  vec3 col = mix(colA, colB, smoothstep(0.16,0.8,n));',
-      '  col = mix(col, colC, smoothstep(0.5,0.92,n2) * 0.68);',
+      // capa frontal (profundidad) mezclada con blend tipo "screen" en vez de
+      // un simple mix -- dos capas de ruido a distinta escala/velocidad dan
+      // sensacion de profundidad en vez de una sola textura plana.
+      '  float front = smoothstep(0.5,0.92,n2) * 0.68;',
+      '  col = 1.0 - (1.0-col) * (1.0 - colC*front);',
+      // nucleo emisivo que sigue al puntero -- caida inverse-square, se
+      // siente como una fuente de luz real en vez de un blob difuso.
+      '  float core = 1.0 / (1.0 + distPtr*distPtr*14.0);',
+      '  col += colC * core * 0.85 * uIntensity;',
       '  float vig = smoothstep(1.05, 0.3, length(ap-0.5)*1.4);',
-      '  col *= mix(0.6, 1.05, vig);',
+      '  col *= mix(0.55, 1.05, vig);',
       '  float g = hash(uv*uResolution.xy*0.5 + uTime*60.0);',
       '  col += (g-0.5) * 0.045;',
       '  gl_FragColor = vec4(col, 1.0);',
@@ -646,7 +664,7 @@
       aboutScene = new THREE.Scene();
       aboutRenderer.userData_cam = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
       aboutMaterial = new THREE.ShaderMaterial({
-        uniforms:{ uTime:{ value:0 }, uResolution:{ value:new THREE.Vector2(1,1) } },
+        uniforms:{ uTime:{ value:0 }, uResolution:{ value:new THREE.Vector2(1,1) }, uPointer:{ value:aboutPointerSmooth }, uIntensity:{ value:1 } },
         vertexShader:ABOUT_VERT, fragmentShader:ABOUT_FRAG
       });
       aboutScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), aboutMaterial));
@@ -663,18 +681,30 @@
     }
     function aboutAnimate(){
       aboutRAF = requestAnimationFrame(aboutAnimate);
-      aboutMaterial.uniforms.uTime.value = aboutClock.getElapsedTime();
+      var elapsed = aboutClock.getElapsedTime();
+      aboutMaterial.uniforms.uTime.value = elapsed;
+      // rampa de intensidad al abrir -- el shader "enciende" en ~900ms en
+      // vez de aparecer ya al 100%, sincronizado con el reveal del texto.
+      aboutMaterial.uniforms.uIntensity.value = 0.4 + 0.6 * Math.min((elapsed - aboutOpenAt) / 0.9, 1);
+      aboutPointerSmooth.lerp(aboutPointerTarget, 0.08);
       aboutRenderer.render(aboutScene, aboutRenderer.userData_cam);
     }
     function startAboutShader(){
       initAboutShader();
       resizeAboutShader();
-      if(reducedMotion) return;
+      aboutOpenAt = aboutClock.getElapsedTime();
+      aboutPointerTarget.set(0.5, 0.5);
+      aboutPointerSmooth.set(0.5, 0.5);
+      if(reducedMotion){ aboutMaterial.uniforms.uIntensity.value = 1; resizeAboutShader(); return; }
       if(aboutRAF === null) aboutAnimate();
     }
     function stopAboutShader(){
       if(aboutRAF !== null){ cancelAnimationFrame(aboutRAF); aboutRAF = null; }
     }
+    aboutOverlay.addEventListener('pointermove', function(e){
+      var r = aboutOverlay.getBoundingClientRect();
+      aboutPointerTarget.set((e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height);
+    });
     window.addEventListener('resize', function(){ if(overlayOpen && currentOverlay === aboutOverlay) resizeAboutShader(); });
 
     document.getElementById('about-trigger').addEventListener('click', function(){ openOverlay(aboutOverlay); startAboutShader(); });
