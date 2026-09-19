@@ -123,19 +123,33 @@
   .overlay-close{ position:absolute; top:clamp(16px,4vw,32px); right:clamp(16px,4vw,32px); width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:none; color:var(--ink); font-size:18px; cursor:pointer; z-index:3; }
   .overlay-close:hover{ border-color:var(--ink); }
 
-  /* ---- Video de fondo en About: perezoso, pausable, con respaldo solido ---- */
-  .about-overlay{ background:#12100d; overflow:hidden; }
-  .about-video{
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:cover; object-position:center; z-index:0;
-    opacity:0; transition:opacity .8s ease;
+  /* ---- Fondo animado del About: gradiente calido + grano, sin video ----
+     Reemplaza el video stock anterior por una superficie coherente con el
+     resto del sitio (misma paleta y mismo ruido SVG que usa <body>), con
+     movimiento sutil via background-position (barato, sin canvas/JS). */
+  .about-overlay{ background:#241f19; overflow:hidden; }
+  .about-gradient{
+    position:absolute; inset:-12%; z-index:0;
+    background:
+      radial-gradient(ellipse at 22% 28%, rgba(232,93,44,0.38) 0%, rgba(232,93,44,0) 55%),
+      radial-gradient(ellipse at 78% 74%, rgba(241,238,231,0.16) 0%, rgba(241,238,231,0) 52%),
+      linear-gradient(160deg, #2b241c 0%, #332e27 45%, #1c1712 100%);
+    background-size:220% 220%;
+    animation:aboutGradientDrift 20s ease-in-out infinite alternate;
   }
-  .about-video.is-ready{ opacity:1; }
+  .about-grain{
+    position:absolute; inset:0; z-index:1; opacity:0.4; mix-blend-mode:overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   .about-scrim{
-    position:absolute; inset:0; z-index:1;
-    background:linear-gradient(180deg, rgba(10,9,7,0.6), rgba(10,9,7,0.78));
+    position:absolute; inset:0; z-index:2;
+    background:linear-gradient(180deg, rgba(10,9,7,0.35), rgba(10,9,7,0.6));
   }
-  .about-overlay .overlay-inner{ position:relative; z-index:2; }
+  @keyframes aboutGradientDrift{
+    0%{ background-position:0% 25%; }
+    100%{ background-position:100% 75%; }
+  }
+  .about-overlay .overlay-inner{ position:relative; z-index:3; }
   .about-overlay .overlay-close{ border-color:rgba(255,255,255,0.4); color:#fff; }
   .about-overlay .overlay-close:hover{ border-color:#fff; }
   .overlay-inner{ max-width:640px; width:100%; text-align:center; }
@@ -153,6 +167,44 @@
   .about-overlay .kicker{ color:var(--accent); }
   .about-overlay .about-message{ color:#F5F1E8; text-shadow:0 2px 14px rgba(0,0,0,0.4); }
   .about-message{ font-size:clamp(19px,3vw,26px); line-height:1.5; font-weight:500; margin:0; }
+
+  /* Trazo de acento -- eco del borde "rasgado" de las tarjetas, dibujado
+     con stroke-dashoffset cuando el overlay abre. */
+  .about-stroke{ width:88px; height:20px; margin:0 auto 14px; display:block; overflow:visible; }
+  .about-stroke path{ stroke-dasharray:170; stroke-dashoffset:170; transition:stroke-dashoffset .9s cubic-bezier(.22,.8,.28,1); }
+  .about-overlay.open .about-stroke path{ stroke-dashoffset:0; }
+
+  .about-facts{ display:flex; align-items:center; gap:16px; margin:22px 0 0; text-align:left; }
+  .about-fact{ display:flex; flex-direction:column; gap:4px; flex:0 0 auto; }
+  .about-fact span{ font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:rgba(245,241,232,0.55); }
+  .about-fact strong{ font-size:13px; font-weight:600; color:#F5F1E8; letter-spacing:0.01em; }
+  .about-fact-right{ margin-left:auto; text-align:right; }
+  .about-divider-line{ flex:1 1 auto; height:1px; background:rgba(245,241,232,0.25); }
+
+  .about-cta{
+    display:inline-flex; align-items:center; gap:6px; margin-top:26px;
+    font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:#F5F1E8; text-decoration:none; border-bottom:1px solid rgba(245,241,232,0.4); padding-bottom:2px;
+    transition:opacity .2s ease, border-color .2s ease;
+  }
+  .about-cta:hover, .about-cta:focus-visible{ opacity:0.75; border-color:#F5F1E8; }
+  .about-cta i{ font-style:normal; transition:transform .15s ease; }
+  .about-cta:hover i, .about-cta:focus-visible i{ transform:translate(2px,-2px); }
+
+  /* Reveal escalonado: cada hijo directo de .about-card entra en cascada. */
+  .about-card > *{ opacity:0; transform:translateY(10px); }
+  .about-overlay.open .about-card > *{ animation:aboutReveal .5s ease forwards; }
+  .about-overlay.open .about-card > *:nth-child(1){ animation-delay:.05s; }
+  .about-overlay.open .about-card > *:nth-child(2){ animation-delay:.13s; }
+  .about-overlay.open .about-card > *:nth-child(3){ animation-delay:.21s; }
+  .about-overlay.open .about-card > *:nth-child(4){ animation-delay:.29s; }
+  .about-overlay.open .about-card > *:nth-child(5){ animation-delay:.37s; }
+  @keyframes aboutReveal{ to{ opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce){
+    .about-gradient{ animation:none; }
+    .about-card > *{ opacity:1; transform:none; animation:none; }
+    .about-stroke path{ stroke-dashoffset:0; transition:none; }
+  }
 
   .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 </style>
@@ -185,13 +237,23 @@
   </div>
 
   <div class="overlay about-overlay" id="about-overlay" aria-hidden="true">
-    <video class="about-video" id="about-video" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <div class="about-gradient" aria-hidden="true"></div>
+    <div class="about-grain" aria-hidden="true"></div>
     <div class="about-scrim"></div>
     <button class="overlay-close" id="about-close" aria-label="Cerrar">&times;</button>
     <div class="overlay-inner">
       <div class="about-card">
+        <svg class="about-stroke" viewBox="0 0 120 24" fill="none" aria-hidden="true">
+          <path d="M4 18 C 24 4, 48 4, 66 14 C 82 22, 100 10, 116 6" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
         <p class="kicker">Denysoft &middot; About</p>
-        <p class="about-message">Denysoft es un estudio de diseño y desarrollo AI-native con sede en El Salvador, trabajando con clientes en Canada y LATAM.</p>
+        <p class="about-message">Estudio de diseño y desarrollo AI-native.</p>
+        <div class="about-facts">
+          <div class="about-fact"><span>Sede</span><strong>Canadá</strong></div>
+          <div class="about-divider-line" aria-hidden="true"></div>
+          <div class="about-fact about-fact-right"><span>Operando en</span><strong>El Salvador &middot; USA &middot; LATAM</strong></div>
+        </div>
+        <a class="about-cta" href="mailto:info@denysoft.net">Escríbenos <i aria-hidden="true">&#8599;</i></a>
       </div>
     </div>
   </div>
@@ -518,44 +580,14 @@
     // Overlay (About)
     // ---------------------------------------------------------------
     var overlayOpen = false, currentOverlay = null;
-    function escHandler(e){ if(e.key==='Escape' && currentOverlay){ if(currentOverlay === aboutOverlay) stopAboutVideo(); closeOverlay(currentOverlay); } }
+    function escHandler(e){ if(e.key==='Escape' && currentOverlay){ closeOverlay(currentOverlay); } }
     function openOverlay(el){ overlayOpen=true; currentOverlay=el; el.classList.add('open'); el.setAttribute('aria-hidden','false'); var c=el.querySelector('.overlay-close'); if(c) c.focus(); document.addEventListener('keydown', escHandler); }
     function closeOverlay(el){ overlayOpen=false; currentOverlay=null; el.classList.remove('open'); el.setAttribute('aria-hidden','true'); document.removeEventListener('keydown', escHandler); }
 
     var aboutOverlay = document.getElementById('about-overlay');
 
-    // ---------------------------------------------------------------
-    // Video de fondo en About -- carga perezosa (nada se descarga hasta
-    // que se abre el panel), se pausa al cerrar, y se desactiva solo si
-    // hay "reducir movimiento" o una conexion medida/lenta.
-    // ---------------------------------------------------------------
-    var ABOUT_VIDEO_SRC = 'https://adilo.bigcommand.com/91addba5-c452-4b1e-9f0e-b5499ddeb2aa.mp4';
-    var aboutVideo = document.getElementById('about-video');
-    var aboutVideoStarted = false;
-
-    function canAutoplayVideo(){
-      if(reducedMotion) return false;
-      var conn = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
-      if(conn && (conn.saveData || /(^|-)2g/.test(conn.effectiveType || ''))) return false;
-      return true;
-    }
-    function startAboutVideo(){
-      if(!canAutoplayVideo()) return;
-      if(!aboutVideoStarted){
-        aboutVideoStarted = true;
-        aboutVideo.addEventListener('canplay', function(){ aboutVideo.classList.add('is-ready'); }, { once:true });
-        aboutVideo.src = ABOUT_VIDEO_SRC;
-        aboutVideo.load();
-      }
-      var p = aboutVideo.play();
-      if(p && p.catch){ p.catch(function(){ /* autoplay bloqueado -- el scrim y la tarjeta ya se ven bien sin video */ }); }
-    }
-    function stopAboutVideo(){
-      aboutVideo.pause();
-    }
-
-    document.getElementById('about-trigger').addEventListener('click', function(){ openOverlay(aboutOverlay); startAboutVideo(); });
-    document.getElementById('about-close').addEventListener('click', function(){ closeOverlay(aboutOverlay); stopAboutVideo(); });
+    document.getElementById('about-trigger').addEventListener('click', function(){ openOverlay(aboutOverlay); });
+    document.getElementById('about-close').addEventListener('click', function(){ closeOverlay(aboutOverlay); });
 
     // ---------------------------------------------------------------
     // Drag / momentum / snap / wheel / hover-raycast -- motor original
