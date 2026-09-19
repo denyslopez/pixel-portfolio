@@ -796,15 +796,19 @@
     // pero no es un affordance obvio. Para que el efecto se descubra solo,
     // cada vez que una tarjeta se vuelve la activa se le muestra brevemente
     // su cara alterna (auto-reveal), sin reemplazar el press-and-hold.
-    var AUTO_REVEAL_SECONDS = 1.8;
-    var autoRevealIndex = -1, autoRevealUntil = 0;
+    // Secuencia con 3 fases perceptibles: primero se sostiene el estado base
+    // (el "antes"), luego cambia al alterno (el "despues"), y por ultimo
+    // vuelve al base -- sin el delay inicial, la transicion de entrada era
+    // casi instantanea y daba la impresion de arrancar ya en "despues".
+    var AUTO_REVEAL_DELAY = 0.35, AUTO_REVEAL_HOLD = 1.4;
+    var autoRevealIndex = -1, autoRevealSince = 0;
 
     function setActive(i){
       if(i === lastActive) return;
       lastActive = i;
       if(isMobileLayout){
         autoRevealIndex = i;
-        autoRevealUntil = clock.getElapsedTime() + AUTO_REVEAL_SECONDS;
+        autoRevealSince = clock.getElapsedTime();
       }
       var spec = SPECIMENS[i];
       captionName.style.opacity = 0; captionDesc.style.opacity = 0;
@@ -891,7 +895,8 @@
         var hits = raycaster.intersectObjects(cards);
         if(hits.length) hoveredMesh = hits[0].object;
       }
-      var autoRevealing = isMobileLayout && t < autoRevealUntil;
+      var sinceActive = t - autoRevealSince;
+      var autoRevealing = isMobileLayout && sinceActive >= AUTO_REVEAL_DELAY && sinceActive < AUTO_REVEAL_DELAY + AUTO_REVEAL_HOLD;
       cards.forEach(function(mesh){
         var target = (mesh === hoveredMesh || (autoRevealing && mesh.userData.index === autoRevealIndex)) ? 1 : 0;
         mesh.userData.hoverProgress += (target - mesh.userData.hoverProgress) * 0.15;
