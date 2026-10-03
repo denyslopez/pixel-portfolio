@@ -78,6 +78,29 @@ let browser;
 try {
   await waitForServer(`${baseUrl}/en`);
 
+  // DENYSOFT-RP-WP-001 — Root Routing Contract Regression Guard
+  // The current Product intentionally serves the standalone Lab prototype at "/"
+  // through a beforeFiles rewrite while the canonical bilingual App Router
+  // experience remains available at /en and /es. Guard that Product truth
+  // without changing the routing implementation itself.
+  const rootResponse = await fetch(`${baseUrl}/`);
+  invariant(rootResponse.ok, `root route failed with HTTP ${rootResponse.status}`);
+  invariant(new URL(rootResponse.url).pathname === "/", `root route unexpectedly redirected to ${rootResponse.url}`);
+  const rootHtml = await rootResponse.text();
+
+  const labResponse = await fetch(`${baseUrl}/lab.html`);
+  invariant(labResponse.ok, `lab.html failed with HTTP ${labResponse.status}`);
+  const labHtml = await labResponse.text();
+  invariant(rootHtml === labHtml, "root route no longer resolves to the governed Lab prototype");
+
+  for (const locale of ["en", "es"]) {
+    const localeResponse = await fetch(`${baseUrl}/${locale}`);
+    invariant(localeResponse.ok, `/${locale} failed with HTTP ${localeResponse.status}`);
+    invariant(new URL(localeResponse.url).pathname === `/${locale}`, `/${locale} unexpectedly redirected to ${localeResponse.url}`);
+    const localeHtml = await localeResponse.text();
+    invariant(localeHtml !== labHtml, `/${locale} was replaced by the Lab prototype`);
+  }
+
   const robotsResponse = await fetch(`${baseUrl}/robots.txt`);
   invariant(robotsResponse.ok, "robots.txt is not available");
   const robotsText = await robotsResponse.text();
